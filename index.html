@@ -115,12 +115,12 @@
           }
         }
         
-        // Update hero image
-        const heroImg = document.querySelector('.hero-image');
-        if (heroImg) {
-          const saved = localStorage.getItem('image_hero');
-          if (saved) heroImg.src = saved;
-        }
+        // Update hero images
+        const heroImgs = document.querySelectorAll('.hero-image');
+        heroImgs.forEach((img, index) => {
+          const saved = localStorage.getItem(`image_hero${index + 1}`);
+          if (saved) img.src = saved;
+        });
         
         // Update map image
         const mapImg = document.querySelector('.location-map img');
@@ -219,7 +219,10 @@
     <div class="hero-visual">
       <div class="hero-image-wrapper">
         <div class="image-glow"></div>
-        <img src="img/hero.png" alt="L'Esthétique Vespucci" class="hero-image">
+        <div class="hero-images-container">
+          <img src="img/1.png" alt="L'Esthétique Vespucci" class="hero-image hero-image-left">
+          <img src="img/2.png" alt="L'Esthétique Vespucci" class="hero-image hero-image-right">
+        </div>
       </div>
     </div>
   </section>
