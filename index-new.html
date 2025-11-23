@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>L'Esthétique Vespucci - Accueil</title>
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <link rel="stylesheet" href="assets/styles-new.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="animated-bg">
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+    <div class="noise-overlay"></div>
+  </div>
+
+  <!-- Geometric Shapes -->
+  <div class="geometric-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="main-nav">
+    <div class="nav-container">
+      <a href="index.html" class="logo">
+        <span class="logo-text">VESPUCCI</span>
+        <span class="logo-subtitle">ESTHÉTIQUE</span>
+      </a>
+      <div class="nav-links">
+        <a href="index-new.html" class="nav-item active">Accueil</a>
+        <a href="tarifs.html" class="nav-item">Tarifs</a>
+        <a href="femmes.html" class="nav-item">Femmes</a>
+        <a href="hommes.html" class="nav-item">Hommes</a>
+        <a href="#faq" class="nav-item">FAQ</a>
+      </div>
+      <button class="nav-toggle" id="navToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span>Excellence depuis 2020</span>
+      </div>
+      <h1 class="hero-title">
+        <span class="title-line">L'ART DE</span>
+        <span class="title-line highlight">VOTRE BEAUTÉ</span>
+        <span class="title-line">RÉVÉLÉ</span>
+      </h1>
+      <p class="hero-description">
+        Un salon où l'expertise rencontre l'élégance. 
+        Chaque coupe est une œuvre d'art, chaque client une priorité.
+      </p>
+      <div class="hero-cta">
+        <a href="#" class="btn btn-primary" id="openBookingModal">
+          <span>Réserver</span>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <a href="#services" class="btn btn-secondary">
+          <span>Découvrir</span>
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-number" data-target="5000">0</div>
+          <div class="stat-label">Clients satisfaits</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" data-target="15">0</div>
+          <div class="stat-label">Années d'expérience</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" data-target="100">0</div>
+          <div class="stat-label">% Satisfaction</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-image-wrapper">
+        <div class="image-glow"></div>
+        <img src="img/hero.png" alt="L'Esthétique Vespucci" class="hero-image">
+        <div class="floating-card card-1">
+          <div class="card-icon">✂️</div>
+          <div class="card-text">Coupe sur mesure</div>
+        </div>
+        <div class="floating-card card-2">
+          <div class="card-icon">💇</div>
+          <div class="card-text">Style unique</div>
+        </div>
+        <div class="floating-card card-3">
+          <div class="card-icon">✨</div>
+          <div class="card-text">Expertise premium</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery Carousel -->
+  <section class="gallery-section">
+    <div class="section-header">
+      <span class="section-tag">Galerie</span>
+      <h2 class="section-title">Nos Réalisations</h2>
+    </div>
+    <div class="gallery-container">
+      <div class="gallery-track">
+        <div class="gallery-item">
+          <img src="img/carousel/1.png" alt="Réalisation 1">
+          <div class="gallery-overlay">
+            <span>Voir plus</span>
+          </div>
+        </div>
+        <div class="gallery-item">
+          <img src="img/carousel/2.png" alt="Réalisation 2">
+          <div class="gallery-overlay">
+            <span>Voir plus</span>
+          </div>
+        </div>
+        <div class="gallery-item">
+          <img src="img/carousel/3.png" alt="Réalisation 3">
+          <div class="gallery-overlay">
+            <span>Voir plus</span>
+          </div>
+        </div>
+        <div class="gallery-item">
+          <img src="img/carousel/4.png" alt="Réalisation 4">
+          <div class="gallery-overlay">
+            <span>Voir plus</span>
+          </div>
+        </div>
+        <div class="gallery-item">
+          <img src="img/carousel/5.png" alt="Réalisation 5">
+          <div class="gallery-overlay">
+            <span>Voir plus</span>
+          </div>
+        </div>
+        <div class="gallery-item">
+          <img src="img/carousel/6.png" alt="Réalisation 6">
+          <div class="gallery-overlay">
+            <span>Voir plus</span>
+          </div>
+        </div>
+        <!-- Duplicate for infinite scroll -->
+        <div class="gallery-item">
+          <img src="img/carousel/1.png" alt="Réalisation 1">
+          <div class="gallery-overlay">
+            <span>Voir plus</span>
+          </div>
+        </div>
+        <div class="gallery-item">
+          <img src="img/carousel/2.png" alt="Réalisation 2">
+          <div class="gallery-overlay">
+            <span>Voir plus</span>
+          </div>
+        </div>
+        <div class="gallery-item">
+          <img src="img/carousel/3.png" alt="Réalisation 3">
+          <div class="gallery-overlay">
+            <span>Voir plus</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section id="services" class="services-section">
+    <div class="section-header">
+      <span class="section-tag">Services</span>
+      <h2 class="section-title">Nos Catalogues</h2>
+    </div>
+    <div class="services-grid">
+      <div class="service-card" data-tilt>
+        <div class="service-number">01</div>
+        <div class="service-content">
+          <h3>Hommes</h3>
+          <p>Coupes masculines modernes et classiques, adaptées à votre style et à votre personnalité.</p>
+          <a href="hommes.html" class="service-link">
+            <span>Explorer</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+        <div class="service-bg"></div>
+      </div>
+      <div class="service-card" data-tilt>
+        <div class="service-number">02</div>
+        <div class="service-content">
+          <h3>Femmes</h3>
+          <p>Coupes féminines tendances et uniques, pour révéler votre beauté naturelle.</p>
+          <a href="femmes.html" class="service-link">
+            <span>Explorer</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+        <div class="service-bg"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team Section -->
+  <section class="team-section">
+    <div class="section-header">
+      <span class="section-tag">Équipe</span>
+      <h2 class="section-title">Rencontrez Nos Experts</h2>
+    </div>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-image-wrapper">
+          <img src="img/team/1.png" alt="Membre 1">
+          <div class="team-overlay">
+            <div class="team-social">
+              <a href="#">Instagram</a>
+              <a href="#">Facebook</a>
+            </div>
+          </div>
+        </div>
+        <div class="team-info">
+          <h3>Nom Prénom</h3>
+          <p>Directeur</p>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-image-wrapper">
+          <img src="img/team/2.png" alt="Membre 2">
+          <div class="team-overlay">
+            <div class="team-social">
+              <a href="#">Instagram</a>
+              <a href="#">Facebook</a>
+            </div>
+          </div>
+        </div>
+        <div class="team-info">
+          <h3>Nom Prénom</h3>
+          <p>Coiffeur</p>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-image-wrapper">
+          <img src="img/team/3.png" alt="Membre 3">
+          <div class="team-overlay">
+            <div class="team-social">
+              <a href="#">Instagram</a>
+              <a href="#">Facebook</a>
+            </div>
+          </div>
+        </div>
+        <div class="team-info">
+          <h3>Nom Prénom</h3>
+          <p>Coiffeuse</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Map Section -->
+  <section class="location-section">
+    <div class="section-header">
+      <span class="section-tag">Localisation</span>
+      <h2 class="section-title">Nous Trouver</h2>
+    </div>
+    <div class="location-container">
+      <div class="location-map">
+        <img src="img/map.png" alt="Carte">
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews Section -->
+  <section class="reviews-section">
+    <div class="section-header">
+      <span class="section-tag">Témoignages</span>
+      <h2 class="section-title">Ce Que Disent Nos Clients</h2>
+    </div>
+    <div class="reviews-container">
+      <div class="reviews-track">
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <h3>Service exceptionnel</h3>
+          <p>Un accueil chaleureux et un travail de qualité.</p>
+          <div class="review-author">— Client satisfait</div>
+        </div>
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <h3>Très satisfaite</h3>
+          <p>Coupe parfaite et ambiance très détendue dans le salon.</p>
+          <div class="review-author">— Client satisfait</div>
+        </div>
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <h3>Excellente expérience</h3>
+          <p>Première visite et je suis totalement conquise.</p>
+          <div class="review-author">— Client satisfait</div>
+        </div>
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <h3>Recommandé</h3>
+          <p>Service impeccable avec un résultat toujours au top.</p>
+          <div class="review-author">— Client satisfait</div>
+        </div>
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <h3>Parfait</h3>
+          <p>Ambiance conviviale et résultat professionnel à chaque visite.</p>
+          <div class="review-author">— Client satisfait</div>
+        </div>
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <h3>Très professionnel</h3>
+          <p>Équipe compétente et très à l'écoute de nos demandes.</p>
+          <div class="review-author">— Client satisfait</div>
+        </div>
+      </div>
+    </div>
+    <div class="reviews-cta">
+      <a href="#" class="btn btn-outline" id="openReviewModal">Écrire un avis</a>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="faq-section">
+    <div class="section-header">
+      <span class="section-tag">FAQ</span>
+      <h2 class="section-title">Questions Fréquentes</h2>
+    </div>
+    <div class="faq-container">
+      <div class="faq-item">
+        <div class="faq-question">
+          <h3>Quels sont vos horaires d'ouverture ?</h3>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>Nous sommes ouverts du lundi au dimanche et les horaires peuvent fluctuer. Veillez à jeter un œil régulièrement sur l'application "Services" afin d'être tenu au courant des ouvertures et fermetures.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">
+          <h3>Comment prendre rendez-vous ?</h3>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>Vous pouvez prendre rendez-vous directement via notre site web en cliquant sur le bouton "PRENDRE RENDEZ-VOUS", ou nous contacter par téléphone ou via nos réseaux sociaux. Notre équipe sera ravie de vous aider à trouver le créneau qui vous convient.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">
+          <h3>Quels moyens de paiement acceptez-vous ?</h3>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>Nous acceptons les paiements en espèces, par carte bancaire, et via les moyens de paiement disponibles dans l'application. Pour plus de détails, n'hésitez pas à nous contacter.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">
+          <h3>Ma question n'est pas listée..</h3>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>Si vous continuez à expérimenter des zones d'ombre malgré les détails présents sur notre site web, n'hésitez pas à nous rendre visite dans notre salon sur Vespucci et notre équipe veillera à ce que vous repartiez avec une réponse à chacune de vos questions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <h3>VESPUCCI</h3>
+        <p>L'Esthétique Vespucci © 2025</p>
+      </div>
+      <div class="footer-links">
+        <a href="index-new.html">Accueil</a>
+        <a href="femmes.html">Femmes</a>
+        <a href="tarifs.html">Tarifs</a>
+        <a href="hommes.html">Hommes</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Fixed CTA Button -->
+  <a href="#" class="fixed-cta" id="openFixedBookingModal">
+    <span>Réserver</span>
+  </a>
+
+  <!-- Modals -->
+  <div id="bookingModal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeBookingModal">&times;</button>
+      <h2>Prendre Rendez-vous</h2>
+      <p>Contactez-nous pour réserver votre créneau</p>
+      <p style="margin-top: 20px; color: #999;">Formulaire de réservation à configurer</p>
+    </div>
+  </div>
+
+  <div id="reviewModal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeReviewModal">&times;</button>
+      <h2>Écrire un Avis</h2>
+      <p>Partagez votre expérience avec nous</p>
+      <p style="margin-top: 20px; color: #999;">Formulaire d'avis à configurer</p>
+    </div>
+  </div>
+
+  <script src="assets/burger-menu.js" defer></script>
+  <script src="assets/faq.js" defer></script>
+  <script src="assets/reviews.js" defer></script>
+  <script>
+    // Navigation Toggle
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (navToggle) {
+      navToggle.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
+        navToggle.classList.toggle('active');
+      });
+    }
+
+    // Stats Counter Animation
+    function animateCounter(element) {
+      const target = parseInt(element.getAttribute('data-target'));
+      const duration = 2000;
+      const increment = target / (duration / 16);
+      let current = 0;
+      
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          element.textContent = target;
+          clearInterval(timer);
+        } else {
+          element.textContent = Math.floor(current);
+        }
+      }, 16);
+    }
+
+    const statsObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const statNumber = entry.target.querySelector('.stat-number');
+          if (statNumber && !statNumber.classList.contains('animated')) {
+            statNumber.classList.add('animated');
+            animateCounter(statNumber);
+          }
+        }
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.stat-item').forEach(item => {
+      statsObserver.observe(item);
+    });
+
+    // Gallery Lightbox
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    galleryItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const img = item.querySelector('img');
+        if (img) {
+          const lightbox = document.createElement('div');
+          lightbox.className = 'lightbox';
+          lightbox.innerHTML = `
+            <div class="lightbox-content">
+              <img src="${img.src}" alt="${img.alt}">
+              <button class="lightbox-close">&times;</button>
+            </div>
+          `;
+          document.body.appendChild(lightbox);
+          setTimeout(() => lightbox.classList.add('active'), 10);
+          
+          lightbox.querySelector('.lightbox-close').addEventListener('click', () => {
+            lightbox.classList.remove('active');
+            setTimeout(() => lightbox.remove(), 300);
+          });
+          
+          lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) {
+              lightbox.classList.remove('active');
+              setTimeout(() => lightbox.remove(), 300);
+            }
+          });
+        }
+      });
+    });
+
+    // Modal Handling
+    const openBookingModal = document.getElementById('openBookingModal');
+    const openFixedBookingModal = document.getElementById('openFixedBookingModal');
+    const openReviewModal = document.getElementById('openReviewModal');
+    const bookingModal = document.getElementById('bookingModal');
+    const reviewModal = document.getElementById('reviewModal');
+    const closeBookingModal = document.getElementById('closeBookingModal');
+    const closeReviewModal = document.getElementById('closeReviewModal');
+
+    function openModal(modal) {
+      if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeModal(modal) {
+      if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+
+    if (openBookingModal) openBookingModal.addEventListener('click', (e) => { e.preventDefault(); openModal(bookingModal); });
+    if (openFixedBookingModal) openFixedBookingModal.addEventListener('click', (e) => { e.preventDefault(); openModal(bookingModal); });
+    if (openReviewModal) openReviewModal.addEventListener('click', (e) => { e.preventDefault(); openModal(reviewModal); });
+    if (closeBookingModal) closeBookingModal.addEventListener('click', () => closeModal(bookingModal));
+    if (closeReviewModal) closeReviewModal.addEventListener('click', () => closeModal(reviewModal));
+
+    [bookingModal, reviewModal].forEach(modal => {
+      if (modal) {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) closeModal(modal);
+        });
+      }
+    });
+
+    // Smooth Scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href === '#') return;
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Parallax Effect
+    window.addEventListener('scroll', () => {
+      const scrolled = window.pageYOffset;
+      const heroVisual = document.querySelector('.hero-visual');
+      if (heroVisual) {
+        heroVisual.style.transform = `translateY(${scrolled * 0.3}px)`;
+      }
+    });
+
+    // 3D Tilt Effect
+    document.querySelectorAll('[data-tilt]').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = (y - centerY) / 10;
+        const rotateY = (centerX - x) / 10;
+        
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+      });
+    });
+  </script>
+</body>
+</html>
+
