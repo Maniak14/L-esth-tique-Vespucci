@@ -940,10 +940,10 @@ section {
   animation: scrollReviews 50s linear infinite;
   width: fit-content;
   padding: 0;
-  margin: 0;
+  margin: 0 0 0 auto;
   justify-content: flex-start;
   position: relative;
-  left: 0;
+  right: 0;
 }
 
 .review-card {
@@ -994,7 +994,7 @@ section {
     transform: translateX(0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translateX(calc(-50% - 2rem));
   }
 }
 
