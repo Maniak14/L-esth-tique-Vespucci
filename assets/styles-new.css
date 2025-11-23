@@ -362,10 +362,11 @@ body {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+  background: var(--surface);
   color: var(--text-primary);
-  border: none;
-  box-shadow: 0 10px 30px rgba(184, 148, 230, 0.3);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .btn-primary::before {
@@ -384,8 +385,10 @@ body {
 }
 
 .btn-primary:hover {
+  background: var(--surface-hover);
+  border-color: var(--primary-light);
   transform: translateY(-2px);
-  box-shadow: 0 15px 40px rgba(150, 100, 200, 0.5);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .btn-secondary {
