@@ -9,6 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    // Force scroll to top immediately on page load
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+  </script>
 </head>
 <body>
   <!-- Animated Background -->
@@ -411,6 +418,17 @@
   <script src="assets/faq.js" defer></script>
   <script src="assets/reviews.js" defer></script>
   <script>
+    // Force scroll to top on page load/refresh
+    window.addEventListener('beforeunload', () => {
+      window.scrollTo(0, 0);
+    });
+    
+    window.addEventListener('load', () => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
+    
     // Navigation Toggle
     const navToggle = document.getElementById('navToggle');
     const navLinks = document.querySelector('.nav-links');
@@ -539,13 +557,18 @@
     });
 
     // Parallax Effect
-    window.addEventListener('scroll', () => {
-      const scrolled = window.pageYOffset;
+    function updateParallax() {
+      const scrolled = window.pageYOffset || window.scrollY || 0;
       const heroVisual = document.querySelector('.hero-visual');
       if (heroVisual) {
         heroVisual.style.transform = `translateY(${-80 + scrolled * 0.3}px)`;
       }
-    });
+    }
+    
+    // Initialize parallax on load
+    updateParallax();
+    
+    window.addEventListener('scroll', updateParallax, { passive: true });
 
     // 3D Tilt Effect
     document.querySelectorAll('[data-tilt]').forEach(card => {
