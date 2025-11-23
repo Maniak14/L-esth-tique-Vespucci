@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>L'Esthétique Vespucci - Accueil</title>
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <link rel="stylesheet" href="assets/styles-premium.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Cursor Effect -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-follower" id="cursorFollower"></div>
+
+  <!-- Animated Grid Background -->
+  <div class="grid-background">
+    <div class="grid-lines"></div>
+    <div class="grid-dots"></div>
+  </div>
+
+  <!-- Floating Particles -->
+  <div class="particles-container" id="particles"></div>
+
+  <!-- Gradient Orbs -->
+  <div class="gradient-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav-premium">
+    <div class="nav-wrapper">
+      <div class="nav-logo">
+        <div class="logo-main">VESPUCCI</div>
+        <div class="logo-line"></div>
+        <div class="logo-sub">ESTHÉTIQUE</div>
+      </div>
+      <div class="nav-menu" id="navMenu">
+        <a href="index-premium.html" class="nav-link active" data-text="Accueil">Accueil</a>
+        <a href="tarifs.html" class="nav-link" data-text="Tarifs">Tarifs</a>
+        <a href="femmes.html" class="nav-link" data-text="Femmes">Femmes</a>
+        <a href="hommes.html" class="nav-link" data-text="Hommes">Hommes</a>
+        <a href="#faq" class="nav-link" data-text="FAQ">FAQ</a>
+      </div>
+      <button class="nav-burger" id="navBurger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero-premium">
+    <div class="hero-content-wrapper">
+      <div class="hero-badge-premium">
+        <span class="badge-text">Excellence • Élégance • Expertise</span>
+        <div class="badge-line"></div>
+      </div>
+      
+      <h1 class="hero-title-premium">
+        <span class="title-word" data-speed="0.8">L'ART</span>
+        <span class="title-word highlight" data-speed="0.6">DE LA</span>
+        <span class="title-word" data-speed="0.7">BEAUTÉ</span>
+      </h1>
+      
+      <div class="hero-subtitle">
+        <p>Où chaque coupe devient une œuvre d'art, chaque client une priorité absolue.</p>
+      </div>
+      
+      <div class="hero-actions">
+        <a href="#" class="btn-premium btn-primary-premium" id="openBookingModal">
+          <span class="btn-text">Réserver maintenant</span>
+          <div class="btn-shine"></div>
+          <svg class="btn-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </a>
+        <a href="#gallery" class="btn-premium btn-secondary-premium">
+          <span class="btn-text">Découvrir</span>
+        </a>
+      </div>
+      
+      <div class="hero-stats-premium">
+        <div class="stat-premium">
+          <div class="stat-value" data-count="5000">0</div>
+          <div class="stat-label">Clients</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-premium">
+          <div class="stat-value" data-count="15">0</div>
+          <div class="stat-label">Années</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-premium">
+          <div class="stat-value" data-count="100">0</div>
+          <div class="stat-label">% Satisfaction</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="hero-image-premium">
+      <div class="image-container">
+        <div class="image-glow-premium"></div>
+        <div class="image-border"></div>
+        <img src="img/hero.png" alt="L'Esthétique Vespucci" class="hero-img">
+        <div class="image-overlay"></div>
+      </div>
+      
+      <!-- Floating Elements -->
+      <div class="floating-element float-1">
+        <div class="float-icon">✂️</div>
+        <div class="float-text">Coupe sur mesure</div>
+      </div>
+      <div class="floating-element float-2">
+        <div class="float-icon">💎</div>
+        <div class="float-text">Service premium</div>
+      </div>
+      <div class="floating-element float-3">
+        <div class="float-icon">✨</div>
+        <div class="float-text">Expertise unique</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery Section -->
+  <section id="gallery" class="gallery-premium">
+    <div class="section-header-premium">
+      <div class="section-number">01</div>
+      <div class="section-content">
+        <span class="section-label">Galerie</span>
+        <h2 class="section-title-premium">Nos Réalisations</h2>
+        <p class="section-description">Découvrez l'excellence de notre travail à travers nos créations</p>
+      </div>
+    </div>
+    
+    <div class="gallery-grid-premium">
+      <div class="gallery-item-premium" data-index="1">
+        <div class="gallery-image-wrapper">
+          <img src="img/carousel/1.png" alt="Réalisation 1">
+          <div class="gallery-overlay-premium">
+            <div class="overlay-content">
+              <span class="overlay-title">Coupe Moderne</span>
+              <span class="overlay-subtitle">Style contemporain</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-item-premium" data-index="2">
+        <div class="gallery-image-wrapper">
+          <img src="img/carousel/2.png" alt="Réalisation 2">
+          <div class="gallery-overlay-premium">
+            <div class="overlay-content">
+              <span class="overlay-title">Style Élégant</span>
+              <span class="overlay-subtitle">Raffinement</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-item-premium" data-index="3">
+        <div class="gallery-image-wrapper">
+          <img src="img/carousel/3.png" alt="Réalisation 3">
+          <div class="gallery-overlay-premium">
+            <div class="overlay-content">
+              <span class="overlay-title">Tendance</span>
+              <span class="overlay-subtitle">Mode actuelle</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-item-premium" data-index="4">
+        <div class="gallery-image-wrapper">
+          <img src="img/carousel/4.png" alt="Réalisation 4">
+          <div class="gallery-overlay-premium">
+            <div class="overlay-content">
+              <span class="overlay-title">Classique</span>
+              <span class="overlay-subtitle">Intemporel</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-item-premium" data-index="5">
+        <div class="gallery-image-wrapper">
+          <img src="img/carousel/5.png" alt="Réalisation 5">
+          <div class="gallery-overlay-premium">
+            <div class="overlay-content">
+              <span class="overlay-title">Créatif</span>
+              <span class="overlay-subtitle">Originalité</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="gallery-item-premium" data-index="6">
+        <div class="gallery-image-wrapper">
+          <img src="img/carousel/6.png" alt="Réalisation 6">
+          <div class="gallery-overlay-premium">
+            <div class="overlay-content">
+              <span class="overlay-title">Premium</span>
+              <span class="overlay-subtitle">Luxe</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section class="services-premium">
+    <div class="section-header-premium">
+      <div class="section-number">02</div>
+      <div class="section-content">
+        <span class="section-label">Services</span>
+        <h2 class="section-title-premium">Nos Catalogues</h2>
+        <p class="section-description">Explorez nos collections dédiées</p>
+      </div>
+    </div>
+    
+    <div class="services-grid-premium">
+      <div class="service-card-premium" data-service="hommes">
+        <div class="service-number-premium">01</div>
+        <div class="service-content-premium">
+          <h3 class="service-title">Hommes</h3>
+          <p class="service-description">Coupes masculines modernes et classiques, adaptées à votre style unique.</p>
+          <a href="hommes.html" class="service-link-premium">
+            <span>Découvrir</span>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </a>
+        </div>
+        <div class="service-bg-premium"></div>
+        <div class="service-hover-effect"></div>
+      </div>
+      
+      <div class="service-card-premium" data-service="femmes">
+        <div class="service-number-premium">02</div>
+        <div class="service-content-premium">
+          <h3 class="service-title">Femmes</h3>
+          <p class="service-description">Coupes féminines tendances et uniques, pour révéler votre beauté naturelle.</p>
+          <a href="femmes.html" class="service-link-premium">
+            <span>Découvrir</span>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </a>
+        </div>
+        <div class="service-bg-premium"></div>
+        <div class="service-hover-effect"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team Section -->
+  <section class="team-premium">
+    <div class="section-header-premium">
+      <div class="section-number">03</div>
+      <div class="section-content">
+        <span class="section-label">Équipe</span>
+        <h2 class="section-title-premium">Nos Experts</h2>
+        <p class="section-description">Rencontrez les artisans de votre beauté</p>
+      </div>
+    </div>
+    
+    <div class="team-grid-premium">
+      <div class="team-card-premium">
+        <div class="team-image-container">
+          <div class="team-image-wrapper">
+            <img src="img/team/1.png" alt="Membre 1">
+            <div class="team-overlay-premium">
+              <div class="team-social-premium">
+                <a href="#" class="social-link">IG</a>
+                <a href="#" class="social-link">FB</a>
+              </div>
+            </div>
+          </div>
+          <div class="team-glow"></div>
+        </div>
+        <div class="team-info-premium">
+          <h3>Nom Prénom</h3>
+          <p>Directeur</p>
+        </div>
+      </div>
+      
+      <div class="team-card-premium">
+        <div class="team-image-container">
+          <div class="team-image-wrapper">
+            <img src="img/team/2.png" alt="Membre 2">
+            <div class="team-overlay-premium">
+              <div class="team-social-premium">
+                <a href="#" class="social-link">IG</a>
+                <a href="#" class="social-link">FB</a>
+              </div>
+            </div>
+          </div>
+          <div class="team-glow"></div>
+        </div>
+        <div class="team-info-premium">
+          <h3>Nom Prénom</h3>
+          <p>Coiffeur</p>
+        </div>
+      </div>
+      
+      <div class="team-card-premium">
+        <div class="team-image-container">
+          <div class="team-image-wrapper">
+            <img src="img/team/3.png" alt="Membre 3">
+            <div class="team-overlay-premium">
+              <div class="team-social-premium">
+                <a href="#" class="social-link">IG</a>
+                <a href="#" class="social-link">FB</a>
+              </div>
+            </div>
+          </div>
+          <div class="team-glow"></div>
+        </div>
+        <div class="team-info-premium">
+          <h3>Nom Prénom</h3>
+          <p>Coiffeuse</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Location Section -->
+  <section class="location-premium">
+    <div class="section-header-premium">
+      <div class="section-number">04</div>
+      <div class="section-content">
+        <span class="section-label">Localisation</span>
+        <h2 class="section-title-premium">Nous Trouver</h2>
+        <p class="section-description">Venez nous rendre visite</p>
+      </div>
+    </div>
+    
+    <div class="location-container-premium">
+      <div class="location-map-premium">
+        <img src="img/map.png" alt="Carte">
+        <div class="map-overlay-premium"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews Section -->
+  <section class="reviews-premium">
+    <div class="section-header-premium">
+      <div class="section-number">05</div>
+      <div class="section-content">
+        <span class="section-label">Témoignages</span>
+        <h2 class="section-title-premium">Ce Que Disent Nos Clients</h2>
+        <p class="section-description">La satisfaction avant tout</p>
+      </div>
+    </div>
+    
+    <div class="reviews-slider-premium">
+      <div class="reviews-track-premium">
+        <div class="review-card-premium">
+          <div class="review-stars-premium">★★★★★</div>
+          <h3>Service exceptionnel</h3>
+          <p>Un accueil chaleureux et un travail de qualité exceptionnelle.</p>
+          <div class="review-author-premium">— Client satisfait</div>
+        </div>
+        <div class="review-card-premium">
+          <div class="review-stars-premium">★★★★★</div>
+          <h3>Très satisfaite</h3>
+          <p>Coupe parfaite et ambiance très détendue dans le salon.</p>
+          <div class="review-author-premium">— Client satisfait</div>
+        </div>
+        <div class="review-card-premium">
+          <div class="review-stars-premium">★★★★★</div>
+          <h3>Excellente expérience</h3>
+          <p>Première visite et je suis totalement conquise.</p>
+          <div class="review-author-premium">— Client satisfait</div>
+        </div>
+        <div class="review-card-premium">
+          <div class="review-stars-premium">★★★★★</div>
+          <h3>Recommandé</h3>
+          <p>Service impeccable avec un résultat toujours au top.</p>
+          <div class="review-author-premium">— Client satisfait</div>
+        </div>
+        <div class="review-card-premium">
+          <div class="review-stars-premium">★★★★★</div>
+          <h3>Parfait</h3>
+          <p>Ambiance conviviale et résultat professionnel à chaque visite.</p>
+          <div class="review-author-premium">— Client satisfait</div>
+        </div>
+        <div class="review-card-premium">
+          <div class="review-stars-premium">★★★★★</div>
+          <h3>Très professionnel</h3>
+          <p>Équipe compétente et très à l'écoute de nos demandes.</p>
+          <div class="review-author-premium">— Client satisfait</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="reviews-cta-premium">
+      <a href="#" class="btn-premium btn-outline-premium" id="openReviewModal">Écrire un avis</a>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="faq-premium">
+    <div class="section-header-premium">
+      <div class="section-number">06</div>
+      <div class="section-content">
+        <span class="section-label">FAQ</span>
+        <h2 class="section-title-premium">Questions Fréquentes</h2>
+        <p class="section-description">Tout ce que vous devez savoir</p>
+      </div>
+    </div>
+    
+    <div class="faq-container-premium">
+      <div class="faq-item-premium">
+        <div class="faq-question-premium">
+          <h3>Quels sont vos horaires d'ouverture ?</h3>
+          <div class="faq-icon-premium">
+            <span class="icon-line"></span>
+            <span class="icon-line"></span>
+          </div>
+        </div>
+        <div class="faq-answer-premium">
+          <p>Nous sommes ouverts du lundi au dimanche et les horaires peuvent fluctuer. Veillez à jeter un œil régulièrement sur l'application "Services" afin d'être tenu au courant des ouvertures et fermetures.</p>
+        </div>
+      </div>
+      
+      <div class="faq-item-premium">
+        <div class="faq-question-premium">
+          <h3>Comment prendre rendez-vous ?</h3>
+          <div class="faq-icon-premium">
+            <span class="icon-line"></span>
+            <span class="icon-line"></span>
+          </div>
+        </div>
+        <div class="faq-answer-premium">
+          <p>Vous pouvez prendre rendez-vous directement via notre site web en cliquant sur le bouton "PRENDRE RENDEZ-VOUS", ou nous contacter par téléphone ou via nos réseaux sociaux. Notre équipe sera ravie de vous aider à trouver le créneau qui vous convient.</p>
+        </div>
+      </div>
+      
+      <div class="faq-item-premium">
+        <div class="faq-question-premium">
+          <h3>Quels moyens de paiement acceptez-vous ?</h3>
+          <div class="faq-icon-premium">
+            <span class="icon-line"></span>
+            <span class="icon-line"></span>
+          </div>
+        </div>
+        <div class="faq-answer-premium">
+          <p>Nous acceptons les paiements en espèces, par carte bancaire, et via les moyens de paiement disponibles dans l'application. Pour plus de détails, n'hésitez pas à nous contacter.</p>
+        </div>
+      </div>
+      
+      <div class="faq-item-premium">
+        <div class="faq-question-premium">
+          <h3>Ma question n'est pas listée..</h3>
+          <div class="faq-icon-premium">
+            <span class="icon-line"></span>
+            <span class="icon-line"></span>
+          </div>
+        </div>
+        <div class="faq-answer-premium">
+          <p>Si vous continuez à expérimenter des zones d'ombre malgré les détails présents sur notre site web, n'hésitez pas à nous rendre visite dans notre salon sur Vespucci et notre équipe veillera à ce que vous repartiez avec une réponse à chacune de vos questions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer-premium">
+    <div class="footer-content-premium">
+      <div class="footer-brand-premium">
+        <div class="footer-logo">VESPUCCI</div>
+        <p>L'Esthétique Vespucci © 2025</p>
+      </div>
+      <div class="footer-links-premium">
+        <a href="index-premium.html">Accueil</a>
+        <a href="femmes.html">Femmes</a>
+        <a href="tarifs.html">Tarifs</a>
+        <a href="hommes.html">Hommes</a>
+      </div>
+    </div>
+    <div class="footer-line"></div>
+  </footer>
+
+  <!-- Fixed CTA -->
+  <a href="#" class="fixed-cta-premium" id="openFixedBookingModal">
+    <span class="cta-text">Réserver</span>
+    <div class="cta-pulse"></div>
+  </a>
+
+  <!-- Modals -->
+  <div id="bookingModal" class="modal-premium">
+    <div class="modal-backdrop-premium"></div>
+    <div class="modal-content-premium">
+      <button class="modal-close-premium" id="closeBookingModal">
+        <span></span>
+        <span></span>
+      </button>
+      <h2>Prendre Rendez-vous</h2>
+      <p>Contactez-nous pour réserver votre créneau</p>
+      <p style="margin-top: 20px; color: #999;">Formulaire de réservation à configurer</p>
+    </div>
+  </div>
+
+  <div id="reviewModal" class="modal-premium">
+    <div class="modal-backdrop-premium"></div>
+    <div class="modal-content-premium">
+      <button class="modal-close-premium" id="closeReviewModal">
+        <span></span>
+        <span></span>
+      </button>
+      <h2>Écrire un Avis</h2>
+      <p>Partagez votre expérience avec nous</p>
+      <p style="margin-top: 20px; color: #999;">Formulaire d'avis à configurer</p>
+    </div>
+  </div>
+
+  <script src="assets/faq.js" defer></script>
+  <script src="assets/reviews.js" defer></script>
+  <script>
+    // Custom Cursor
+    const cursor = document.getElementById('cursor');
+    const cursorFollower = document.getElementById('cursorFollower');
+    
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+      
+      setTimeout(() => {
+        cursorFollower.style.left = e.clientX + 'px';
+        cursorFollower.style.top = e.clientY + 'px';
+      }, 100);
+    });
+    
+    document.querySelectorAll('a, button, .gallery-item-premium, .service-card-premium').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.classList.add('hover');
+        cursorFollower.classList.add('hover');
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.classList.remove('hover');
+        cursorFollower.classList.remove('hover');
+      });
+    });
+
+    // Particles
+    function createParticles() {
+      const container = document.getElementById('particles');
+      const particleCount = 50;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 5 + 's';
+        particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+        container.appendChild(particle);
+      }
+    }
+    createParticles();
+
+    // Navigation
+    const navBurger = document.getElementById('navBurger');
+    const navMenu = document.getElementById('navMenu');
+    
+    if (navBurger) {
+      navBurger.addEventListener('click', () => {
+        navBurger.classList.toggle('active');
+        navMenu.classList.toggle('active');
+      });
+    }
+
+    // Stats Counter
+    function animateCounter(el) {
+      const target = parseInt(el.getAttribute('data-count'));
+      const duration = 2000;
+      const increment = target / (duration / 16);
+      let current = 0;
+      
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          el.textContent = target;
+          clearInterval(timer);
+        } else {
+          el.textContent = Math.floor(current);
+        }
+      }, 16);
+    }
+
+    const statsObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const statValue = entry.target.querySelector('.stat-value');
+          if (statValue && !statValue.classList.contains('animated')) {
+            statValue.classList.add('animated');
+            animateCounter(statValue);
+          }
+        }
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.stat-premium').forEach(stat => {
+      statsObserver.observe(stat);
+    });
+
+    // Parallax
+    window.addEventListener('scroll', () => {
+      const scrolled = window.pageYOffset;
+      const heroImage = document.querySelector('.hero-image-premium');
+      if (heroImage) {
+        heroImage.style.transform = `translateY(${scrolled * 0.2}px)`;
+      }
+      
+      document.querySelectorAll('.orb').forEach((orb, index) => {
+        orb.style.transform = `translateY(${scrolled * (0.1 + index * 0.05)}px)`;
+      });
+    });
+
+    // Gallery Lightbox
+    document.querySelectorAll('.gallery-item-premium').forEach(item => {
+      item.addEventListener('click', () => {
+        const img = item.querySelector('img');
+        if (img) {
+          const lightbox = document.createElement('div');
+          lightbox.className = 'lightbox-premium';
+          lightbox.innerHTML = `
+            <div class="lightbox-backdrop-premium"></div>
+            <div class="lightbox-content-premium">
+              <img src="${img.src}" alt="${img.alt}">
+              <button class="lightbox-close-premium">
+                <span></span>
+                <span></span>
+              </button>
+            </div>
+          `;
+          document.body.appendChild(lightbox);
+          setTimeout(() => lightbox.classList.add('active'), 10);
+          
+          lightbox.querySelector('.lightbox-close-premium').addEventListener('click', () => {
+            lightbox.classList.remove('active');
+            setTimeout(() => lightbox.remove(), 300);
+          });
+          
+          lightbox.querySelector('.lightbox-backdrop-premium').addEventListener('click', () => {
+            lightbox.classList.remove('active');
+            setTimeout(() => lightbox.remove(), 300);
+          });
+        }
+      });
+    });
+
+    // Service Cards 3D Effect
+    document.querySelectorAll('.service-card-premium').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = (y - centerY) / 15;
+        const rotateY = (centerX - x) / 15;
+        
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+      });
+    });
+
+    // Modal Handling
+    const openBookingModal = document.getElementById('openBookingModal');
+    const openFixedBookingModal = document.getElementById('openFixedBookingModal');
+    const openReviewModal = document.getElementById('openReviewModal');
+    const bookingModal = document.getElementById('bookingModal');
+    const reviewModal = document.getElementById('reviewModal');
+    const closeBookingModal = document.getElementById('closeBookingModal');
+    const closeReviewModal = document.getElementById('closeReviewModal');
+
+    function openModal(modal) {
+      if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeModal(modal) {
+      if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+
+    if (openBookingModal) openBookingModal.addEventListener('click', (e) => { e.preventDefault(); openModal(bookingModal); });
+    if (openFixedBookingModal) openFixedBookingModal.addEventListener('click', (e) => { e.preventDefault(); openModal(bookingModal); });
+    if (openReviewModal) openReviewModal.addEventListener('click', (e) => { e.preventDefault(); openModal(reviewModal); });
+    if (closeBookingModal) closeBookingModal.addEventListener('click', () => closeModal(bookingModal));
+    if (closeReviewModal) closeReviewModal.addEventListener('click', () => closeModal(reviewModal));
+
+    [bookingModal, reviewModal].forEach(modal => {
+      if (modal) {
+        modal.querySelector('.modal-backdrop-premium')?.addEventListener('click', () => closeModal(modal));
+      }
+    });
+
+    // Smooth Scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href === '#') return;
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Text Reveal Animation
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -100px 0px'
+    };
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.section-header-premium, .service-card-premium, .team-card-premium, .review-card-premium, .faq-item-premium').forEach(el => {
+      revealObserver.observe(el);
+    });
+  </script>
+</body>
+</html>
+
