@@ -197,14 +197,16 @@ body {
   text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
+  margin-left: -0.5rem;
 }
 
 .logo-image {
-  height: 40px;
+  height: 60px;
   width: auto;
   object-fit: contain;
   flex-shrink: 0;
+  margin-right: 0.5rem;
 }
 
 .logo-text-wrapper {
