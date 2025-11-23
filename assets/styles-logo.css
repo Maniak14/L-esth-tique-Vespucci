@@ -962,6 +962,18 @@ section {
   object-position: center 3%;
 }
 
+.team-image-wrapper img[alt="Inaya Kinslow"] {
+  object-position: center 3%;
+}
+
+.team-image-wrapper img[alt="Andres Henarnandez"] {
+  object-position: center 0%;
+}
+
+.team-image-wrapper img[alt="Yoruhime Yoshikage"] {
+  object-position: center 18%;
+}
+
 .team-card:hover .team-image-wrapper img {
   transform: scale(1.1);
 }
