@@ -595,6 +595,7 @@ section {
    ============================================ */
 .gallery-section {
   padding: 6rem 2rem;
+  overflow: visible;
 }
 
 .gallery-container {
@@ -673,12 +674,14 @@ section {
    ============================================ */
 .services-section {
   padding: 6rem 2rem;
+  overflow: visible;
 }
 
 .services-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 3rem;
+  padding: 1rem 0;
 }
 
 .service-card {
@@ -896,11 +899,13 @@ section {
    ============================================ */
 .reviews-section {
   padding: 6rem 2rem;
+  overflow: visible;
 }
 
 .reviews-container {
   overflow: hidden;
   margin-bottom: 3rem;
+  padding: 1rem 0;
 }
 
 .reviews-track {
@@ -908,6 +913,7 @@ section {
   gap: 2rem;
   animation: scrollReviews 50s linear infinite;
   width: fit-content;
+  padding: 1rem 0;
 }
 
 .review-card {
