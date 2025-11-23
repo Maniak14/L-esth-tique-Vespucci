@@ -1097,7 +1097,7 @@ section {
   right: 2rem;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  justify-content: center;
   padding: 0.75rem 1.5rem;
   background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
   color: var(--text-primary);
@@ -1131,24 +1131,10 @@ section {
 .fixed-cta:hover {
   transform: translateY(-3px);
   box-shadow: 0 12px 35px rgba(184, 148, 230, 0.6), 0 0 0 8px rgba(184, 148, 230, 0.1);
-  gap: 1rem;
 }
 
 .fixed-cta:active {
   transform: translateY(-1px);
-}
-
-.cta-icon {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  transition: transform 0.3s ease;
-  position: relative;
-  z-index: 1;
-}
-
-.fixed-cta:hover .cta-icon {
-  transform: translateX(2px);
 }
 
 .cta-text {
@@ -1417,12 +1403,6 @@ section {
     bottom: 1rem;
     right: 1rem;
     font-size: 0.8rem;
-    gap: 0.5rem;
-  }
-
-  .cta-icon {
-    width: 14px;
-    height: 14px;
   }
 }
 
