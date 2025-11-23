@@ -570,6 +570,28 @@
     
     window.addEventListener('scroll', updateParallax, { passive: true });
 
+    // Hide fixed CTA button near footer
+    function handleFixedCTA() {
+      const fixedCTA = document.querySelector('.fixed-cta');
+      const footer = document.querySelector('.main-footer');
+      if (fixedCTA && footer) {
+        const footerTop = footer.offsetTop;
+        const windowBottom = window.pageYOffset + window.innerHeight;
+        const distanceToFooter = footerTop - windowBottom;
+        
+        if (distanceToFooter < 150) {
+          fixedCTA.style.opacity = '0';
+          fixedCTA.style.pointerEvents = 'none';
+        } else {
+          fixedCTA.style.opacity = '1';
+          fixedCTA.style.pointerEvents = 'auto';
+        }
+      }
+    }
+    
+    window.addEventListener('scroll', handleFixedCTA, { passive: true });
+    handleFixedCTA();
+
     // 3D Tilt Effect
     document.querySelectorAll('[data-tilt]').forEach(card => {
       card.addEventListener('mousemove', (e) => {
