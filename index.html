@@ -601,6 +601,9 @@
       // Add shuffled reviews (duplicate for seamless loop)
       const reviewsHTML = shuffledReviews.map(createReviewCard).join('');
       reviewsTrack.innerHTML = reviewsHTML + reviewsHTML;
+      
+      // Ensure animation speed remains constant
+      reviewsTrack.style.animation = 'scrollReviews 50s linear infinite';
     }
 
     // Modal Handling
