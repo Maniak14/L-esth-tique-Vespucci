@@ -1464,7 +1464,6 @@ section {
 
 .modal-close:hover {
   background: var(--surface-hover);
-  transform: rotate(90deg);
 }
 
 .modal-content h2 {
@@ -1518,8 +1517,8 @@ section {
 
 .lightbox-close {
   position: absolute;
-  top: -50px;
-  right: 0;
+  top: 20px;
+  right: 20px;
   width: 40px;
   height: 40px;
   border: none;
@@ -1531,12 +1530,12 @@ section {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease;
+  z-index: 10;
 }
 
 .lightbox-close:hover {
   background: var(--surface-hover);
-  transform: rotate(90deg);
 }
 
 /* ============================================
