@@ -338,15 +338,21 @@
     }
 
     // Create image item HTML
-    function createImageItem(config, container) {
+    function createImageItem(config, container, isCustom = false) {
       const currentImage = getCurrentImage(config);
       const item = document.createElement('div');
       item.className = 'image-item';
       item.dataset.imageId = config.id;
+      item.dataset.isCustom = isCustom;
+      
+      const deleteBtn = isCustom ? `<button class="delete-image-btn" onclick="deleteCustomImage('${config.id}')" title="Supprimer">×</button>` : '';
+      const resetBtn = !isCustom ? `<button class="remove-btn" onclick="resetImage('${config.id}')" title="Réinitialiser">×</button>` : '';
+      
       item.innerHTML = `
+        ${deleteBtn}
         <img src="${currentImage}" alt="${config.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage%3C/text%3E%3C/svg%3E'">
         <div class="image-label">${config.name}</div>
-        <button class="remove-btn" onclick="resetImage('${config.id}')" title="Réinitialiser">×</button>
+        ${resetBtn}
         <input type="text" class="input-url" placeholder="URL de l'image" value="${currentImage}" onchange="updateImageUrl('${config.id}', this.value)">
         <button class="btn-small" onclick="updateImageUrl('${config.id}', this.previousElementSibling.value)">Mettre à jour</button>
       `;
@@ -426,6 +432,44 @@
       }
     }
 
+    // Add new gallery image
+    function addNewGalleryImage() {
+      const galleryContainer = document.getElementById('galleryImages');
+      const existingImages = galleryContainer.querySelectorAll('.image-item').length;
+      const customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
+      const newId = `gallery_custom_${Date.now()}`;
+      
+      const newConfig = {
+        id: newId,
+        name: `Galerie ${existingImages + 1}`,
+        default: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E'
+      };
+      
+      customImages.push(newId);
+      localStorage.setItem('custom_gallery_images', JSON.stringify(customImages));
+      
+      createImageItem(newConfig, galleryContainer, true);
+    }
+    
+    // Delete custom image
+    function deleteCustomImage(imageId) {
+      if (confirm('Êtes-vous sûr de vouloir supprimer cette image ?')) {
+        // Remove from DOM
+        const item = document.querySelector(`[data-image-id="${imageId}"]`);
+        if (item) {
+          item.remove();
+        }
+        
+        // Remove from localStorage
+        localStorage.removeItem(`image_${imageId}`);
+        
+        // Remove from custom images list
+        const customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
+        const updated = customImages.filter(id => id !== imageId);
+        localStorage.setItem('custom_gallery_images', JSON.stringify(updated));
+      }
+    }
+    
     // Save all images
     function saveAllImages() {
       const message = document.getElementById('successMessage');
@@ -452,6 +496,21 @@
       const galleryContainer = document.getElementById('galleryImages');
       imageConfig.gallery.forEach(config => {
         createImageItem(config, galleryContainer);
+      });
+      
+      // Load custom gallery images
+      const customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
+      customImages.forEach(imageId => {
+        const saved = localStorage.getItem(`image_${imageId}`);
+        if (saved) {
+          const name = `Galerie ${galleryContainer.querySelectorAll('.image-item').length + 1}`;
+          const config = {
+            id: imageId,
+            name: name,
+            default: saved
+          };
+          createImageItem(config, galleryContainer, true);
+        }
       });
 
       // Load hero image

@@ -60,11 +60,60 @@
         
         // Update gallery images
         const galleryItems = document.querySelectorAll('.gallery-item img');
-        galleryItems.forEach((img, index) => {
-          const galleryId = `gallery${(index % 6) + 1}`;
-          const saved = localStorage.getItem(`image_${galleryId}`);
-          if (saved) img.src = saved;
+        const allGalleryImages = [];
+        
+        // Load default gallery images
+        for (let i = 1; i <= 6; i++) {
+          const saved = localStorage.getItem(`image_gallery${i}`);
+          allGalleryImages.push(saved || `img/carousel/${i}.png`);
+        }
+        
+        // Load custom gallery images
+        const customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
+        customImages.forEach(imageId => {
+          const saved = localStorage.getItem(`image_${imageId}`);
+          if (saved) {
+            allGalleryImages.push(saved);
+          }
         });
+        
+        // Update existing gallery items and add new ones if needed
+        galleryItems.forEach((img, index) => {
+          if (allGalleryImages[index]) {
+            img.src = allGalleryImages[index];
+          }
+        });
+        
+        // Add new gallery items for custom images (if more than 6)
+        if (allGalleryImages.length > 6) {
+          const galleryTrack = document.querySelector('.gallery-track');
+          if (galleryTrack) {
+            // Remove duplicates first
+            const existingItems = galleryTrack.querySelectorAll('.gallery-item');
+            const originalCount = 6;
+            const totalNeeded = allGalleryImages.length * 2; // For seamless loop
+            
+            // Add new items for custom images
+            for (let i = originalCount; i < allGalleryImages.length; i++) {
+              const newItem = document.createElement('div');
+              newItem.className = 'gallery-item';
+              newItem.innerHTML = `
+                <img src="${allGalleryImages[i]}" alt="Réalisation ${i + 1}">
+                <div class="gallery-overlay">
+                  <span>Voir plus</span>
+                </div>
+              `;
+              galleryTrack.insertBefore(newItem, galleryTrack.lastElementChild);
+            }
+            
+            // Duplicate for seamless loop
+            const itemsToDuplicate = galleryTrack.querySelectorAll('.gallery-item');
+            itemsToDuplicate.forEach(item => {
+              const clone = item.cloneNode(true);
+              galleryTrack.appendChild(clone);
+            });
+          }
+        }
         
         // Update hero image
         const heroImg = document.querySelector('.hero-image');
