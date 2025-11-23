@@ -4,7 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Admin - L'Esthétique Vespucci</title>
+  <link rel="icon" type="image/png" href="img/V.png">
   <link rel="stylesheet" href="assets/styles-logo.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    // Force scroll to top immediately on page load
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+  </script>
   <style>
     .admin-container {
       max-width: 1400px;
@@ -252,7 +263,47 @@
   </style>
 </head>
 <body>
-  <div class="admin-container">
+  <!-- Animated Background -->
+  <div class="animated-bg">
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+    <div class="noise-overlay"></div>
+  </div>
+
+  <!-- Geometric Shapes -->
+  <div class="geometric-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="main-nav">
+    <div class="nav-container">
+      <a href="index.html" class="logo">
+        <img src="img/V.png" alt="Logo Vespucci" class="logo-image">
+        <div class="logo-text-wrapper">
+          <span class="logo-text">VESPUCCI</span>
+          <span class="logo-subtitle">ESTHÉTIQUE</span>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="index.html" class="nav-item">Accueil</a>
+        <a href="tarifs.html" class="nav-item">Tarifs</a>
+        <a href="femmes.html" class="nav-item">Femmes</a>
+        <a href="hommes.html" class="nav-item">Hommes</a>
+        <a href="admin.html" class="nav-item active">Admin</a>
+      </div>
+      <button class="nav-toggle" id="navToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="admin-container" style="padding-top: 8rem;">
     <div class="admin-header">
       <h1>🔧 Administration - L'Esthétique Vespucci</h1>
       <p style="color: var(--text-secondary);">Gérez les images de votre site</p>
@@ -325,6 +376,28 @@
     <button class="save-btn" onclick="saveAllImages()">💾 Sauvegarder toutes les modifications</button>
     <div class="success-message" id="successMessage">✅ Modifications sauvegardées avec succès !</div>
   </div>
+
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <a href="index.html" class="footer-logo">
+          <img src="img/V.png" alt="Logo Vespucci" class="footer-logo-image">
+          <div class="footer-logo-text-wrapper">
+            <span class="footer-logo-text">VESPUCCI</span>
+            <span class="footer-logo-subtitle">ESTHÉTIQUE</span>
+          </div>
+        </a>
+        <p>L'Esthétique Vespucci © 2025</p>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">Accueil</a>
+        <a href="femmes.html">Femmes</a>
+        <a href="tarifs.html">Tarifs</a>
+        <a href="hommes.html">Hommes</a>
+      </div>
+    </div>
+  </footer>
 
   <script>
     // Image configuration
@@ -443,8 +516,8 @@
       item.dataset.isCustom = isCustom;
       
       const isCatalogImage = config.id.startsWith('femme_') || config.id.startsWith('homme_');
-      const isTeamMember = imageConfig.team.some(t => t.id === config.id) || isCustom && config.id.startsWith('team_');
-      const deleteBtn = (isCustom || isCatalogImage || (isTeamMember && isCustom)) ? `<button class="delete-image-btn" onclick="${isCatalogImage ? 'deleteCatalogImage' : (isTeamMember ? 'deleteTeamMember' : 'deleteCustomImage')}('${config.id}')" title="Supprimer">×</button>` : '';
+      const isTeamMember = imageConfig.team.some(t => t.id === config.id) || (isCustom && config.id.startsWith('team_'));
+      const deleteBtn = (isCustom || isCatalogImage || isTeamMember) ? `<button class="delete-image-btn" onclick="${isCatalogImage ? 'deleteCatalogImage' : (isTeamMember ? 'deleteTeamMember' : 'deleteCustomImage')}('${config.id}')" title="Supprimer">×</button>` : '';
       const resetBtn = (!isCustom && !isCatalogImage && !isTeamMember) ? `<button class="remove-btn" onclick="resetImage('${config.id}')" title="Réinitialiser">×</button>` : '';
       
       let teamFields = '';
@@ -754,6 +827,13 @@
         const teamMembers = JSON.parse(localStorage.getItem('team_members') || '[]');
         const updated = teamMembers.filter(m => m.id !== memberId);
         localStorage.setItem('team_members', JSON.stringify(updated));
+        
+        // Mark as deleted if it's a default member
+        const deletedMembers = JSON.parse(localStorage.getItem('deleted_team_members') || '[]');
+        if (!deletedMembers.includes(memberId)) {
+          deletedMembers.push(memberId);
+          localStorage.setItem('deleted_team_members', JSON.stringify(deletedMembers));
+        }
       }
     }
     
@@ -843,7 +923,19 @@
     // Prevent default drag behavior on page
     document.addEventListener('dragover', (e) => e.preventDefault());
     document.addEventListener('drop', (e) => e.preventDefault());
+    
+    // Navigation Toggle
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (navToggle) {
+      navToggle.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
+        navToggle.classList.toggle('active');
+      });
+    }
   </script>
+  <script src="assets/burger-menu.js" defer></script>
 </body>
 </html>
 

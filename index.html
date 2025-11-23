@@ -132,14 +132,19 @@
         { id: 'yoruhime', firstName: 'Yoruhime', lastName: 'Yoshikage', grade: 'Responsable Tatoueur', phone: '672-0651', imageId: 'yoruhime' }
       ];
       
-      // Merge default members with saved members
+      // Get deleted members
+      const deletedMembers = JSON.parse(localStorage.getItem('deleted_team_members') || '[]');
+      
+      // Merge default members with saved members (excluding deleted ones)
       const allMembers = [];
       defaultMembers.forEach(defaultMember => {
-        const saved = teamMembers.find(m => m.id === defaultMember.id);
-        if (saved) {
-          allMembers.push({ ...defaultMember, ...saved });
-        } else {
-          allMembers.push(defaultMember);
+        if (!deletedMembers.includes(defaultMember.id)) {
+          const saved = teamMembers.find(m => m.id === defaultMember.id);
+          if (saved) {
+            allMembers.push({ ...defaultMember, ...saved });
+          } else {
+            allMembers.push(defaultMember);
+          }
         }
       });
       
