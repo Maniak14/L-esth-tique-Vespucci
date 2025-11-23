@@ -38,25 +38,9 @@
         'gallery6': 'img/carousel/6.png'
       };
       
-      // Update team images
+      // Load team members
       document.addEventListener('DOMContentLoaded', () => {
-        // Team images mapping
-        const teamMapping = [
-          { id: 'julio', selector: 'img[alt="Julio Alvarez"]' },
-          { id: 'soren', selector: 'img[alt="Soren Wanks"]' },
-          { id: 'sun', selector: 'img[alt="Sun Price"]' },
-          { id: 'inaya', selector: 'img[alt="Inaya Kinslow"]' },
-          { id: 'andres', selector: 'img[alt="Andres Henarnandez"]' },
-          { id: 'yoruhime', selector: 'img[alt="Yoruhime Yoshikage"]' }
-        ];
-        
-        teamMapping.forEach(mapping => {
-          const saved = localStorage.getItem(`image_${mapping.id}`);
-          if (saved) {
-            const img = document.querySelector(mapping.selector);
-            if (img) img.src = saved;
-          }
-        });
+        loadTeamMembers();
         
         // Update gallery images
         const galleryItems = document.querySelectorAll('.gallery-item img');
@@ -132,6 +116,74 @@
     }
     
     loadSavedImages();
+    
+    // Load team members from localStorage
+    function loadTeamMembers() {
+      const teamGrid = document.getElementById('teamGrid');
+      if (!teamGrid) return;
+      
+      const teamMembers = JSON.parse(localStorage.getItem('team_members') || '[]');
+      const defaultMembers = [
+        { id: 'julio', firstName: 'Julio', lastName: 'Alvarez', grade: 'Patron', phone: '682-6030', imageId: 'julio' },
+        { id: 'soren', firstName: 'Soren', lastName: 'Wanks', grade: 'Co-Patron', phone: '575-5535', imageId: 'soren' },
+        { id: 'sun', firstName: 'Sun', lastName: 'Price', grade: 'DRH', phone: '740-3572', imageId: 'sun' },
+        { id: 'inaya', firstName: 'Inaya', lastName: 'Kinslow', grade: 'DRH', phone: '344-6279', imageId: 'inaya' },
+        { id: 'andres', firstName: 'Andres', lastName: 'Henarnandez', grade: 'Responsable Coiffeur', phone: '212-0212', imageId: 'andres' },
+        { id: 'yoruhime', firstName: 'Yoruhime', lastName: 'Yoshikage', grade: 'Responsable Tatoueur', phone: '672-0651', imageId: 'yoruhime' }
+      ];
+      
+      // Merge default members with saved members
+      const allMembers = [];
+      defaultMembers.forEach(defaultMember => {
+        const saved = teamMembers.find(m => m.id === defaultMember.id);
+        if (saved) {
+          allMembers.push({ ...defaultMember, ...saved });
+        } else {
+          allMembers.push(defaultMember);
+        }
+      });
+      
+      // Add custom members
+      teamMembers.forEach(member => {
+        if (member.id.startsWith('team_') && !allMembers.find(m => m.id === member.id)) {
+          allMembers.push(member);
+        }
+      });
+      
+      teamGrid.innerHTML = '';
+      allMembers.forEach(member => {
+        const imageId = member.imageId || member.id;
+        const savedImage = localStorage.getItem(`image_${imageId}`);
+        const defaultImages = {
+          'julio': 'https://i.goopics.net/pjtgz1.png',
+          'soren': 'https://i.goopics.net/8y3mgo.png',
+          'sun': 'https://i.goopics.net/t7adhn.png',
+          'inaya': 'https://i.goopics.net/zyg7y5.png',
+          'andres': 'https://i.goopics.net/xloucg.png',
+          'yoruhime': 'https://i.goopics.net/15utm9.png'
+        };
+        const imageUrl = savedImage || defaultImages[imageId] || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage%3C/text%3E%3C/svg%3E';
+        const fullName = `${member.firstName || ''} ${member.lastName || ''}`.trim() || 'Nouvel employé';
+        
+        const card = document.createElement('div');
+        card.className = 'team-card';
+        card.innerHTML = `
+          <div class="team-image-wrapper">
+            <img src="${imageUrl}" alt="${fullName}">
+            <div class="team-overlay">
+              <div class="team-social">
+                <a>${member.phone || ''}</a>
+              </div>
+            </div>
+          </div>
+          <div class="team-info">
+            <h3>${fullName}</h3>
+            <p>${member.grade || ''}</p>
+          </div>
+        `;
+        teamGrid.appendChild(card);
+      });
+    }
   </script>
 </head>
 <body>
@@ -332,91 +384,8 @@
       <span class="section-tag">Équipe</span>
       <h2 class="section-title">Rencontrez nos experts</h2>
     </div>
-    <div class="team-grid">
-      <div class="team-card">
-        <div class="team-image-wrapper">
-          <img src="https://i.goopics.net/pjtgz1.png" alt="Julio Alvarez">
-          <div class="team-overlay">
-            <div class="team-social">
-              <a>682-6030</a>
-            </div>
-          </div>
-        </div>
-        <div class="team-info">
-          <h3>Julio Alvarez</h3>
-          <p>Patron</p>
-        </div>
-      </div>
-      <div class="team-card">
-        <div class="team-image-wrapper">
-          <img src="https://i.goopics.net/8y3mgo.png" alt="Soren Wanks">
-          <div class="team-overlay">
-            <div class="team-social">
-              <a>575-5535</a>
-            </div>
-          </div>
-        </div>
-        <div class="team-info">
-          <h3>Soren Wanks</h3>
-          <p>Co-Patron</p>
-        </div>
-      </div>
-      <div class="team-card">
-        <div class="team-image-wrapper">
-          <img src="https://i.goopics.net/t7adhn.png" alt="Sun Price">
-          <div class="team-overlay">
-            <div class="team-social">
-              <a>740-3572</a>
-            </div>
-          </div>
-        </div>
-        <div class="team-info">
-          <h3>Sun Price</h3>
-          <p>DRH</p>
-        </div>
-      </div>
-      <div class="team-card">
-        <div class="team-image-wrapper">
-          <img src="https://i.goopics.net/zyg7y5.png" alt="Inaya Kinslow">
-          <div class="team-overlay">
-            <div class="team-social">
-              <a>344-6279</a>
-            </div>
-          </div>
-        </div>
-        <div class="team-info">
-          <h3>Inaya Kinslow</h3>
-          <p>DRH</p>
-        </div>
-      </div>
-      <div class="team-card">
-        <div class="team-image-wrapper">
-          <img src="https://i.goopics.net/xloucg.png" alt="Andres Henarnandez">
-          <div class="team-overlay">
-            <div class="team-social">
-              <a>212-0212</a>
-            </div>
-          </div>
-        </div>
-        <div class="team-info">
-          <h3>Andres Henarnandez</h3>
-          <p>Responsable Coiffeur</p>
-        </div>
-      </div>
-      <div class="team-card">
-        <div class="team-image-wrapper">
-          <img src="https://i.goopics.net/15utm9.png" alt="Yoruhime Yoshikage">
-          <div class="team-overlay">
-            <div class="team-social">
-              <a>672-0651</a>
-            </div>
-          </div>
-        </div>
-        <div class="team-info">
-          <h3>Yoruhime Yoshikage</h3>
-          <p>Responsable Tatoueur</p>
-        </div>
-      </div>
+    <div class="team-grid" id="teamGrid">
+      <!-- Team members will be loaded dynamically -->
     </div>
   </section>
 

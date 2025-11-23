@@ -264,6 +264,10 @@
       <div class="image-grid" id="teamImages">
         <!-- Team images will be loaded here -->
       </div>
+      <div class="add-image-btn" onclick="addNewTeamMember()" title="Ajouter un nouvel employé">
+        <div>+</div>
+        <span>Ajouter un employé</span>
+      </div>
     </div>
 
     <!-- Gallery Images Section -->
@@ -372,6 +376,64 @@
       return saved || config.default;
     }
 
+    // Get team member info
+    function getTeamMemberInfo(memberId) {
+      const teamMembers = JSON.parse(localStorage.getItem('team_members') || '[]');
+      const member = teamMembers.find(m => m.id === memberId);
+      if (member) {
+        return member;
+      }
+      // Return default info from config
+      const config = imageConfig.team.find(t => t.id === memberId);
+      if (config) {
+        const defaultInfo = {
+          'julio': { firstName: 'Julio', lastName: 'Alvarez', grade: 'Patron', phone: '682-6030' },
+          'soren': { firstName: 'Soren', lastName: 'Wanks', grade: 'Co-Patron', phone: '575-5535' },
+          'sun': { firstName: 'Sun', lastName: 'Price', grade: 'DRH', phone: '740-3572' },
+          'inaya': { firstName: 'Inaya', lastName: 'Kinslow', grade: 'DRH', phone: '344-6279' },
+          'andres': { firstName: 'Andres', lastName: 'Henarnandez', grade: 'Responsable Coiffeur', phone: '212-0212' },
+          'yoruhime': { firstName: 'Yoruhime', lastName: 'Yoshikage', grade: 'Responsable Tatoueur', phone: '672-0651' }
+        };
+        return defaultInfo[memberId] || { firstName: '', lastName: '', grade: '', phone: '' };
+      }
+      return { firstName: '', lastName: '', grade: '', phone: '' };
+    }
+
+    // Save team member info
+    function saveTeamMemberInfo(memberId, info) {
+      const teamMembers = JSON.parse(localStorage.getItem('team_members') || '[]');
+      const existingIndex = teamMembers.findIndex(m => m.id === memberId);
+      const memberData = { id: memberId, ...info };
+      
+      if (existingIndex >= 0) {
+        teamMembers[existingIndex] = memberData;
+      } else {
+        teamMembers.push(memberData);
+      }
+      
+      localStorage.setItem('team_members', JSON.stringify(teamMembers));
+    }
+    
+    // Update team member info from form fields
+    function updateTeamMemberInfo(memberId) {
+      const firstName = document.getElementById(`firstName_${memberId}`)?.value || '';
+      const lastName = document.getElementById(`lastName_${memberId}`)?.value || '';
+      const grade = document.getElementById(`grade_${memberId}`)?.value || '';
+      const phone = document.getElementById(`phone_${memberId}`)?.value || '';
+      
+      saveTeamMemberInfo(memberId, { firstName, lastName, grade, phone });
+      
+      // Update the label
+      const item = document.querySelector(`[data-image-id="${memberId}"]`);
+      if (item) {
+        const label = item.querySelector('.image-label');
+        if (label) {
+          const fullName = `${firstName} ${lastName}`.trim() || 'Nouvel employé';
+          label.textContent = fullName;
+        }
+      }
+    }
+
     // Create image item HTML
     function createImageItem(config, container, isCustom = false) {
       const currentImage = getCurrentImage(config);
@@ -381,8 +443,22 @@
       item.dataset.isCustom = isCustom;
       
       const isCatalogImage = config.id.startsWith('femme_') || config.id.startsWith('homme_');
-      const deleteBtn = (isCustom || isCatalogImage) ? `<button class="delete-image-btn" onclick="${isCatalogImage ? 'deleteCatalogImage' : 'deleteCustomImage'}('${config.id}')" title="Supprimer">×</button>` : '';
-      const resetBtn = (!isCustom && !isCatalogImage) ? `<button class="remove-btn" onclick="resetImage('${config.id}')" title="Réinitialiser">×</button>` : '';
+      const isTeamMember = imageConfig.team.some(t => t.id === config.id) || isCustom && config.id.startsWith('team_');
+      const deleteBtn = (isCustom || isCatalogImage || (isTeamMember && isCustom)) ? `<button class="delete-image-btn" onclick="${isCatalogImage ? 'deleteCatalogImage' : (isTeamMember ? 'deleteTeamMember' : 'deleteCustomImage')}('${config.id}')" title="Supprimer">×</button>` : '';
+      const resetBtn = (!isCustom && !isCatalogImage && !isTeamMember) ? `<button class="remove-btn" onclick="resetImage('${config.id}')" title="Réinitialiser">×</button>` : '';
+      
+      let teamFields = '';
+      if (isTeamMember) {
+        const memberInfo = getTeamMemberInfo(config.id);
+        teamFields = `
+          <div style="margin-top: 1rem; display: grid; gap: 0.5rem;">
+            <input type="text" class="input-url" id="firstName_${config.id}" placeholder="Prénom" value="${memberInfo.firstName || ''}" onchange="updateTeamMemberInfo('${config.id}')">
+            <input type="text" class="input-url" id="lastName_${config.id}" placeholder="Nom" value="${memberInfo.lastName || ''}" onchange="updateTeamMemberInfo('${config.id}')">
+            <input type="text" class="input-url" id="grade_${config.id}" placeholder="Grade" value="${memberInfo.grade || ''}" onchange="updateTeamMemberInfo('${config.id}')">
+            <input type="text" class="input-url" id="phone_${config.id}" placeholder="Téléphone" value="${memberInfo.phone || ''}" onchange="updateTeamMemberInfo('${config.id}')">
+          </div>
+        `;
+      }
       
       item.innerHTML = `
         ${deleteBtn}
@@ -391,6 +467,7 @@
         ${resetBtn}
         <input type="text" class="input-url" placeholder="URL de l'image" value="${currentImage}" onchange="updateImageUrl('${config.id}', this.value)">
         <button class="btn-small" onclick="updateImageUrl('${config.id}', this.previousElementSibling.value); ${(config.id.startsWith('femme_') || config.id.startsWith('homme_')) ? 'loadFemmesCatalog(); loadHommesCatalog();' : ''}">Mettre à jour</button>
+        ${teamFields}
       `;
       
       // Drag and drop
@@ -645,6 +722,41 @@
       }
     }
     
+    // Add new team member
+    function addNewTeamMember() {
+      const teamContainer = document.getElementById('teamImages');
+      const existingMembers = teamContainer.querySelectorAll('.image-item').length;
+      const newId = `team_${Date.now()}`;
+      
+      const newConfig = {
+        id: newId,
+        name: `Nouvel employé ${existingMembers + 1}`,
+        default: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E'
+      };
+      
+      // Save initial team member info
+      saveTeamMemberInfo(newId, { firstName: '', lastName: '', grade: '', phone: '' });
+      
+      createImageItem(newConfig, teamContainer, true);
+    }
+    
+    // Delete team member
+    function deleteTeamMember(memberId) {
+      if (confirm('Êtes-vous sûr de vouloir supprimer cet employé ?')) {
+        // Remove from DOM
+        const item = document.querySelector(`[data-image-id="${memberId}"]`);
+        if (item) {
+          item.remove();
+        }
+        
+        // Remove from localStorage
+        localStorage.removeItem(`image_${memberId}`);
+        const teamMembers = JSON.parse(localStorage.getItem('team_members') || '[]');
+        const updated = teamMembers.filter(m => m.id !== memberId);
+        localStorage.setItem('team_members', JSON.stringify(updated));
+      }
+    }
+    
     // Save all images
     function saveAllImages() {
       const message = document.getElementById('successMessage');
@@ -659,13 +771,35 @@
       }, 1000);
     }
 
-    // Initialize admin page
-    function initAdmin() {
-      // Load team images
+    // Load team members
+    function loadTeamMembers() {
       const teamContainer = document.getElementById('teamImages');
+      const teamMembers = JSON.parse(localStorage.getItem('team_members') || '[]');
+      const defaultMembers = imageConfig.team.map(t => t.id);
+      
+      // Load default team members
       imageConfig.team.forEach(config => {
         createImageItem(config, teamContainer);
       });
+      
+      // Load custom team members
+      teamMembers.forEach(member => {
+        if (!defaultMembers.includes(member.id) && member.id.startsWith('team_')) {
+          const savedImage = localStorage.getItem(`image_${member.id}`);
+          const config = {
+            id: member.id,
+            name: `${member.firstName || ''} ${member.lastName || ''}`.trim() || 'Nouvel employé',
+            default: savedImage || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E'
+          };
+          createImageItem(config, teamContainer, true);
+        }
+      });
+    }
+
+    // Initialize admin page
+    function initAdmin() {
+      // Load team images
+      loadTeamMembers();
 
       // Load gallery images
       const galleryContainer = document.getElementById('galleryImages');
