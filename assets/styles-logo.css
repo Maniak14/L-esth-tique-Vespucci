@@ -196,6 +196,19 @@ body {
 .logo {
   text-decoration: none;
   display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo-image {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.logo-text-wrapper {
+  display: flex;
   flex-direction: column;
   gap: 0.2rem;
 }
