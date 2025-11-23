@@ -898,14 +898,21 @@ section {
    REVIEWS SECTION
    ============================================ */
 .reviews-section {
-  padding: 6rem 2rem;
+  padding: 6rem 0;
   overflow: visible;
+}
+
+.reviews-section .section-header {
+  max-width: 1400px;
+  margin: 0 auto 4rem;
+  padding: 0 2rem;
 }
 
 .reviews-container {
   overflow: hidden;
   margin-bottom: 3rem;
   padding: 1rem 0;
+  width: 100%;
 }
 
 .reviews-track {
@@ -913,7 +920,7 @@ section {
   gap: 2rem;
   animation: scrollReviews 50s linear infinite;
   width: fit-content;
-  padding: 1rem 0;
+  padding: 1rem 2rem;
 }
 
 .review-card {
@@ -970,6 +977,9 @@ section {
 
 .reviews-cta {
   text-align: center;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
 }
 
 /* ============================================
