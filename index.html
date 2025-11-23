@@ -15,6 +15,74 @@
       history.scrollRestoration = 'manual';
     }
     window.scrollTo(0, 0);
+    
+    // Load images from localStorage (admin changes)
+    function loadSavedImages() {
+      // Team images
+      const teamImages = {
+        'julio': 'https://i.goopics.net/pjtgz1.png',
+        'soren': 'https://i.goopics.net/8y3mgo.png',
+        'sun': 'https://i.goopics.net/t7adhn.png',
+        'inaya': 'https://i.goopics.net/zyg7y5.png',
+        'andres': 'https://i.goopics.net/xloucg.png',
+        'yoruhime': 'https://i.goopics.net/15utm9.png'
+      };
+      
+      // Gallery images
+      const galleryImages = {
+        'gallery1': 'img/carousel/1.png',
+        'gallery2': 'img/carousel/2.png',
+        'gallery3': 'img/carousel/3.png',
+        'gallery4': 'img/carousel/4.png',
+        'gallery5': 'img/carousel/5.png',
+        'gallery6': 'img/carousel/6.png'
+      };
+      
+      // Update team images
+      document.addEventListener('DOMContentLoaded', () => {
+        // Team images mapping
+        const teamMapping = [
+          { id: 'julio', selector: 'img[alt="Julio Alvarez"]' },
+          { id: 'soren', selector: 'img[alt="Soren Wanks"]' },
+          { id: 'sun', selector: 'img[alt="Sun Price"]' },
+          { id: 'inaya', selector: 'img[alt="Inaya Kinslow"]' },
+          { id: 'andres', selector: 'img[alt="Andres Henarnandez"]' },
+          { id: 'yoruhime', selector: 'img[alt="Yoruhime Yoshikage"]' }
+        ];
+        
+        teamMapping.forEach(mapping => {
+          const saved = localStorage.getItem(`image_${mapping.id}`);
+          if (saved) {
+            const img = document.querySelector(mapping.selector);
+            if (img) img.src = saved;
+          }
+        });
+        
+        // Update gallery images
+        const galleryItems = document.querySelectorAll('.gallery-item img');
+        galleryItems.forEach((img, index) => {
+          const galleryId = `gallery${(index % 6) + 1}`;
+          const saved = localStorage.getItem(`image_${galleryId}`);
+          if (saved) img.src = saved;
+        });
+        
+        // Update hero image
+        const heroImg = document.querySelector('.hero-image');
+        if (heroImg) {
+          const saved = localStorage.getItem('image_hero');
+          if (saved) heroImg.src = saved;
+        }
+        
+        // Update map image
+        const mapImg = document.querySelector('.location-map img');
+        if (mapImg) {
+          const saved = localStorage.getItem('image_map');
+          if (saved) mapImg.src = saved;
+        }
+      });
+    }
+    
+    loadSavedImages();
   </script>
 </head>
 <body>
