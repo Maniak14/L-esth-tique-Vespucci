@@ -1154,6 +1154,45 @@ section {
   gap: 2rem;
 }
 
+.footer-logo {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.footer-logo-image {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.footer-logo-text-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.footer-logo-text {
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.footer-logo-subtitle {
+  font-size: 0.6rem;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
 .footer-brand h3 {
   font-size: 1.5rem;
   font-weight: 800;
