@@ -643,17 +643,30 @@
           document.body.appendChild(lightbox);
           setTimeout(() => lightbox.classList.add('active'), 10);
           
-          lightbox.querySelector('.lightbox-close').addEventListener('click', () => {
+          // Function to close lightbox
+          const closeLightbox = () => {
             lightbox.classList.remove('active');
             setTimeout(() => lightbox.remove(), 300);
-          });
+          };
           
+          // Close on button click
+          lightbox.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+          
+          // Close on click outside (on background)
           lightbox.addEventListener('click', (e) => {
             if (e.target === lightbox) {
-              lightbox.classList.remove('active');
-              setTimeout(() => lightbox.remove(), 300);
+              closeLightbox();
             }
           });
+          
+          // Close on Escape key
+          const handleEscape = (e) => {
+            if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+              closeLightbox();
+              document.removeEventListener('keydown', handleEscape);
+            }
+          };
+          document.addEventListener('keydown', handleEscape);
         }
       });
     });
