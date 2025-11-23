@@ -1063,7 +1063,7 @@ section {
 .reviews-track {
   display: flex;
   gap: 2rem;
-  animation: scrollReviews 120s linear infinite;
+  animation: scrollReviews 180s linear infinite;
   width: fit-content;
   padding: 0;
   margin: 0;
