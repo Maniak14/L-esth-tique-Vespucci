@@ -446,7 +446,7 @@ body {
   max-width: 500px;
   position: relative;
   z-index: 2;
-  transform: translateY(-40px);
+  transform: translateY(-80px);
 }
 
 .hero-image-wrapper {
