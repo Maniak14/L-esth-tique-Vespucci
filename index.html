@@ -323,80 +323,8 @@
       <h2 class="section-title">Ce Que Disent Nos Clients</h2>
     </div>
     <div class="reviews-container">
-      <div class="reviews-track">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <h3>Excellence au rendez-vous</h3>
-          <p>J'ai passé un excellent moment entre les mains expertes. Votre professionnalisme, votre patience et votre attention aux détails font toute la différence. Vous avez su comprendre exactement ce que je voulais et le résultat est au-delà de mes attentes !</p>
-          <div class="review-author">— Young Euphon</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <h3>Un travail incroyable</h3>
-          <p>Je tiens à dire un immense merci à toute l'équipe de l'Esthétique Vespucci. Dès mon arrivée, j'ai été accueilli avec un grand sourire et une bonne humeur communicative. Le résultat est juste incroyable : le trait est net, les ombrages sont magnifiques.</p>
-          <div class="review-author">— Tyler Jackson</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <h3>Super tatoueur</h3>
-          <p>Franchement, un super tatoueur : pro, talentueux, et en plus super sympa et drôle. Le résultat est top, rien à redire sur le taf, c'est propre, précis, vraiment du bon boulot.</p>
-          <div class="review-author">— Ezekiel Buck</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <h3>Très belle accueil</h3>
-          <p>Rien à dire très belle accueil, bonne humeur on rigole super bien il met ses clients bien à l'aise. Très professionnel, je recommande et je reviendrais. Il nous donne des coupes très magnifiques.</p>
-          <div class="review-author">— Lazaro Navarro</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <h3>Coiffeur souriant</h3>
-          <p>Coiffeur souriant, professionnel de bonne humeur qui donne d'excellents conseils. Je recommande vivement !</p>
-          <div class="review-author">— Finley Winters</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <h3>Coiffeuse incroyable</h3>
-          <p>Coiffeuse incroyable, très professionnelle, très patiente. Merci pour les coupes !</p>
-          <div class="review-author">— Ava Brown</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <h3>Tatouage personnalisé</h3>
-          <p>Un grand merci pour le tatouage custom. Ton travail est vraiment incroyable, tu as parfaitement su donner vie à mon idée et le résultat dépasse toutes mes attentes. Je suis super fier de le porter !</p>
-          <div class="review-author">— Ryuji Shiranui</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <h3>Très satisfait</h3>
-          <p>Merci beaucoup pour ce tatouage personnalisé. J'apprécie vraiment le temps, l'écoute et le soin que tu as apportés pour créer cette pièce. Le résultat est exactement ce que j'espérais.</p>
-          <div class="review-author">— Léon Dawson</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <h3>Accueillante et professionnelle</h3>
-          <p>Accueillante, respectueuse, professionnelle, très charmante. Une expérience parfaite !</p>
-          <div class="review-author">— Jayden Lebs</div>
-        </div>
-        <!-- Duplicate for seamless loop -->
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <h3>Excellence au rendez-vous</h3>
-          <p>J'ai passé un excellent moment entre les mains expertes. Votre professionnalisme, votre patience et votre attention aux détails font toute la différence. Vous avez su comprendre exactement ce que je voulais et le résultat est au-delà de mes attentes !</p>
-          <div class="review-author">— Young Euphon</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <h3>Un travail incroyable</h3>
-          <p>Je tiens à dire un immense merci à toute l'équipe de l'Esthétique Vespucci. Dès mon arrivée, j'ai été accueilli avec un grand sourire et une bonne humeur communicative. Le résultat est juste incroyable : le trait est net, les ombrages sont magnifiques.</p>
-          <div class="review-author">— Tyler Jackson</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <h3>Super tatoueur</h3>
-          <p>Franchement, un super tatoueur : pro, talentueux, et en plus super sympa et drôle. Le résultat est top, rien à redire sur le taf, c'est propre, précis, vraiment du bon boulot.</p>
-          <div class="review-author">— Ezekiel Buck</div>
-        </div>
+      <div class="reviews-track" id="reviewsTrack">
+        <!-- Reviews will be randomly shuffled by JavaScript -->
       </div>
     </div>
     <div class="reviews-cta">
@@ -592,6 +520,87 @@
       galleryTrack.addEventListener('mouseleave', () => {
         galleryTrack.style.animationPlayState = 'running';
       });
+    }
+
+    // Random Reviews Shuffle
+    const reviewsData = [
+      { title: "Excellence au rendez-vous", text: "J'ai passé un excellent moment entre les mains expertes. Votre professionnalisme, votre patience et votre attention aux détails font toute la différence. Vous avez su comprendre exactement ce que je voulais et le résultat est au-delà de mes attentes !", author: "Young Euphon" },
+      { title: "Un travail incroyable", text: "Je tiens à dire un immense merci à toute l'équipe de l'Esthétique Vespucci. Dès mon arrivée, j'ai été accueilli avec un grand sourire et une bonne humeur communicative. Le résultat est juste incroyable : le trait est net, les ombrages sont magnifiques.", author: "Tyler Jackson" },
+      { title: "Super tatoueur", text: "Franchement, un super tatoueur : pro, talentueux, et en plus super sympa et drôle. Le résultat est top, rien à redire sur le taf, c'est propre, précis, vraiment du bon boulot.", author: "Ezekiel Buck" },
+      { title: "Très belle accueil", text: "Rien à dire très belle accueil, bonne humeur on rigole super bien il met ses clients bien à l'aise. Très professionnel, je recommande et je reviendrais. Il nous donne des coupes très magnifiques.", author: "Lazaro Navarro" },
+      { title: "Coiffeur souriant", text: "Coiffeur souriant, professionnel de bonne humeur qui donne d'excellents conseils. Je recommande vivement !", author: "Finley Winters" },
+      { title: "Coiffeuse incroyable", text: "Coiffeuse incroyable, très professionnelle, très patiente. Merci pour les coupes !", author: "Ava Brown" },
+      { title: "Tatouage personnalisé", text: "Un grand merci pour le tatouage custom. Ton travail est vraiment incroyable, tu as parfaitement su donner vie à mon idée et le résultat dépasse toutes mes attentes. Je suis super fier de le porter !", author: "Ryuji Shiranui" },
+      { title: "Très satisfait", text: "Merci beaucoup pour ce tatouage personnalisé. J'apprécie vraiment le temps, l'écoute et le soin que tu as apportés pour créer cette pièce. Le résultat est exactement ce que j'espérais.", author: "Léon Dawson" },
+      { title: "Accueillante et professionnelle", text: "Accueillante, respectueuse, professionnelle, très charmante. Une expérience parfaite !", author: "Jayden Lebs" },
+      { title: "Merci pour cette expérience", text: "Merci à @wSmok pour cette magnifique expérience au sein de l'esthétique vespucci.", author: "J2✞NR" },
+      { title: "Trop cool", text: "Il est trop cool bonne humeur rapide enfaite juste le meilleur.", author: "Benett Tilio" },
+      { title: "MAIS COMMENT FAIT T'IL", text: "MAIS COMMENT FAIT T'IL POUR ETRE SI PARFAIT bonne humeur rapide enfaite juste le meilleur.", author: "Benett Tilio" },
+      { title: "Parfait", text: "Parfait ce mec sérieux.", author: "Jayden Lebs" },
+      { title: "Parfait et professionnel", text: "Parfait ce mec sérieux poli et très professionnel parfait quoi.", author: "Jonasse mantilla" },
+      { title: "Inégalable", text: "Inégalable, merci pour tout t'es le meilleur fréro.", author: "Ivar Muchadov" },
+      { title: "La goat", text: "La goat incroyable et grave sympathique.", author: "Henry Smith" },
+      { title: "Franchement incroyable", text: "Franchement si j'avais pas de limite les étoiles serait infini la goat pour le coup gentil, sans prise de tête, sympa mais qui est elle serait t'elle pas juste la goat non vraiment une très bonne personne.", author: "Shavonn" },
+      { title: "GOOD KOUAFEUR", text: "GOOD KOUAFEUR", author: "LEON" },
+      { title: "Pas mal le coiffeur", text: "Pas mal le coiffeur la famille.", author: "Wyatt" },
+      { title: "Rapide efficace", text: "Rapide efficace", author: "Jayden" },
+      { title: "Meilleur coiffeur", text: "Meilleur coiffeur la famille", author: "Tricky" },
+      { title: "Un bon RH", text: "Un de ces bon RH, J'ai rarrement vu ça dans ma lonnnngue vie ! BIG UP", author: "POWD3R" },
+      { title: "Bon tatoueur/coiffeur", text: "Emilio est un bon tatoueur/coiffeur patient et l'écoute", author: "Koda Smith" },
+      { title: "Super, parfaitement à l'écoute", text: "Super, parfaitement à l'écoute !!", author: "Camilo Osorio" },
+      { title: "Incroyable", text: "Incroyable, vraiment super bon conseil, à l'écoute, au top", author: "Camila Osorio" },
+      { title: "Incroyable travail", text: "Incroyable, vraiment un bonbon cette femme, un travail rapide et efficace merci a toi!!!", author: "Kassy Payne" },
+      { title: "Rapide et efficace", text: "Rapide/efficace et un résulta parfait", author: "Russel Blood" },
+      { title: "Dessinateur et Tatoueuse INCROYABLE", text: "Dessinateur et Tatoueuse INCROYABLE ! (Bref venez faire vos tatoos ici)", author: "Sån•PnK" },
+      { title: "Meilleur tatoueur", text: "Ce mec est fou meilleur tatoueur en ville", author: "Synthia Papaya" },
+      { title: "Coiffeur d'une gentillesse", text: "Jayden est un coiffeur d'une gentillesse et d'une patience, je vous le recommande.", author: "Moly" },
+      { title: "Très professionnelle", text: "Très professionnelle, patiente et à l'écoute", author: "Alma-Rosa" },
+      { title: "Résultat très propres", text: "Très professionnelle, je recommande pour faire nos coiffure résultat très propres !", author: "James Walter" },
+      { title: "Super bien conseillé", text: "Il a super bien conseillé mon employée ! Il a pris le temps de l'écouter et de la guider pour trouver la coiffure qui lui va parfaitement. On est vraiment ravis du résultat, merci encore !", author: "Zion Braxton" },
+      { title: "Cool", text: "Cool", author: "lazaro" },
+      { title: "De bon conseils", text: "De bon conseils, à l'ecoute travaille de pro !", author: "Zaëly Cruz" },
+      { title: "Tatouage et coiffure impect", text: "Tatouage et coiffure impect, je recommande !", author: "Lyam Seals" },
+      { title: "Rapide simple efficace", text: "Rapide simple efficace", author: "Riley parks" },
+      { title: "Efficace et pas chère", text: "Efficace et pas chère, c'est Aiden que je préfère", author: "Rafael moretti" },
+      { title: "Merci pour les tattoos", text: "Merci beaucoup pour les tattoos ils me conviennent parfaitement, accueillant et très gentil", author: "Anthonio Gomez" },
+      { title: "Bonne accueil", text: "Bonne accueil de la part de ce coiffeur, même à cette heure-ci, je recommande fortement pour son professionnalisme.", author: "Amber Clarke" },
+      { title: "Accueillant et professionnel", text: "Accueillant, sympa, et professionnel. Tout simplement un goat", author: "Granit Berisha" },
+      { title: "Super moment", text: "J'ai passé un super moment à l'esthétique Vespucci ! Accueil chaleureux, ambiance détendue et résultat impeccable. Mention spéciale à Michou, qui s'est occupé de ma coupe avec beaucoup de soin et de talent.", author: "efraim" },
+      { title: "Patiente, trop la goatt", text: "Patiente, trop la goatt enfainte", author: "Kaelen Winslow" },
+      { title: "Nickel", text: "Nickel, rien à dire.", author: "Owen Davis" }
+    ];
+
+    // Fisher-Yates shuffle algorithm
+    function shuffleArray(array) {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
+    // Generate and shuffle reviews
+    const reviewsTrack = document.getElementById('reviewsTrack');
+    if (reviewsTrack) {
+      // Shuffle reviews
+      const shuffledReviews = shuffleArray(reviewsData);
+      
+      // Create review cards
+      function createReviewCard(review) {
+        return `
+          <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <h3>${review.title}</h3>
+            <p>${review.text}</p>
+            <div class="review-author">— ${review.author}</div>
+          </div>
+        `;
+      }
+      
+      // Add shuffled reviews (duplicate for seamless loop)
+      const reviewsHTML = shuffledReviews.map(createReviewCard).join('');
+      reviewsTrack.innerHTML = reviewsHTML + reviewsHTML;
     }
 
     // Modal Handling
