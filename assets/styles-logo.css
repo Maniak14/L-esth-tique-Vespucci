@@ -523,32 +523,20 @@ body::-webkit-scrollbar {
 
 .hero-images-container {
   display: flex;
-  gap: 0;
+  gap: 1.5rem;
   width: 100%;
   position: relative;
   z-index: 1;
 }
 
 .hero-image {
-  width: 50%;
+  width: calc(50% - 0.75rem);
   height: auto;
   display: block;
   border-radius: 30px;
   position: relative;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
   object-fit: cover;
-}
-
-.hero-image-left {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  border-right: none;
-}
-
-.hero-image-right {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  border-left: none;
 }
 
 .floating-card {
