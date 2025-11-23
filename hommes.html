@@ -1,128 +1,138 @@
 <!DOCTYPE html>
-<html lang="fr" data-page="hommes" data-title="Hommes">
+<html lang="fr">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>L'Esthétique Vespucci - Hommes</title>
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
-  <link rel="stylesheet" href="assets/styles.css">
-  <link rel="preload" href="assets/styles.css" as="style">
-  <style>
-    body::after {
-      background: 
-        radial-gradient(ellipse 1200px 600px at 20% 30%, rgba(150,100,200,0.12) 0%, rgba(150,100,200,0.06) 30%, transparent 60%),
-        radial-gradient(ellipse 900px 450px at 80% 70%, rgba(150,100,200,0.10) 0%, rgba(150,100,200,0.04) 30%, transparent 60%),
-        radial-gradient(ellipse 600px 300px at 50% 20%, rgba(150,100,200,0.08) 0%, rgba(150,100,200,0.03) 30%, transparent 60%);
+  <link rel="stylesheet" href="assets/styles-new.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
     }
-    
-    .fluid-blob-1 {
-      background: radial-gradient(ellipse, rgba(150,100,200,0.15) 0%, rgba(150,100,200,0.08) 30%, transparent 70%);
-    }
-    
-    .fluid-blob-2 {
-      background: radial-gradient(ellipse, rgba(150,100,200,0.12) 0%, rgba(150,100,200,0.06) 30%, transparent 70%);
-    }
-    
-    .fluid-blob-3 {
-      background: radial-gradient(ellipse, rgba(150,100,200,0.10) 0%, rgba(150,100,200,0.05) 30%, transparent 70%);
-    }
-  </style>
+    window.scrollTo(0, 0);
+  </script>
 </head>
-<body class="no-scrollbar">
-<div class="grid-bg"></div>
-<div class="bg-color-left"></div>
-<div class="bg-color-right"></div>
-<div class="particles" id="particles"></div>
-<div class="fluid-blob-1"></div>
-<div class="fluid-blob-2"></div>
-<div class="fluid-blob-3"></div>
+<body>
+  <!-- Animated Background -->
+  <div class="animated-bg">
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+    <div class="noise-overlay"></div>
+  </div>
 
-  <header class="main-header">
-    <a href="index.html" class="mobile-title">L'Esthétique Vespucci</a>
-    <nav class="navbar">
-      <a href="index.html" class="nav-link">Accueil</a>
-      <a href="tarifs.html" class="nav-link">Tarifs</a>
-      <a href="femmes.html" class="nav-link">Femmes</a>
-      <a href="hommes.html" class="nav-link active">Hommes</a>
-      <a href="index.html#faq" class="nav-link">F.A.Q</a>
-    </nav>
-    <div class="burger" id="burger">
-      <span></span>
-      <span></span>
-      <span></span>
+  <!-- Geometric Shapes -->
+  <div class="geometric-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="main-nav">
+    <div class="nav-container">
+      <a href="index.html" class="logo">
+        <span class="logo-text">VESPUCCI</span>
+        <span class="logo-subtitle">ESTHÉTIQUE</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html" class="nav-item">Accueil</a>
+        <a href="tarifs.html" class="nav-item">Tarifs</a>
+        <a href="femmes.html" class="nav-item">Femmes</a>
+        <a href="hommes.html" class="nav-item active">Hommes</a>
+        <a href="index.html#faq" class="nav-item">FAQ</a>
+      </div>
+      <button class="nav-toggle" id="navToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
-  </header>
+  </nav>
 
-  <section class="catalog-section fade-in" style="padding-top: 8rem; padding-bottom: 4rem;">
-    <div class="catalog-header" style="text-align: center; margin-bottom: 4rem; max-width: 1400px; margin-left: auto; margin-right: auto; padding: 0 2rem;">
-      <h1 style="font-size: 3rem; margin-bottom: 1rem; background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Catalogue Hommes</h1>
-      <p style="font-size: 1.2rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto;">Découvrez notre sélection de coupes masculines modernes et classiques, réalisées par nos experts coiffeurs.</p>
+  <!-- Catalog Section -->
+  <section class="gallery-section" style="padding-top: 8rem;">
+    <div class="section-header">
+      <span class="section-tag">Catalogue</span>
+      <h2 class="section-title">Catalogue Hommes</h2>
     </div>
+    <p style="text-align: center; color: var(--text-secondary); max-width: 600px; margin: 0 auto 4rem; font-size: 1.1rem; line-height: 1.8;">
+      Découvrez notre sélection de coupes masculines modernes et classiques, réalisées par nos experts coiffeurs.
+    </p>
 
-    <div class="catalog-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; max-width: 1400px; margin: 0 auto; padding: 0 2rem;">
-      <div class="catalog-item fade-in" style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 15px; overflow: hidden; backdrop-filter: blur(20px); transition: all 0.3s ease; cursor: pointer;">
-        <img src="img/hommes/1.png" alt="Coupe Homme 1" style="width: 100%; height: 400px; object-fit: cover;">
-        <div style="padding: 1.5rem;">
-          <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem; color: var(--text-primary);">Coupe Classique</h3>
-          <p style="color: var(--text-secondary);">Une coupe intemporelle et élégante pour un look professionnel.</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; max-width: 1400px; margin: 0 auto; padding: 0 2rem;">
+      <div class="service-card" data-tilt style="padding: 0; overflow: hidden; cursor: pointer;">
+        <img src="img/hommes/1.png" alt="Coupe Homme 1" style="width: 100%; height: 400px; object-fit: cover; display: block;">
+        <div class="service-content" style="padding: 2rem;">
+          <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Coupe Classique</h3>
+          <p style="color: var(--text-secondary); line-height: 1.8;">Une coupe intemporelle et élégante pour un look professionnel.</p>
         </div>
       </div>
-      <div class="catalog-item fade-in" style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 15px; overflow: hidden; backdrop-filter: blur(20px); transition: all 0.3s ease; cursor: pointer;">
-        <img src="img/hommes/2.png" alt="Coupe Homme 2" style="width: 100%; height: 400px; object-fit: cover;">
-        <div style="padding: 1.5rem;">
-          <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem; color: var(--text-primary);">Coupe Moderne</h3>
-          <p style="color: var(--text-secondary);">Un style contemporain et tendance pour un look actuel.</p>
+      <div class="service-card" data-tilt style="padding: 0; overflow: hidden; cursor: pointer;">
+        <img src="img/hommes/2.png" alt="Coupe Homme 2" style="width: 100%; height: 400px; object-fit: cover; display: block;">
+        <div class="service-content" style="padding: 2rem;">
+          <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Coupe Moderne</h3>
+          <p style="color: var(--text-secondary); line-height: 1.8;">Un style contemporain et tendance pour un look actuel.</p>
         </div>
       </div>
-      <div class="catalog-item fade-in" style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 15px; overflow: hidden; backdrop-filter: blur(20px); transition: all 0.3s ease; cursor: pointer;">
-        <img src="img/hommes/3.png" alt="Coupe Homme 3" style="width: 100%; height: 400px; object-fit: cover;">
-        <div style="padding: 1.5rem;">
-          <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem; color: var(--text-primary);">Coupe Fade</h3>
-          <p style="color: var(--text-secondary);">Un dégradé parfait pour un style net et structuré.</p>
+      <div class="service-card" data-tilt style="padding: 0; overflow: hidden; cursor: pointer;">
+        <img src="img/hommes/3.png" alt="Coupe Homme 3" style="width: 100%; height: 400px; object-fit: cover; display: block;">
+        <div class="service-content" style="padding: 2rem;">
+          <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Coupe Fade</h3>
+          <p style="color: var(--text-secondary); line-height: 1.8;">Un dégradé parfait pour un style net et structuré.</p>
         </div>
       </div>
-      <div class="catalog-item fade-in" style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 15px; overflow: hidden; backdrop-filter: blur(20px); transition: all 0.3s ease; cursor: pointer;">
-        <img src="img/hommes/4.png" alt="Coupe Homme 4" style="width: 100%; height: 400px; object-fit: cover;">
-        <div style="padding: 1.5rem;">
-          <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem; color: var(--text-primary);">Coupe Undercut</h3>
-          <p style="color: var(--text-secondary);">Un style audacieux avec les côtés rasés et le dessus long.</p>
+      <div class="service-card" data-tilt style="padding: 0; overflow: hidden; cursor: pointer;">
+        <img src="img/hommes/4.png" alt="Coupe Homme 4" style="width: 100%; height: 400px; object-fit: cover; display: block;">
+        <div class="service-content" style="padding: 2rem;">
+          <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Coupe Undercut</h3>
+          <p style="color: var(--text-secondary); line-height: 1.8;">Un style audacieux avec les côtés rasés et le dessus long.</p>
         </div>
       </div>
-      <div class="catalog-item fade-in" style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 15px; overflow: hidden; backdrop-filter: blur(20px); transition: all 0.3s ease; cursor: pointer;">
-        <img src="img/hommes/5.png" alt="Coupe Homme 5" style="width: 100%; height: 400px; object-fit: cover;">
-        <div style="padding: 1.5rem;">
-          <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem; color: var(--text-primary);">Coupe Pompadour</h3>
-          <p style="color: var(--text-secondary);">Un style rétro revisité pour un look sophistiqué.</p>
+      <div class="service-card" data-tilt style="padding: 0; overflow: hidden; cursor: pointer;">
+        <img src="img/hommes/5.png" alt="Coupe Homme 5" style="width: 100%; height: 400px; object-fit: cover; display: block;">
+        <div class="service-content" style="padding: 2rem;">
+          <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Coupe Pompadour</h3>
+          <p style="color: var(--text-secondary); line-height: 1.8;">Un style rétro revisité pour un look sophistiqué.</p>
         </div>
       </div>
-      <div class="catalog-item fade-in" style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 15px; overflow: hidden; backdrop-filter: blur(20px); transition: all 0.3s ease; cursor: pointer;">
-        <img src="img/hommes/6.png" alt="Coupe Homme 6" style="width: 100%; height: 400px; object-fit: cover;">
-        <div style="padding: 1.5rem;">
-          <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem; color: var(--text-primary);">Coupe Texturée</h3>
-          <p style="color: var(--text-secondary);">Volume et mouvement pour un style décontracté.</p>
+      <div class="service-card" data-tilt style="padding: 0; overflow: hidden; cursor: pointer;">
+        <img src="img/hommes/6.png" alt="Coupe Homme 6" style="width: 100%; height: 400px; object-fit: cover; display: block;">
+        <div class="service-content" style="padding: 2rem;">
+          <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Coupe Texturée</h3>
+          <p style="color: var(--text-secondary); line-height: 1.8;">Volume et mouvement pour un style décontracté.</p>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- Footer -->
   <footer class="main-footer">
     <div class="footer-content">
-      <div class="footer-info">
-        <h4><a href="index.html" class="footer-brand-link">L'Esthétique Vespucci</a></h4>
-        <p>© L'Esthétique Vespucci 2025</p>
+      <div class="footer-brand">
+        <h3>VESPUCCI</h3>
+        <p>L'Esthétique Vespucci © 2025</p>
       </div>
-      <div class="footer-nav">
-        <a href="index.html" class="footer-link">Accueil</a>
-        <a href="femmes.html" class="footer-link">Femmes</a>
-        <a href="tarifs.html" class="footer-link">Tarifs</a>
-        <a href="hommes.html" class="footer-link active">Hommes</a>
+      <div class="footer-links">
+        <a href="index.html">Accueil</a>
+        <a href="femmes.html">Femmes</a>
+        <a href="tarifs.html">Tarifs</a>
+        <a href="hommes.html">Hommes</a>
       </div>
     </div>
   </footer>
 
-  <a href="#" class="fixed-join-button fade-in" id="openFixedBookingModal">PRENDRE RENDEZ-VOUS</a>
+  <!-- Fixed CTA Button -->
+  <a href="#" class="fixed-cta" id="openFixedBookingModal">
+    <span class="cta-text">Réserver</span>
+  </a>
 
-  <div id="bookingModal" class="modal-overlay">
+  <!-- Modals -->
+  <div id="bookingModal" class="modal">
     <div class="modal-content">
       <button class="modal-close" id="closeBookingModal">&times;</button>
       <h2>Prendre Rendez-vous</h2>
@@ -131,106 +141,132 @@
     </div>
   </div>
 
-  <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog">
-    <img id="lightbox-img" alt="Aperçu coupe" />
+  <div id="lightbox" class="lightbox">
+    <div class="lightbox-content">
+      <img id="lightbox-img" alt="Aperçu coupe">
+      <button class="lightbox-close">&times;</button>
+    </div>
   </div>
 
-  <script src="assets/app.js" defer></script>
-  <script src="assets/particles.js" defer></script>
   <script src="assets/burger-menu.js" defer></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const catalogItems = document.querySelectorAll('.catalog-item');
-      const lightbox = document.getElementById('lightbox');
-      const lightboxImg = document.getElementById('lightbox-img');
-      
-      catalogItems.forEach(item => {
-        item.addEventListener('click', function() {
-          const img = this.querySelector('img');
-          if (img) {
-            lightboxImg.src = img.src;
-            lightboxImg.alt = img.alt;
-            lightbox.classList.add('open');
-            lightbox.setAttribute('aria-hidden', 'false');
-            document.body.style.overflow = 'hidden';
-          }
-        });
-        
-        item.addEventListener('mouseenter', function() {
-          this.style.transform = 'translateY(-10px)';
-          this.style.borderColor = 'var(--primary-color)';
-        });
-        
-        item.addEventListener('mouseleave', function() {
-          this.style.transform = 'translateY(0)';
-          this.style.borderColor = 'var(--glass-border)';
-        });
+    // Navigation Toggle
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (navToggle) {
+      navToggle.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
+        navToggle.classList.toggle('active');
       });
-      
-      function closeLightbox() {
-        lightbox.classList.remove('open');
-        lightbox.setAttribute('aria-hidden', 'true');
-        lightboxImg.removeAttribute('src');
-        document.body.style.overflow = '';
-      }
-      
-      lightbox.addEventListener('click', function(e) {
-        if (e.target === lightbox) {
-          closeLightbox();
+    }
+
+    // Gallery Lightbox
+    const catalogItems = document.querySelectorAll('.service-card[data-tilt]');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    
+    catalogItems.forEach(item => {
+      item.addEventListener('click', function() {
+        const img = this.querySelector('img');
+        if (img) {
+          lightboxImg.src = img.src;
+          lightboxImg.alt = img.alt;
+          lightbox.classList.add('active');
+          document.body.style.overflow = 'hidden';
         }
       });
-      
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && lightbox.classList.contains('open')) {
-          closeLightbox();
-        }
-      });
-      
-      const fixedButton = document.getElementById('openFixedBookingModal');
-      const openModalBtn = fixedButton;
-      const bookingModal = document.getElementById('bookingModal');
-      const closeBookingModalBtn = document.getElementById('closeBookingModal');
-      
-      if (fixedButton) {
-        setTimeout(() => {
-          fixedButton.classList.add('in');
-        }, 500);
+    });
+    
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+      lightboxImg.removeAttribute('src');
+      document.body.style.overflow = '';
+    }
+    
+    lightbox.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', function(e) {
+      if (e.target === lightbox) {
+        closeLightbox();
       }
-      
-      function openModal() {
-        bookingModal.classList.add('active');
+    });
+    
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+        closeLightbox();
+      }
+    });
+
+    // Modal Handling
+    const openFixedBookingModal = document.getElementById('openFixedBookingModal');
+    const bookingModal = document.getElementById('bookingModal');
+    const closeBookingModal = document.getElementById('closeBookingModal');
+
+    function openModal(modal) {
+      if (modal) {
+        modal.classList.add('active');
         document.body.style.overflow = 'hidden';
       }
-      
-      function closeModal() {
-        bookingModal.classList.remove('active');
+    }
+
+    function closeModal(modal) {
+      if (modal) {
+        modal.classList.remove('active');
         document.body.style.overflow = '';
       }
-      
-      if (openModalBtn) {
-        openModalBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          openModal();
-        });
-      }
-      
-      if (closeBookingModalBtn) {
-        closeBookingModalBtn.addEventListener('click', closeModal);
-      }
-      
-      bookingModal.addEventListener('click', function(e) {
-        if (e.target === bookingModal) {
-          closeModal();
+    }
+
+    if (openFixedBookingModal) openFixedBookingModal.addEventListener('click', (e) => { e.preventDefault(); openModal(bookingModal); });
+    if (closeBookingModal) closeBookingModal.addEventListener('click', () => closeModal(bookingModal));
+
+    if (bookingModal) {
+      bookingModal.addEventListener('click', (e) => {
+        if (e.target === bookingModal) closeModal(bookingModal);
+      });
+    }
+
+    // Hide fixed CTA button near footer
+    function handleFixedCTA() {
+      const fixedCTA = document.querySelector('.fixed-cta');
+      const footer = document.querySelector('.main-footer');
+      if (fixedCTA && footer) {
+        const footerTop = footer.offsetTop;
+        const windowBottom = window.pageYOffset + window.innerHeight;
+        const distanceToFooter = footerTop - windowBottom;
+        
+        if (distanceToFooter < 150) {
+          fixedCTA.style.opacity = '0';
+          fixedCTA.style.pointerEvents = 'none';
+        } else {
+          fixedCTA.style.opacity = '1';
+          fixedCTA.style.pointerEvents = 'auto';
         }
+      }
+    }
+    
+    window.addEventListener('scroll', handleFixedCTA, { passive: true });
+    handleFixedCTA();
+
+    // 3D Tilt Effect
+    document.querySelectorAll('[data-tilt]').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = (y - centerY) / 10;
+        const rotateY = (centerX - x) / 10;
+        
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
       });
       
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && bookingModal.classList.contains('active')) {
-          closeModal();
-        }
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
       });
     });
   </script>
 </body>
 </html>
-
