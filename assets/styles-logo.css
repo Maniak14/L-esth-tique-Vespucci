@@ -557,12 +557,19 @@ body::-webkit-scrollbar {
 
 .hero-image-wrapper-right .hero-image {
   object-position: center 20%;
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 .hero-image-wrapper:hover .hero-image {
-  transform: scale(1.05);
   filter: brightness(0.8);
+}
+
+.hero-image-wrapper-left:hover .hero-image {
+  transform: scale(1.05);
+}
+
+.hero-image-wrapper-right:hover .hero-image {
+  transform: scale(1.15);
 }
 
 .hero-status-overlay {
