@@ -150,8 +150,8 @@
         card.style.cssText = 'padding: 0; overflow: hidden; cursor: pointer;';
         card.innerHTML = `
           <img src="${item.url}" alt="Coupe Femme ${index + 1}" style="width: 100%; height: 300px; object-fit: cover; display: block;">
-          <div class="service-content" style="padding: 1.5rem; text-align: center;">
-            <h3 style="font-size: 1.3rem; margin: 0;">Coupe ${index + 1}</h3>
+          <div class="service-content" style="padding: 0.75rem; text-align: center;">
+            <h3 style="font-size: 0.9rem; margin: 0; color: var(--text-secondary); font-weight: 500;">Coupe ${index + 1}</h3>
           </div>
         `;
         container.appendChild(card);
