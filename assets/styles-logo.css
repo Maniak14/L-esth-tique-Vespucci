@@ -552,7 +552,7 @@ body::-webkit-scrollbar {
 }
 
 .hero-image-wrapper-left .hero-image {
-  object-position: 10% center;
+  object-position: 10% 60%;
 }
 
 .hero-image-wrapper:hover .hero-image {
