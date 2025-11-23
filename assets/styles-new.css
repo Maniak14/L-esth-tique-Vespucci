@@ -8,11 +8,11 @@
 }
 
 :root {
-  --primary: #4A90E2;
-  --primary-light: #6BA3F0;
-  --primary-dark: #357ABD;
-  --accent: #00D4FF;
-  --accent-light: #33DDFF;
+  --primary: #9664c8;
+  --primary-light: #b894e6;
+  --primary-dark: #7a4fa8;
+  --accent: #ff6b9d;
+  --accent-light: #ff8fb3;
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.7);
   --text-muted: rgba(255, 255, 255, 0.5);
@@ -22,7 +22,7 @@
   --surface-hover: rgba(255, 255, 255, 0.06);
   --border: rgba(255, 255, 255, 0.1);
   --shadow: rgba(0, 0, 0, 0.3);
-  --shadow-glow: rgba(74, 144, 226, 0.4);
+  --shadow-glow: rgba(150, 100, 200, 0.4);
 }
 
 html {
@@ -365,7 +365,7 @@ body {
   background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
   color: var(--text-primary);
   border: none;
-  box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 10px 30px rgba(150, 100, 200, 0.3);
 }
 
 .btn-primary::before {
