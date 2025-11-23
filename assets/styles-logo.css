@@ -8,11 +8,11 @@
 }
 
 :root {
-  --primary: #9664c8;
-  --primary-light: #b894e6;
-  --primary-dark: #7a4fa8;
-  --accent: #ff6b9d;
-  --accent-light: #ff8fb3;
+  --primary: #20B2AA;
+  --primary-light: #4ECDC4;
+  --primary-dark: #1A9B94;
+  --accent: #2E8B87;
+  --accent-light: #6ED3D0;
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.7);
   --text-muted: rgba(255, 255, 255, 0.5);
@@ -22,7 +22,7 @@
   --surface-hover: rgba(255, 255, 255, 0.06);
   --border: rgba(255, 255, 255, 0.1);
   --shadow: rgba(0, 0, 0, 0.3);
-  --shadow-glow: rgba(150, 100, 200, 0.4);
+  --shadow-glow: rgba(32, 178, 170, 0.4);
 }
 
 html {
@@ -36,9 +36,6 @@ body {
   overflow-x: hidden;
   line-height: 1.6;
   position: relative;
-  margin: 0;
-  padding: 0;
-  width: 100%;
 }
 
 /* ============================================
@@ -248,7 +245,7 @@ body {
   background: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%);
   border-radius: 2px;
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 8px rgba(184, 148, 230, 0.5);
+  box-shadow: 0 0 8px rgba(32, 178, 170, 0.5);
 }
 
 .nav-item:hover,
@@ -262,7 +259,7 @@ body {
 
 .nav-item.active::after {
   width: 100%;
-  box-shadow: 0 0 12px rgba(184, 148, 230, 0.7);
+  box-shadow: 0 0 12px rgba(32, 178, 170, 0.7);
 }
 
 .nav-toggle {
@@ -719,7 +716,7 @@ section {
 .service-card:hover {
   transform: translateY(-10px);
   border-color: var(--primary);
-  box-shadow: 0 20px 60px rgba(150, 100, 200, 0.3);
+  box-shadow: 0 20px 60px rgba(32, 178, 170, 0.3);
 }
 
 .service-number {
@@ -814,7 +811,7 @@ section {
 .team-card:hover .team-image-wrapper {
   transform: scale(1.05);
   border-color: var(--accent);
-  box-shadow: 0 20px 60px rgba(150, 100, 200, 0.4);
+  box-shadow: 0 20px 60px rgba(32, 178, 170, 0.4);
 }
 
 .team-image-wrapper img {
@@ -903,10 +900,9 @@ section {
 .reviews-section {
   padding: 6rem 0;
   overflow: visible;
-  margin: 0;
+  margin-left: 0;
+  margin-right: 0;
   width: 100%;
-  max-width: 100%;
-  position: relative;
 }
 
 .reviews-section .section-header {
@@ -920,12 +916,11 @@ section {
   margin-bottom: 3rem;
   padding: 1rem 0;
   width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
   position: relative;
-  left: calc((100vw - 100%) / -2);
-  padding-left: 0;
-  padding-right: 0;
-  margin-left: 0;
-  margin-right: 0;
+  left: 0;
+  right: 0;
 }
 
 .reviews-track {
@@ -934,7 +929,7 @@ section {
   animation: scrollReviews 50s linear infinite;
   width: fit-content;
   padding: 0;
-  margin: 0;
+  margin-left: 0;
 }
 
 .review-card {
@@ -951,7 +946,7 @@ section {
 .review-card:hover {
   transform: translateY(-10px);
   border-color: var(--primary);
-  box-shadow: 0 20px 60px rgba(150, 100, 200, 0.3);
+  box-shadow: 0 20px 60px rgba(32, 178, 170, 0.3);
 }
 
 .review-stars {
