@@ -555,6 +555,11 @@ body::-webkit-scrollbar {
   object-position: 10% center;
 }
 
+.hero-image-wrapper-right .hero-image {
+  object-position: center 20%;
+  transform: scale(1.1);
+}
+
 .hero-image-wrapper:hover .hero-image {
   transform: scale(1.05);
   filter: brightness(0.8);
