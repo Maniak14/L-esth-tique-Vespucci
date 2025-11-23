@@ -537,6 +537,14 @@ body::-webkit-scrollbar {
   position: relative;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
   object-fit: cover;
+  object-position: center 14%;
+  filter: grayscale(1) contrast(1.1);
+  transition: filter 0.4s;
+  z-index: 2;
+}
+
+.hero-image:hover {
+  filter: grayscale(0) contrast(1.1);
 }
 
 .hero-image-left {
