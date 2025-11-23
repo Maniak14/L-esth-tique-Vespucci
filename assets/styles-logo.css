@@ -950,14 +950,6 @@ section {
   background-clip: text;
 }
 
-/* Services supplémentaires - texte sur une ligne */
-.services-grid + div .service-content h3 {
-  white-space: nowrap;
-  font-size: 1.5rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .service-bg {
   position: absolute;
   bottom: 0;
