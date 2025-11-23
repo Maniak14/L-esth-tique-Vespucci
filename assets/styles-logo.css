@@ -485,7 +485,7 @@ body::-webkit-scrollbar {
 
 .hero-visual {
   flex: 1;
-  max-width: 750px;
+  max-width: 800px;
   position: relative;
   z-index: 2;
   transform: translateY(-80px);
