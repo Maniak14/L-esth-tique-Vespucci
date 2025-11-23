@@ -958,6 +958,10 @@ section {
   object-position: center 8%;
 }
 
+.team-image-wrapper img[alt="Sun Price"] {
+  object-position: center 3%;
+}
+
 .team-card:hover .team-image-wrapper img {
   transform: scale(1.1);
 }
