@@ -1044,7 +1044,8 @@ section {
 .main-footer {
   position: relative;
   z-index: 1;
-  padding: 4rem 2rem 2rem;
+  padding: 4rem 2rem 6rem;
+  padding-right: calc(2rem + 140px);
   border-top: 1px solid var(--border);
   background: rgba(5, 5, 8, 0.5);
   backdrop-filter: blur(20px);
@@ -1396,6 +1397,11 @@ section {
 
   .review-card {
     width: 300px;
+  }
+
+  .main-footer {
+    padding-right: 2rem;
+    padding-bottom: 5rem;
   }
 
   .footer-content {
