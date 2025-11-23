@@ -594,20 +594,52 @@ section {
    GALLERY SECTION
    ============================================ */
 .gallery-section {
-  padding: 6rem 2rem;
+  padding: 6rem 0;
   overflow: visible;
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.gallery-section .section-header {
+  max-width: 1400px;
+  margin: 0 auto 4rem;
+  padding: 0 2rem;
 }
 
 .gallery-container {
   overflow: hidden;
+  margin-bottom: 3rem;
+  padding: 1rem 0;
+  width: 100vw;
+  max-width: none;
   position: relative;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: 0;
+  margin-right: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .gallery-track {
   display: flex;
   gap: 2rem;
-  animation: scrollGallery 40s linear infinite;
+  animation: scrollGallery 50s linear infinite;
   width: fit-content;
+  padding: 0;
+  margin: 0;
+  justify-content: flex-start;
+  position: relative;
+  left: auto;
+  right: 0;
+  margin-left: auto;
 }
 
 .gallery-item {
@@ -665,7 +697,7 @@ section {
     transform: translateX(0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translateX(calc(-50% - 2rem));
   }
 }
 

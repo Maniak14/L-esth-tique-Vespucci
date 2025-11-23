@@ -564,6 +564,18 @@
       });
     });
 
+    // Gallery Pause on Hover
+    const galleryTrack = document.querySelector('.gallery-track');
+    if (galleryTrack) {
+      galleryTrack.addEventListener('mouseenter', () => {
+        galleryTrack.style.animationPlayState = 'paused';
+      });
+      
+      galleryTrack.addEventListener('mouseleave', () => {
+        galleryTrack.style.animationPlayState = 'running';
+      });
+    }
+
     // Modal Handling
     const openBookingModal = document.getElementById('openBookingModal');
     const openFixedBookingModal = document.getElementById('openFixedBookingModal');
