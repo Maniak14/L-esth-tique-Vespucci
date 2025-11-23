@@ -278,6 +278,30 @@
       </div>
     </div>
 
+    <!-- Femmes Catalog Section -->
+    <div class="admin-section">
+      <h2>Catalogue Femmes</h2>
+      <div class="image-grid" id="femmesCatalog">
+        <!-- Femmes images will be loaded here -->
+      </div>
+      <div class="add-image-btn" onclick="addNewFemmesImage()" title="Ajouter une nouvelle image">
+        <div>+</div>
+        <span>Ajouter une image</span>
+      </div>
+    </div>
+
+    <!-- Hommes Catalog Section -->
+    <div class="admin-section">
+      <h2>Catalogue Hommes</h2>
+      <div class="image-grid" id="hommesCatalog">
+        <!-- Hommes images will be loaded here -->
+      </div>
+      <div class="add-image-btn" onclick="addNewHommesImage()" title="Ajouter une nouvelle image">
+        <div>+</div>
+        <span>Ajouter une image</span>
+      </div>
+    </div>
+
     <!-- Hero Image Section -->
     <div class="admin-section">
       <h2>Image Hero</h2>
@@ -333,6 +357,17 @@
 
     // Get current image URL (saved or default)
     function getCurrentImage(config) {
+      // Check if it's a catalog image
+      if (config.id.startsWith('femme_')) {
+        const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
+        const image = femmesImages.find(img => img.id === config.id);
+        return image ? image.url : config.default;
+      } else if (config.id.startsWith('homme_')) {
+        const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
+        const image = hommesImages.find(img => img.id === config.id);
+        return image ? image.url : config.default;
+      }
+      
       const saved = getSavedImage(config.id);
       return saved || config.default;
     }
@@ -345,8 +380,9 @@
       item.dataset.imageId = config.id;
       item.dataset.isCustom = isCustom;
       
-      const deleteBtn = isCustom ? `<button class="delete-image-btn" onclick="deleteCustomImage('${config.id}')" title="Supprimer">×</button>` : '';
-      const resetBtn = !isCustom ? `<button class="remove-btn" onclick="resetImage('${config.id}')" title="Réinitialiser">×</button>` : '';
+      const isCatalogImage = config.id.startsWith('femme_') || config.id.startsWith('homme_');
+      const deleteBtn = (isCustom || isCatalogImage) ? `<button class="delete-image-btn" onclick="${isCatalogImage ? 'deleteCatalogImage' : 'deleteCustomImage'}('${config.id}')" title="Supprimer">×</button>` : '';
+      const resetBtn = (!isCustom && !isCatalogImage) ? `<button class="remove-btn" onclick="resetImage('${config.id}')" title="Réinitialiser">×</button>` : '';
       
       item.innerHTML = `
         ${deleteBtn}
@@ -354,7 +390,7 @@
         <div class="image-label">${config.name}</div>
         ${resetBtn}
         <input type="text" class="input-url" placeholder="URL de l'image" value="${currentImage}" onchange="updateImageUrl('${config.id}', this.value)">
-        <button class="btn-small" onclick="updateImageUrl('${config.id}', this.previousElementSibling.value)">Mettre à jour</button>
+        <button class="btn-small" onclick="updateImageUrl('${config.id}', this.previousElementSibling.value); ${(config.id.startsWith('femme_') || config.id.startsWith('homme_')) ? 'loadFemmesCatalog(); loadHommesCatalog();' : ''}">Mettre à jour</button>
       `;
       
       // Drag and drop
@@ -403,6 +439,12 @@
     // Update image URL
     function updateImageUrl(imageId, url) {
       if (!url) return;
+      
+      // Check if it's a catalog image (femmes/hommes)
+      if (imageId.startsWith('femme_') || imageId.startsWith('homme_')) {
+        updateCatalogImageUrl(imageId, url);
+        return;
+      }
       
       saveImage(imageId, url);
       
@@ -470,6 +512,139 @@
       }
     }
     
+    // Add new femmes image
+    function addNewFemmesImage() {
+      const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
+      const newId = `femme_${Date.now()}`;
+      const newImage = {
+        id: newId,
+        url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E'
+      };
+      
+      femmesImages.push(newImage);
+      localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
+      
+      loadFemmesCatalog();
+    }
+    
+    // Add new hommes image
+    function addNewHommesImage() {
+      const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
+      const newId = `homme_${Date.now()}`;
+      const newImage = {
+        id: newId,
+        url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E'
+      };
+      
+      hommesImages.push(newImage);
+      localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
+      
+      loadHommesCatalog();
+    }
+    
+    // Load femmes catalog in admin
+    function loadFemmesCatalog() {
+      const container = document.getElementById('femmesCatalog');
+      let femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
+      
+      if (femmesImages.length === 0) {
+        for (let i = 1; i <= 6; i++) {
+          femmesImages.push({ id: `femme_${i}`, url: `img/femmes/${i}.png` });
+        }
+        localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
+      }
+      
+      container.innerHTML = '';
+      femmesImages.forEach((item, index) => {
+        const config = {
+          id: item.id,
+          name: `Coupe ${index + 1}`,
+          default: item.url
+        };
+        createImageItem(config, container, true);
+      });
+    }
+    
+    // Load hommes catalog in admin
+    function loadHommesCatalog() {
+      const container = document.getElementById('hommesCatalog');
+      let hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
+      
+      if (hommesImages.length === 0) {
+        for (let i = 1; i <= 6; i++) {
+          hommesImages.push({ id: `homme_${i}`, url: `img/hommes/${i}.png` });
+        }
+        localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
+      }
+      
+      container.innerHTML = '';
+      hommesImages.forEach((item, index) => {
+        const config = {
+          id: item.id,
+          name: `Coupe ${index + 1}`,
+          default: item.url
+        };
+        createImageItem(config, container, true);
+      });
+    }
+    
+    // Update femmes/hommes image URL
+    function updateCatalogImageUrl(imageId, url) {
+      if (!url) return;
+      
+      // Check if it's a femmes image
+      if (imageId.startsWith('femme_')) {
+        const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
+        const image = femmesImages.find(img => img.id === imageId);
+        if (image) {
+          image.url = url;
+          localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
+        }
+      }
+      // Check if it's a hommes image
+      else if (imageId.startsWith('homme_')) {
+        const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
+        const image = hommesImages.find(img => img.id === imageId);
+        if (image) {
+          image.url = url;
+          localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
+        }
+      }
+      
+      // Update the displayed image
+      const item = document.querySelector(`[data-image-id="${imageId}"]`);
+      if (item) {
+        const img = item.querySelector('img');
+        if (img) {
+          img.src = url;
+        }
+      }
+    }
+    
+    // Delete femmes/hommes image
+    function deleteCatalogImage(imageId) {
+      if (confirm('Êtes-vous sûr de vouloir supprimer cette image ?')) {
+        // Remove from DOM
+        const item = document.querySelector(`[data-image-id="${imageId}"]`);
+        if (item) {
+          item.remove();
+        }
+        
+        // Remove from localStorage
+        if (imageId.startsWith('femme_')) {
+          const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
+          const updated = femmesImages.filter(img => img.id !== imageId);
+          localStorage.setItem('femmes_images', JSON.stringify(updated));
+          loadFemmesCatalog();
+        } else if (imageId.startsWith('homme_')) {
+          const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
+          const updated = hommesImages.filter(img => img.id !== imageId);
+          localStorage.setItem('hommes_images', JSON.stringify(updated));
+          loadHommesCatalog();
+        }
+      }
+    }
+    
     // Save all images
     function saveAllImages() {
       const message = document.getElementById('successMessage');
@@ -520,6 +695,12 @@
       // Load map image
       const mapContainer = document.getElementById('mapImage');
       createImageItem(imageConfig.map, mapContainer);
+      
+      // Load femmes catalog
+      loadFemmesCatalog();
+      
+      // Load hommes catalog
+      loadHommesCatalog();
     }
 
     // Initialize on load

@@ -61,55 +61,14 @@
   <section class="gallery-section" style="padding-top: 8rem;">
     <div class="section-header">
       <span class="section-tag">Catalogue</span>
-      <h2 class="section-title">Catalogue Femmes</h2>
+      <h2 class="section-title">Catalogue femmes</h2>
     </div>
     <p style="text-align: center; color: var(--text-secondary); max-width: 600px; margin: 0 auto 4rem; font-size: 1.1rem; line-height: 1.8;">
       Découvrez notre sélection de coupes féminines tendances et uniques, réalisées par nos experts coiffeurs.
     </p>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; max-width: 1400px; margin: 0 auto; padding: 0 2rem;">
-      <div class="service-card" data-tilt style="padding: 0; overflow: hidden; cursor: pointer;">
-        <img src="img/femmes/1.png" alt="Coupe Femme 1" style="width: 100%; height: 400px; object-fit: cover; display: block;">
-        <div class="service-content" style="padding: 2rem;">
-          <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Coupe Classique</h3>
-          <p style="color: var(--text-secondary); line-height: 1.8;">Une coupe intemporelle qui met en valeur votre visage.</p>
-        </div>
-      </div>
-      <div class="service-card" data-tilt style="padding: 0; overflow: hidden; cursor: pointer;">
-        <img src="img/femmes/2.png" alt="Coupe Femme 2" style="width: 100%; height: 400px; object-fit: cover; display: block;">
-        <div class="service-content" style="padding: 2rem;">
-          <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Coupe Moderne</h3>
-          <p style="color: var(--text-secondary); line-height: 1.8;">Un style contemporain pour un look tendance.</p>
-        </div>
-      </div>
-      <div class="service-card" data-tilt style="padding: 0; overflow: hidden; cursor: pointer;">
-        <img src="img/femmes/3.png" alt="Coupe Femme 3" style="width: 100%; height: 400px; object-fit: cover; display: block;">
-        <div class="service-content" style="padding: 2rem;">
-          <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Coupe Élégante</h3>
-          <p style="color: var(--text-secondary); line-height: 1.8;">Raffinement et sophistication pour toutes les occasions.</p>
-        </div>
-      </div>
-      <div class="service-card" data-tilt style="padding: 0; overflow: hidden; cursor: pointer;">
-        <img src="img/femmes/4.png" alt="Coupe Femme 4" style="width: 100%; height: 400px; object-fit: cover; display: block;">
-        <div class="service-content" style="padding: 2rem;">
-          <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Coupe Bohème</h3>
-          <p style="color: var(--text-secondary); line-height: 1.8;">Un style décontracté et naturel pour un look bohème.</p>
-        </div>
-      </div>
-      <div class="service-card" data-tilt style="padding: 0; overflow: hidden; cursor: pointer;">
-        <img src="img/femmes/5.png" alt="Coupe Femme 5" style="width: 100%; height: 400px; object-fit: cover; display: block;">
-        <div class="service-content" style="padding: 2rem;">
-          <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Coupe Courte</h3>
-          <p style="color: var(--text-secondary); line-height: 1.8;">Audace et modernité avec une coupe courte structurée.</p>
-        </div>
-      </div>
-      <div class="service-card" data-tilt style="padding: 0; overflow: hidden; cursor: pointer;">
-        <img src="img/femmes/6.png" alt="Coupe Femme 6" style="width: 100%; height: 400px; object-fit: cover; display: block;">
-        <div class="service-content" style="padding: 2rem;">
-          <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Coupe Longue</h3>
-          <p style="color: var(--text-secondary); line-height: 1.8;">Romantisme et féminité avec une longue chevelure soignée.</p>
-        </div>
-      </div>
+    <div id="femmesCatalog" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.5rem; max-width: 1400px; margin: 0 auto; padding: 0 2rem;">
+      <!-- Images will be loaded dynamically from localStorage -->
     </div>
   </section>
 
@@ -170,22 +129,79 @@
       });
     }
 
+    // Load femmes catalog images
+    function loadFemmesCatalog() {
+      const container = document.getElementById('femmesCatalog');
+      const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
+      
+      if (femmesImages.length === 0) {
+        // Default images
+        for (let i = 1; i <= 6; i++) {
+          femmesImages.push({ id: `femme_${i}`, url: `img/femmes/${i}.png` });
+        }
+        localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
+      }
+      
+      container.innerHTML = '';
+      femmesImages.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'service-card';
+        card.setAttribute('data-tilt', '');
+        card.style.cssText = 'padding: 0; overflow: hidden; cursor: pointer;';
+        card.innerHTML = `
+          <img src="${item.url}" alt="Coupe Femme ${index + 1}" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+          <div class="service-content" style="padding: 1.5rem; text-align: center;">
+            <h3 style="font-size: 1.3rem; margin: 0;">Coupe ${index + 1}</h3>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+      
+      // Re-attach lightbox and tilt events
+      attachCatalogEvents();
+    }
+    
+    // Attach events to catalog items
+    function attachCatalogEvents() {
+      const catalogItems = document.querySelectorAll('#femmesCatalog .service-card');
+      const lightbox = document.getElementById('lightbox');
+      const lightboxImg = document.getElementById('lightbox-img');
+      
+      catalogItems.forEach(item => {
+        item.addEventListener('click', function() {
+          const img = this.querySelector('img');
+          if (img) {
+            lightboxImg.src = img.src;
+            lightboxImg.alt = img.alt;
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+          }
+        });
+        
+        // 3D Tilt Effect
+        item.addEventListener('mousemove', (e) => {
+          const rect = item.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const rotateX = (y - centerY) / 25;
+          const rotateY = (centerX - x) / 25;
+          item.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+        });
+        
+        item.addEventListener('mouseleave', () => {
+          item.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+        });
+      });
+    }
+    
+    // Load catalog on page load
+    loadFemmesCatalog();
+    
     // Gallery Lightbox
-    const catalogItems = document.querySelectorAll('.service-card[data-tilt]');
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
-    
-    catalogItems.forEach(item => {
-      item.addEventListener('click', function() {
-        const img = this.querySelector('img');
-        if (img) {
-          lightboxImg.src = img.src;
-          lightboxImg.alt = img.alt;
-          lightbox.classList.add('active');
-          document.body.style.overflow = 'hidden';
-        }
-      });
-    });
     
     function closeLightbox() {
       lightbox.classList.remove('active');
@@ -256,26 +272,6 @@
     window.addEventListener('scroll', handleFixedCTA, { passive: true });
     handleFixedCTA();
 
-    // 3D Tilt Effect
-    document.querySelectorAll('[data-tilt]').forEach(card => {
-      card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        
-        const rotateX = (y - centerY) / 25;
-        const rotateY = (centerX - x) / 25;
-        
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-      });
-      
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
-      });
-    });
   </script>
 </body>
 </html>
