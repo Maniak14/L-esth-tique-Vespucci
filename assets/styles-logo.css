@@ -1117,18 +1117,20 @@ section {
 .review-card {
   flex-shrink: 0;
   width: 400px;
-  background: var(--surface);
+  background: rgba(255, 255, 255, 0.02);
   border: none;
   border-radius: 20px;
   padding: 2.5rem;
   backdrop-filter: blur(20px);
   transition: transform 0.3s ease;
+  box-shadow: none;
 }
 
 .review-card:hover {
-  transform: translateY(-10px);
+  transform: translateY(-5px);
   border: none;
-  box-shadow: 0 20px 60px rgba(32, 178, 170, 0.3);
+  box-shadow: none;
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .review-stars {
