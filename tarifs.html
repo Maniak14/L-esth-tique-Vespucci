@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr" data-page="tarifs" data-title="Tarifs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>L'Esthétique Vespucci - Tarifs</title>
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="preload" href="assets/styles.css" as="style">
+  <style>
+    body::after {
+      background: 
+        radial-gradient(ellipse 1200px 600px at 20% 30%, rgba(150,100,200,0.12) 0%, rgba(150,100,200,0.06) 30%, transparent 60%),
+        radial-gradient(ellipse 900px 450px at 80% 70%, rgba(150,100,200,0.10) 0%, rgba(150,100,200,0.04) 30%, transparent 60%),
+        radial-gradient(ellipse 600px 300px at 50% 20%, rgba(150,100,200,0.08) 0%, rgba(150,100,200,0.03) 30%, transparent 60%);
+    }
+    
+    .fluid-blob-1 {
+      background: radial-gradient(ellipse, rgba(150,100,200,0.15) 0%, rgba(150,100,200,0.08) 30%, transparent 70%);
+    }
+    
+    .fluid-blob-2 {
+      background: radial-gradient(ellipse, rgba(150,100,200,0.12) 0%, rgba(150,100,200,0.06) 30%, transparent 70%);
+    }
+    
+    .fluid-blob-3 {
+      background: radial-gradient(ellipse, rgba(150,100,200,0.10) 0%, rgba(150,100,200,0.05) 30%, transparent 70%);
+    }
+  </style>
+</head>
+<body class="no-scrollbar">
+<div class="grid-bg"></div>
+<div class="bg-color-left"></div>
+<div class="bg-color-right"></div>
+<div class="particles" id="particles"></div>
+<div class="fluid-blob-1"></div>
+<div class="fluid-blob-2"></div>
+<div class="fluid-blob-3"></div>
+
+  <header class="main-header">
+    <a href="index.html" class="mobile-title">L'Esthétique Vespucci</a>
+    <nav class="navbar">
+      <a href="index.html" class="nav-link">Accueil</a>
+      <a href="tarifs.html" class="nav-link active">Tarifs</a>
+      <a href="femmes.html" class="nav-link">Femmes</a>
+      <a href="hommes.html" class="nav-link">Hommes</a>
+      <a href="index.html#faq" class="nav-link">F.A.Q</a>
+    </nav>
+    <div class="burger" id="burger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </header>
+
+  <section class="pricing-section fade-in" style="padding-top: 8rem; padding-bottom: 4rem;">
+    <div class="pricing-header" style="text-align: center; margin-bottom: 4rem; max-width: 1400px; margin-left: auto; margin-right: auto; padding: 0 2rem;">
+      <h1 style="font-size: 3rem; margin-bottom: 1rem; background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Nos Tarifs</h1>
+      <p style="font-size: 1.2rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto;">Des prix transparents pour des services de qualité. Tous nos tarifs incluent une consultation personnalisée.</p>
+    </div>
+
+    <div class="pricing-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+      <div class="pricing-card fade-in" style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 2.5rem; backdrop-filter: blur(20px); transition: all 0.3s ease;">
+        <h3 style="font-size: 1.8rem; margin-bottom: 1rem; color: var(--text-primary);">Coupe Homme</h3>
+        <div style="font-size: 3rem; font-weight: 700; color: var(--primary-color); margin-bottom: 1rem;">50€</div>
+        <ul style="list-style: none; padding: 0; margin-bottom: 2rem;">
+          <li style="padding: 0.5rem 0; color: var(--text-secondary); border-bottom: 1px solid var(--glass-border);">Coupe et coiffage</li>
+          <li style="padding: 0.5rem 0; color: var(--text-secondary); border-bottom: 1px solid var(--glass-border);">Consultation personnalisée</li>
+          <li style="padding: 0.5rem 0; color: var(--text-secondary);">Produits de qualité professionnelle</li>
+        </ul>
+        <a href="#" class="cta-btn" style="display: block; text-align: center;">Réserver</a>
+      </div>
+
+      <div class="pricing-card fade-in" style="background: var(--glass-bg); border: 2px solid var(--primary-color); border-radius: 20px; padding: 2.5rem; backdrop-filter: blur(20px); transition: all 0.3s ease; transform: scale(1.05);">
+        <div style="text-align: center; margin-bottom: 1rem;">
+          <span style="background: var(--primary-color); color: var(--text-primary); padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">POPULAIRE</span>
+        </div>
+        <h3 style="font-size: 1.8rem; margin-bottom: 1rem; color: var(--text-primary);">Coupe Femme</h3>
+        <div style="font-size: 3rem; font-weight: 700; color: var(--primary-color); margin-bottom: 1rem;">80€</div>
+        <ul style="list-style: none; padding: 0; margin-bottom: 2rem;">
+          <li style="padding: 0.5rem 0; color: var(--text-secondary); border-bottom: 1px solid var(--glass-border);">Coupe et coiffage</li>
+          <li style="padding: 0.5rem 0; color: var(--text-secondary); border-bottom: 1px solid var(--glass-border);">Consultation personnalisée</li>
+          <li style="padding: 0.5rem 0; color: var(--text-secondary); border-bottom: 1px solid var(--glass-border);">Soin capillaire</li>
+          <li style="padding: 0.5rem 0; color: var(--text-secondary);">Produits de qualité professionnelle</li>
+        </ul>
+        <a href="#" class="cta-btn" style="display: block; text-align: center;">Réserver</a>
+      </div>
+
+      <div class="pricing-card fade-in" style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 2.5rem; backdrop-filter: blur(20px); transition: all 0.3s ease;">
+        <h3 style="font-size: 1.8rem; margin-bottom: 1rem; color: var(--text-primary);">Coupe Enfant</h3>
+        <div style="font-size: 3rem; font-weight: 700; color: var(--primary-color); margin-bottom: 1rem;">35€</div>
+        <ul style="list-style: none; padding: 0; margin-bottom: 2rem;">
+          <li style="padding: 0.5rem 0; color: var(--text-secondary); border-bottom: 1px solid var(--glass-border);">Coupe adaptée</li>
+          <li style="padding: 0.5rem 0; color: var(--text-secondary); border-bottom: 1px solid var(--glass-border);">Ambiance détendue</li>
+          <li style="padding: 0.5rem 0; color: var(--text-secondary);">Produits doux et adaptés</li>
+        </ul>
+        <a href="#" class="cta-btn" style="display: block; text-align: center;">Réserver</a>
+      </div>
+    </div>
+
+    <div class="additional-services" style="max-width: 1200px; margin: 4rem auto 0; padding: 0 2rem;">
+      <h2 style="text-align: center; font-size: 2rem; margin-bottom: 2rem; color: var(--text-primary);">Services Supplémentaires</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 15px; padding: 1.5rem; backdrop-filter: blur(20px);">
+          <h4 style="color: var(--text-primary); margin-bottom: 0.5rem;">Coloration</h4>
+          <p style="color: var(--primary-color); font-size: 1.5rem; font-weight: 600;">À partir de 60€</p>
+        </div>
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 15px; padding: 1.5rem; backdrop-filter: blur(20px);">
+          <h4 style="color: var(--text-primary); margin-bottom: 0.5rem;">Mèches</h4>
+          <p style="color: var(--primary-color); font-size: 1.5rem; font-weight: 600;">À partir de 70€</p>
+        </div>
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 15px; padding: 1.5rem; backdrop-filter: blur(20px);">
+          <h4 style="color: var(--text-primary); margin-bottom: 0.5rem;">Soin Capillaire</h4>
+          <p style="color: var(--primary-color); font-size: 1.5rem; font-weight: 600;">À partir de 30€</p>
+        </div>
+        <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 15px; padding: 1.5rem; backdrop-filter: blur(20px);">
+          <h4 style="color: var(--text-primary); margin-bottom: 0.5rem;">Brushing</h4>
+          <p style="color: var(--primary-color); font-size: 1.5rem; font-weight: 600;">À partir de 25€</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="main-footer">
+    <div class="footer-content">
+      <div class="footer-info">
+        <h4><a href="index.html" class="footer-brand-link">L'Esthétique Vespucci</a></h4>
+        <p>© L'Esthétique Vespucci 2025</p>
+      </div>
+      <div class="footer-nav">
+        <a href="index.html" class="footer-link">Accueil</a>
+        <a href="femmes.html" class="footer-link">Femmes</a>
+        <a href="tarifs.html" class="footer-link active">Tarifs</a>
+        <a href="hommes.html" class="footer-link">Hommes</a>
+      </div>
+    </div>
+  </footer>
+
+  <a href="#" class="fixed-join-button fade-in" id="openFixedBookingModal">PRENDRE RENDEZ-VOUS</a>
+
+  <div id="bookingModal" class="modal-overlay">
+    <div class="modal-content">
+      <button class="modal-close" id="closeBookingModal">&times;</button>
+      <h2>Prendre Rendez-vous</h2>
+      <p>Contactez-nous pour réserver votre créneau</p>
+      <p style="margin-top: 20px; color: #999;">Formulaire de réservation à configurer</p>
+    </div>
+  </div>
+
+  <script src="assets/app.js" defer></script>
+  <script src="assets/particles.js" defer></script>
+  <script src="assets/burger-menu.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const fixedButton = document.getElementById('openFixedBookingModal');
+      const openModalBtn = fixedButton;
+      const bookingModal = document.getElementById('bookingModal');
+      const closeBookingModalBtn = document.getElementById('closeBookingModal');
+      
+      if (fixedButton) {
+        setTimeout(() => {
+          fixedButton.classList.add('in');
+        }, 500);
+      }
+      
+      function openModal() {
+        bookingModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+      
+      function closeModal() {
+        bookingModal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      
+      if (openModalBtn) {
+        openModalBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          openModal();
+        });
+      }
+      
+      if (closeBookingModalBtn) {
+        closeBookingModalBtn.addEventListener('click', closeModal);
+      }
+      
+      bookingModal.addEventListener('click', function(e) {
+        if (e.target === bookingModal) {
+          closeModal();
+        }
+      });
+      
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && bookingModal.classList.contains('active')) {
+          closeModal();
+        }
+      });
+      
+      const pricingCards = document.querySelectorAll('.pricing-card');
+      pricingCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-10px)';
+          this.style.borderColor = 'var(--primary-color)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+          if (!this.style.border.includes('2px')) {
+            this.style.transform = '';
+            this.style.borderColor = '';
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
+
