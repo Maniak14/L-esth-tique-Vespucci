@@ -547,7 +547,12 @@ body::-webkit-scrollbar {
   z-index: 1;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
   object-fit: cover;
+  object-position: center;
   transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.hero-image-wrapper-left .hero-image {
+  object-position: center center;
 }
 
 .hero-image-wrapper:hover .hero-image {
