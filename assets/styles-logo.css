@@ -941,6 +941,15 @@ section {
   display: inline-block;
 }
 
+.service-content .pricing-price-small {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 .service-bg {
   position: absolute;
   bottom: 0;
