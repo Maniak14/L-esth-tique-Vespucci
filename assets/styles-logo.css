@@ -506,6 +506,12 @@ body::-webkit-scrollbar {
   transform-style: preserve-3d;
   flex: 1;
   min-height: 700px;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.hero-image-wrapper:hover {
+  transform: scale(1.02);
 }
 
 .image-glow {
