@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>L'Esthétique Vespucci - Hommes</title>
-  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
-  <link rel="stylesheet" href="assets/styles-new.css">
+  <link rel="icon" type="image/png" href="img/V.png">
+  <link rel="stylesheet" href="assets/styles-logo.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -36,8 +36,11 @@
   <nav class="main-nav">
     <div class="nav-container">
       <a href="index.html" class="logo">
-        <span class="logo-text">VESPUCCI</span>
-        <span class="logo-subtitle">ESTHÉTIQUE</span>
+        <img src="img/V.png" alt="Logo Vespucci" class="logo-image">
+        <div class="logo-text-wrapper">
+          <span class="logo-text">VESPUCCI</span>
+          <span class="logo-subtitle">ESTHÉTIQUE</span>
+        </div>
       </a>
       <div class="nav-links">
         <a href="index.html" class="nav-item">Accueil</a>
@@ -114,7 +117,13 @@
   <footer class="main-footer">
     <div class="footer-content">
       <div class="footer-brand">
-        <h3>VESPUCCI</h3>
+        <a href="index.html" class="footer-logo">
+          <img src="img/V.png" alt="Logo Vespucci" class="footer-logo-image">
+          <div class="footer-logo-text-wrapper">
+            <span class="footer-logo-text">VESPUCCI</span>
+            <span class="footer-logo-subtitle">ESTHÉTIQUE</span>
+          </div>
+        </a>
         <p>L'Esthétique Vespucci © 2025</p>
       </div>
       <div class="footer-links">
@@ -257,10 +266,10 @@
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
         
-        const rotateX = (y - centerY) / 10;
-        const rotateY = (centerX - x) / 10;
+        const rotateX = (y - centerY) / 25;
+        const rotateY = (centerX - x) / 25;
         
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
       });
       
       card.addEventListener('mouseleave', () => {
