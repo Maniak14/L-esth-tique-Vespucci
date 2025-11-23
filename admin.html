@@ -197,6 +197,58 @@
     .success-message.show {
       display: block;
     }
+    
+    .add-image-btn {
+      background: var(--primary);
+      border: 2px dashed var(--primary);
+      border-radius: 15px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      font-size: 3rem;
+    }
+    
+    .add-image-btn:hover {
+      background: rgba(150, 100, 200, 0.2);
+      border-color: var(--primary-light);
+      transform: scale(1.05);
+    }
+    
+    .add-image-btn span {
+      font-size: 1rem;
+      margin-top: 0.5rem;
+      color: var(--text-secondary);
+    }
+    
+    .delete-image-btn {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      background: rgba(255, 0, 0, 0.8);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .image-item:hover .delete-image-btn {
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
@@ -219,6 +271,10 @@
       <h2>Galerie (Carousel)</h2>
       <div class="image-grid" id="galleryImages">
         <!-- Gallery images will be loaded here -->
+      </div>
+      <div class="add-image-btn" onclick="addNewGalleryImage()" title="Ajouter une nouvelle image">
+        <div>+</div>
+        <span>Ajouter une image</span>
       </div>
     </div>
 
