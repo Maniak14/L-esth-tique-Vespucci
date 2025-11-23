@@ -942,6 +942,41 @@ section {
   border-radius: 15px;
 }
 
+.location-addresses {
+  display: flex;
+  gap: 2rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.address-item {
+  text-align: center;
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  backdrop-filter: blur(20px);
+  min-width: 250px;
+}
+
+.address-item h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.address-item p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin: 0;
+}
+
 /* ============================================
    REVIEWS SECTION
    ============================================ */
