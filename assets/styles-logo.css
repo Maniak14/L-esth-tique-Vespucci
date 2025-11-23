@@ -954,6 +954,10 @@ section {
   transition: transform 0.5s ease;
 }
 
+.team-image-wrapper img[alt="Soren Wanks"] {
+  object-position: center 45%;
+}
+
 .team-card:hover .team-image-wrapper img {
   transform: scale(1.1);
 }
