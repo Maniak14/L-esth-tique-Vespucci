@@ -900,6 +900,9 @@ section {
 .reviews-section {
   padding: 6rem 0;
   overflow: visible;
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
 }
 
 .reviews-section .section-header {
@@ -912,9 +915,12 @@ section {
   overflow: hidden;
   margin-bottom: 3rem;
   padding: 1rem 0;
-  width: 100%;
-  margin-left: 0;
-  margin-right: 0;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  position: relative;
+  left: 0;
+  right: 0;
 }
 
 .reviews-track {
@@ -922,7 +928,8 @@ section {
   gap: 2rem;
   animation: scrollReviews 50s linear infinite;
   width: fit-content;
-  padding: 1rem 0;
+  padding: 0;
+  margin-left: 0;
 }
 
 .review-card {
