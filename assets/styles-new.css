@@ -932,6 +932,7 @@ section {
   margin-left: 0;
   margin-right: 0;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .reviews-track {
@@ -940,10 +941,12 @@ section {
   animation: scrollReviews 50s linear infinite;
   width: fit-content;
   padding: 0;
-  margin: 0 0 0 auto;
+  margin: 0;
   justify-content: flex-start;
   position: relative;
+  left: auto;
   right: 0;
+  margin-left: auto;
 }
 
 .review-card {

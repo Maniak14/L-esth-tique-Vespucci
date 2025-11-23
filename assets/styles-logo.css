@@ -900,9 +900,12 @@ section {
 .reviews-section {
   padding: 6rem 0;
   overflow: visible;
-  margin-left: 0;
-  margin-right: 0;
+  margin: 0;
   width: 100%;
+  max-width: 100%;
+  position: relative;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .reviews-section .section-header {
@@ -916,11 +919,17 @@ section {
   margin-bottom: 3rem;
   padding: 1rem 0;
   width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
+  max-width: none;
   position: relative;
-  left: 0;
-  right: 0;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: 0;
+  margin-right: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .reviews-track {
@@ -929,7 +938,12 @@ section {
   animation: scrollReviews 50s linear infinite;
   width: fit-content;
   padding: 0;
-  margin-left: 0;
+  margin: 0;
+  justify-content: flex-start;
+  position: relative;
+  left: auto;
+  right: 0;
+  margin-left: auto;
 }
 
 .review-card {
@@ -980,7 +994,7 @@ section {
     transform: translateX(0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translateX(calc(-50% - 2rem));
   }
 }
 
