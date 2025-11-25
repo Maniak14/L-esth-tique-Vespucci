@@ -1,31 +1,24 @@
-# Fichiers de configuration sensibles
-firebase-config.js
-admin-login.html
-
-# Dossier caché avec fichiers sensibles
-.secrets/
-*.secrets
-
-# Fichiers système
+# OS files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
 *.swp
 *.swo
 *~
-
-# Fichiers d'éditeur
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
 
 # Logs
 *.log
 npm-debug.log*
 
-# Dependencies (si vous utilisez npm)
-node_modules/
-
-# Fichiers temporaires
+# Temporary files
 *.tmp
 *.temp
+
