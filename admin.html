@@ -17,7 +17,9 @@
   <script>
     // Vérifier l'authentification avant d'afficher la page
     if (sessionStorage.getItem('adminAuthenticated') !== 'true') {
-      window.location.href = 'admin-login.html';
+      // Utiliser un chemin absolu depuis la racine
+      const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+      window.location.href = rootPath + '/admin-login.html';
     }
     
     // Force scroll to top immediately on page load
@@ -1346,7 +1348,9 @@
     function logout() {
       if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
         sessionStorage.removeItem('adminAuthenticated');
-        window.location.href = 'admin-login.html';
+        // Utiliser un chemin absolu depuis la racine
+        const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+        window.location.href = rootPath + '/admin-login.html';
       }
     }
 

@@ -148,7 +148,9 @@
     
     // Vérifier si l'utilisateur est déjà connecté
     if (sessionStorage.getItem('adminAuthenticated') === 'true') {
-      window.location.href = 'admin.html';
+      // Utiliser un chemin absolu depuis la racine
+      const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+      window.location.href = rootPath + '/admin.html';
     }
     
     function handleLogin(event) {
@@ -163,8 +165,9 @@
         // Stocker l'authentification dans sessionStorage (se supprime à la fermeture du navigateur)
         sessionStorage.setItem('adminAuthenticated', 'true');
         
-        // Rediriger vers admin.html
-        window.location.href = 'admin.html';
+        // Rediriger vers admin.html avec chemin absolu depuis la racine
+        const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+        window.location.href = rootPath + '/admin.html';
       } else {
         // Afficher l'erreur
         errorMessage.classList.add('show');
