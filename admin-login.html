@@ -127,10 +127,10 @@
       <p>Veuillez entrer le mot de passe pour accéder à la page d'administration</p>
     </div>
     
-    <form class="login-form" id="loginForm" onsubmit="handleLogin(event)">
+    <form class="login-form" id="loginForm" onsubmit="return handleLogin(event)" method="post">
       <div class="form-group">
         <label for="password">Mot de passe</label>
-        <input type="password" id="password" name="password" required autofocus>
+        <input type="password" id="password" required autofocus>
       </div>
       
       <div class="error-message" id="errorMessage">
@@ -178,6 +178,7 @@
     
     async function handleLogin(event) {
       event.preventDefault();
+      event.stopPropagation();
       
       const passwordInput = document.getElementById('password');
       const password = passwordInput.value;
@@ -186,7 +187,7 @@
       if (!firebaseInitialized || !db) {
         errorMessage.textContent = 'Erreur de connexion. Veuillez réessayer.';
         errorMessage.classList.add('show');
-        return;
+        return false;
       }
       
       try {
@@ -196,7 +197,7 @@
         if (!passwordDoc.exists) {
           errorMessage.textContent = 'Configuration manquante. Contactez l\'administrateur.';
           errorMessage.classList.add('show');
-          return;
+          return false;
         }
         
         const storedHash = passwordDoc.data().hash;
@@ -209,9 +210,10 @@
           // Stocker l'authentification dans sessionStorage
           sessionStorage.setItem('adminAuthenticated', 'true');
           
-          // Rediriger vers admin.html
+          // Rediriger vers admin.html (utiliser replace pour éviter le retour en arrière)
           const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
-          window.location.href = rootPath + '/admin.html';
+          window.location.replace(rootPath + '/admin.html');
+          return false;
         } else {
           // Afficher l'erreur
           errorMessage.textContent = 'Mot de passe incorrect. Veuillez réessayer.';
@@ -223,20 +225,36 @@
           setTimeout(() => {
             errorMessage.classList.remove('show');
           }, 3000);
+          return false;
         }
       } catch (error) {
         console.error('Erreur authentification:', error);
         errorMessage.textContent = 'Erreur de connexion. Veuillez réessayer.';
         errorMessage.classList.add('show');
+        return false;
       }
     }
     
-    // Permettre la soumission avec Enter
+    // Empêcher la soumission par défaut du formulaire
     document.addEventListener('DOMContentLoaded', () => {
+      const loginForm = document.getElementById('loginForm');
       const passwordInput = document.getElementById('password');
+      
+      // Empêcher la soumission par défaut du formulaire
+      if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          await handleLogin(e);
+          return false;
+        });
+      }
+      
+      // Permettre la soumission avec Enter
       if (passwordInput) {
         passwordInput.addEventListener('keypress', async (e) => {
           if (e.key === 'Enter') {
+            e.preventDefault();
             await handleLogin(e);
           }
         });
