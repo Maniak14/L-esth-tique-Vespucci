@@ -118,9 +118,18 @@
     loadSavedImages();
     
     // Load team members from localStorage
-    function loadTeamMembers() {
+    async function loadTeamMembers() {
       const teamGrid = document.getElementById('teamGrid');
       if (!teamGrid) return;
+      
+      // Load positions from server
+      let serverPositions = {};
+      try {
+        const response = await fetch('api/positions.php');
+        serverPositions = await response.json();
+      } catch (error) {
+        console.error('Erreur lors du chargement des positions:', error);
+      }
       
       const teamMembers = JSON.parse(localStorage.getItem('team_members') || '[]');
       const defaultMembers = [
@@ -173,7 +182,7 @@
         const card = document.createElement('div');
         card.className = 'team-card';
         
-        // Get saved image position (will be loaded from server)
+        // Get saved image position from server
         const defaultPositions = {
           'julio': 'center 35%',
           'soren': 'center 8%',
@@ -182,8 +191,7 @@
           'andres': 'center 0%',
           'yoruhime': 'center 18%'
         };
-        // Position will be set after loading from server
-        const imagePosition = defaultPositions[imageId] || 'center 35%';
+        const imagePosition = serverPositions[imageId] || defaultPositions[imageId] || 'center 35%';
         
         card.innerHTML = `
           <div class="team-image-wrapper">
