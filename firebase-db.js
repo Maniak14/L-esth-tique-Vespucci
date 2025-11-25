@@ -2,7 +2,7 @@
 // Fonctions pour sauvegarder et charger les données depuis Firebase Firestore
 
 let db;
-let firebaseInitialized = false;
+window.firebaseInitialized = false;
 
 // Initialiser la connexion Firebase
 function initFirebaseDB() {
@@ -12,8 +12,8 @@ function initFirebaseDB() {
   }
   
   if (initFirebase && typeof initFirebase === 'function') {
-    firebaseInitialized = initFirebase();
-    if (firebaseInitialized) {
+    window.firebaseInitialized = initFirebase();
+    if (window.firebaseInitialized) {
       db = firebaseFirestore;
       return true;
     }
@@ -25,7 +25,7 @@ function initFirebaseDB() {
 
 // Sauvegarder une image dans Firestore
 function saveImageToFirebase(imageId, imageUrl) {
-  if (!firebaseInitialized || !db) return;
+  if (!window.firebaseInitialized || !db) return;
   
   try {
     db.collection('images').doc(imageId).set({
@@ -39,7 +39,7 @@ function saveImageToFirebase(imageId, imageUrl) {
 
 // Charger une image depuis Firestore
 function loadImageFromFirebase(imageId, callback) {
-  if (!firebaseInitialized || !db) {
+  if (!window.firebaseInitialized || !db) {
     callback(null);
     return;
   }
@@ -63,7 +63,7 @@ function loadImageFromFirebase(imageId, callback) {
 
 // Écouter les changements d'images en temps réel
 function watchImages(callback) {
-  if (!firebaseInitialized || !db) return;
+  if (!window.firebaseInitialized || !db) return;
   
   try {
     db.collection('images').onSnapshot((snapshot) => {
@@ -96,7 +96,7 @@ function watchImages(callback) {
 
 // Sauvegarder une position d'image dans Firestore
 function savePositionToFirebase(imageId, position) {
-  if (!firebaseInitialized || !db) return;
+  if (!window.firebaseInitialized || !db) return;
   
   try {
     db.collection('positions').doc(imageId).set({
@@ -110,7 +110,7 @@ function savePositionToFirebase(imageId, position) {
 
 // Charger une position depuis Firestore
 function loadPositionFromFirebase(imageId, callback) {
-  if (!firebaseInitialized || !db) {
+  if (!window.firebaseInitialized || !db) {
     callback(null);
     return;
   }
@@ -134,7 +134,7 @@ function loadPositionFromFirebase(imageId, callback) {
 
 // Écouter les changements de positions en temps réel
 function watchPositions(callback) {
-  if (!firebaseInitialized || !db) return;
+  if (!window.firebaseInitialized || !db) return;
   
   try {
     db.collection('positions').onSnapshot((snapshot) => {
@@ -167,7 +167,7 @@ function watchPositions(callback) {
 
 // Sauvegarder les membres de l'équipe dans Firestore
 function saveTeamMembersToFirebase(teamMembers) {
-  if (!firebaseInitialized || !db) return;
+  if (!window.firebaseInitialized || !db) return;
   
   try {
     db.collection('data').doc('team_members').set({
@@ -181,7 +181,7 @@ function saveTeamMembersToFirebase(teamMembers) {
 
 // Charger les membres de l'équipe depuis Firestore
 function loadTeamMembersFromFirebase(callback) {
-  if (!firebaseInitialized || !db) {
+  if (!window.firebaseInitialized || !db) {
     if (callback) callback([]);
     return;
   }
@@ -205,7 +205,7 @@ function loadTeamMembersFromFirebase(callback) {
 
 // Écouter les changements de membres en temps réel
 function watchTeamMembers(callback) {
-  if (!firebaseInitialized || !db) return;
+  if (!window.firebaseInitialized || !db) return;
   
   try {
     db.collection('data').doc('team_members').onSnapshot((doc) => {
@@ -225,7 +225,7 @@ function watchTeamMembers(callback) {
 
 // Sauvegarder les membres supprimés
 function saveDeletedTeamMembersToFirebase(deletedMembers) {
-  if (!firebaseInitialized || !db) return;
+  if (!window.firebaseInitialized || !db) return;
   
   try {
     db.collection('data').doc('deleted_team_members').set({
@@ -239,7 +239,7 @@ function saveDeletedTeamMembersToFirebase(deletedMembers) {
 
 // Charger les membres supprimés
 function loadDeletedTeamMembersFromFirebase(callback) {
-  if (!firebaseInitialized || !db) {
+  if (!window.firebaseInitialized || !db) {
     if (callback) callback([]);
     return;
   }
@@ -265,7 +265,7 @@ function loadDeletedTeamMembersFromFirebase(callback) {
 
 // Sauvegarder les images de galerie personnalisées
 function saveCustomGalleryToFirebase(customImages) {
-  if (!firebaseInitialized || !db) return;
+  if (!window.firebaseInitialized || !db) return;
   
   try {
     db.collection('data').doc('custom_gallery_images').set({
@@ -279,7 +279,7 @@ function saveCustomGalleryToFirebase(customImages) {
 
 // Charger les images de galerie personnalisées
 function loadCustomGalleryFromFirebase(callback) {
-  if (!firebaseInitialized || !db) {
+  if (!window.firebaseInitialized || !db) {
     if (callback) callback([]);
     return;
   }
@@ -305,7 +305,7 @@ function loadCustomGalleryFromFirebase(callback) {
 
 // Sauvegarder le catalogue femmes
 function saveFemmesImagesToFirebase(femmesImages) {
-  if (!firebaseInitialized || !db) return;
+  if (!window.firebaseInitialized || !db) return;
   
   try {
     db.collection('data').doc('femmes_images').set({
@@ -319,7 +319,7 @@ function saveFemmesImagesToFirebase(femmesImages) {
 
 // Charger le catalogue femmes
 function loadFemmesImagesFromFirebase(callback) {
-  if (!firebaseInitialized || !db) {
+  if (!window.firebaseInitialized || !db) {
     if (callback) callback([]);
     return;
   }
@@ -345,7 +345,7 @@ function loadFemmesImagesFromFirebase(callback) {
 
 // Sauvegarder le catalogue hommes
 function saveHommesImagesToFirebase(hommesImages) {
-  if (!firebaseInitialized || !db) return;
+  if (!window.firebaseInitialized || !db) return;
   
   try {
     db.collection('data').doc('hommes_images').set({
@@ -359,7 +359,7 @@ function saveHommesImagesToFirebase(hommesImages) {
 
 // Charger le catalogue hommes
 function loadHommesImagesFromFirebase(callback) {
-  if (!firebaseInitialized || !db) {
+  if (!window.firebaseInitialized || !db) {
     if (callback) callback([]);
     return;
   }
@@ -385,7 +385,7 @@ function loadHommesImagesFromFirebase(callback) {
 
 // Charger toutes les données depuis Firestore
 async function loadAllDataFromFirebase() {
-  if (!firebaseInitialized || !db) return;
+  if (!window.firebaseInitialized || !db) return;
   
   try {
     // Charger toutes les images

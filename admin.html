@@ -691,11 +691,12 @@
     };
 
     // Initialize Firebase on page load
-    let firebaseInitialized = false;
+    // Note: firebaseInitialized is declared in firebase-db.js
     document.addEventListener('DOMContentLoaded', async () => {
       if (initFirebaseDB && typeof initFirebaseDB === 'function') {
-        firebaseInitialized = initFirebaseDB();
-        if (firebaseInitialized) {
+        const initialized = initFirebaseDB();
+        window.firebaseInitialized = initialized;
+        if (initialized) {
           // Charger toutes les données depuis Firebase
           await loadAllDataFromFirebase();
           // Écouter les changements en temps réel
@@ -746,7 +747,7 @@
     // Save image to localStorage and Firebase
     function saveImage(imageId, imageUrl) {
       localStorage.setItem(`image_${imageId}`, imageUrl);
-      if (firebaseInitialized && typeof saveImageToFirebase === 'function') {
+      if (window.firebaseInitialized && typeof saveImageToFirebase === 'function') {
         saveImageToFirebase(imageId, imageUrl);
       }
     }
@@ -1265,8 +1266,8 @@
       }
     }
     
-    // Add new team member
-    function addNewTeamMember() {
+    // Add new team member (global function)
+    window.addNewTeamMember = function() {
       const teamContainer = document.getElementById('teamImages');
       const existingMembers = teamContainer.querySelectorAll('.image-item').length;
       const newId = `team_${Date.now()}`;
@@ -1281,7 +1282,7 @@
       saveTeamMemberInfo(newId, { firstName: '', lastName: '', grade: '', phone: '' });
       
       createImageItem(newConfig, teamContainer, true);
-    }
+    };
     
     // Delete team member
     function deleteTeamMember(memberId) {
