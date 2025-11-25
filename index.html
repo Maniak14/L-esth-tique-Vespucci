@@ -9,12 +9,20 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="firebase-db.js"></script>
   <script>
     // Force scroll to top immediately on page load
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual';
     }
     window.scrollTo(0, 0);
+    
+    // Initialize Firebase and load data
+    let firebaseInitialized = false;
     
     // Load images from localStorage (admin changes)
     function loadSavedImages() {
@@ -38,8 +46,71 @@
         'gallery6': 'img/carousel/6.png'
       };
       
-      // Load team members
-      document.addEventListener('DOMContentLoaded', () => {
+      // Initialize Firebase and load team members
+      document.addEventListener('DOMContentLoaded', async () => {
+        // Initialize Firebase
+        if (initFirebaseDB && typeof initFirebaseDB === 'function') {
+          firebaseInitialized = initFirebaseDB();
+          if (firebaseInitialized) {
+            // Load all data from Firebase
+            await loadAllDataFromFirebase();
+            // Watch for real-time updates
+            watchImages(() => {
+              console.log('Images mises à jour depuis Firebase');
+              loadTeamMembers();
+              // Reload gallery
+              const galleryItems = document.querySelectorAll('.gallery-item img');
+              const allGalleryImages = [];
+              for (let i = 1; i <= 6; i++) {
+                const saved = localStorage.getItem(`image_gallery${i}`);
+                allGalleryImages.push(saved || `img/carousel/${i}.png`);
+              }
+              const customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
+              customImages.forEach(imageId => {
+                const saved = localStorage.getItem(`image_${imageId}`);
+                if (saved) {
+                  allGalleryImages.push(saved);
+                }
+              });
+              galleryItems.forEach((img, index) => {
+                if (allGalleryImages[index]) {
+                  img.src = allGalleryImages[index];
+                }
+              });
+              // Update hero images
+              const heroImgs = document.querySelectorAll('.hero-image');
+              heroImgs.forEach((img, index) => {
+                const saved = localStorage.getItem(`image_hero${index + 1}`);
+                if (saved) img.src = saved;
+              });
+              // Update map
+              const mapImg = document.querySelector('.location-map img');
+              if (mapImg) {
+                const saved = localStorage.getItem('image_map');
+                if (saved) mapImg.src = saved;
+              }
+            });
+            watchPositions(() => {
+              console.log('Positions mises à jour depuis Firebase');
+              // Update team image positions
+              document.querySelectorAll('.team-image-wrapper img').forEach(img => {
+                const imageId = img.getAttribute('data-image-id');
+                if (imageId) {
+                  const position = localStorage.getItem(`image_position_${imageId}`);
+                  if (position) {
+                    img.style.objectPosition = position;
+                  }
+                }
+              });
+            });
+            watchTeamMembers(() => {
+              console.log('Membres de l\'équipe mis à jour depuis Firebase');
+              loadTeamMembers();
+            });
+          }
+        }
+        
+        // Load team members
         loadTeamMembers();
         
         // Update gallery images

@@ -128,6 +128,30 @@
       });
     }
 
+    // Initialize Firebase and load catalog
+    let firebaseInitialized = false;
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (initFirebaseDB && typeof initFirebaseDB === 'function') {
+        firebaseInitialized = initFirebaseDB();
+        if (firebaseInitialized) {
+          await loadAllDataFromFirebase();
+          // Watch for updates
+          if (typeof firebaseFirestore !== 'undefined') {
+            firebaseFirestore.collection('data').doc('hommes_images').onSnapshot((doc) => {
+              if (doc.exists) {
+                const data = doc.data();
+                if (data.images && Array.isArray(data.images)) {
+                  localStorage.setItem('hommes_images', JSON.stringify(data.images));
+                  loadHommesCatalog();
+                }
+              }
+            });
+          }
+        }
+      }
+      loadHommesCatalog();
+    });
+
     // Load hommes catalog images
     function loadHommesCatalog() {
       const container = document.getElementById('hommesCatalog');

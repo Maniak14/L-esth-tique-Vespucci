@@ -9,6 +9,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="firebase-db.js"></script>
   <script>
     // Force scroll to top immediately on page load
     if ('scrollRestoration' in history) {
@@ -685,14 +690,65 @@
       map: { id: 'map', name: 'Carte', default: 'img/map.png' }
     };
 
-    // Load saved images from localStorage
+    // Initialize Firebase on page load
+    let firebaseInitialized = false;
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (initFirebaseDB && typeof initFirebaseDB === 'function') {
+        firebaseInitialized = initFirebaseDB();
+        if (firebaseInitialized) {
+          // Charger toutes les données depuis Firebase
+          await loadAllDataFromFirebase();
+          // Écouter les changements en temps réel
+          watchImages(() => {
+            console.log('Images mises à jour depuis Firebase');
+            // Recharger les images si nécessaire
+            if (typeof loadTeamMembers === 'function') {
+              loadTeamMembers();
+            }
+            // Recharger les catalogues
+            if (typeof loadFemmesCatalog === 'function') {
+              loadFemmesCatalog();
+            }
+            if (typeof loadHommesCatalog === 'function') {
+              loadHommesCatalog();
+            }
+          });
+          watchPositions(() => {
+            console.log('Positions mises à jour depuis Firebase');
+            // Mettre à jour les positions dans l'interface
+            document.querySelectorAll('[id^="preview_"]').forEach(img => {
+              const imageId = img.id.replace('preview_', '');
+              const position = localStorage.getItem(`image_position_${imageId}`);
+              if (position) {
+                img.style.objectPosition = position;
+                const display = document.querySelector(`#position_display_${imageId}`);
+                if (display) {
+                  display.textContent = position;
+                }
+              }
+            });
+          });
+          watchTeamMembers(() => {
+            console.log('Membres de l\'équipe mis à jour depuis Firebase');
+            if (typeof loadTeamMembers === 'function') {
+              loadTeamMembers();
+            }
+          });
+        }
+      }
+    });
+
+    // Load saved images from localStorage (avec cache Firebase)
     function getSavedImage(imageId) {
       return localStorage.getItem(`image_${imageId}`) || null;
     }
 
-    // Save image to localStorage
+    // Save image to localStorage and Firebase
     function saveImage(imageId, imageUrl) {
       localStorage.setItem(`image_${imageId}`, imageUrl);
+      if (firebaseInitialized && typeof saveImageToFirebase === 'function') {
+        saveImageToFirebase(imageId, imageUrl);
+      }
     }
 
     // Get current image URL (saved or default)
@@ -733,6 +789,9 @@
     // Save image position
     function saveImagePosition(imageId, position) {
       localStorage.setItem(`image_position_${imageId}`, position);
+      if (firebaseInitialized && typeof savePositionToFirebase === 'function') {
+        savePositionToFirebase(imageId, position);
+      }
       // Update preview
       const previewImg = document.querySelector(`#preview_${imageId}`);
       if (previewImg) {
@@ -842,6 +901,9 @@
       }
       
       localStorage.setItem('team_members', JSON.stringify(teamMembers));
+      if (firebaseInitialized && typeof saveTeamMembersToFirebase === 'function') {
+        saveTeamMembersToFirebase(teamMembers);
+      }
     }
     
     // Update team member info from form fields
@@ -1023,6 +1085,9 @@
       
       customImages.push(newId);
       localStorage.setItem('custom_gallery_images', JSON.stringify(customImages));
+      if (firebaseInitialized && typeof saveCustomGalleryToFirebase === 'function') {
+        saveCustomGalleryToFirebase(customImages);
+      }
       
       createImageItem(newConfig, galleryContainer, true);
     }
@@ -1043,6 +1108,9 @@
         const customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
         const updated = customImages.filter(id => id !== imageId);
         localStorage.setItem('custom_gallery_images', JSON.stringify(updated));
+        if (firebaseInitialized && typeof saveCustomGalleryToFirebase === 'function') {
+          saveCustomGalleryToFirebase(updated);
+        }
       }
     }
     
@@ -1057,6 +1125,9 @@
       
       femmesImages.push(newImage);
       localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
+      if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
+        saveFemmesImagesToFirebase(femmesImages);
+      }
       
       loadFemmesCatalog();
     }
@@ -1072,6 +1143,9 @@
       
       hommesImages.push(newImage);
       localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
+      if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
+        saveHommesImagesToFirebase(hommesImages);
+      }
       
       loadHommesCatalog();
     }
@@ -1133,6 +1207,9 @@
         if (image) {
           image.url = url;
           localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
+          if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
+            saveFemmesImagesToFirebase(femmesImages);
+          }
         }
       }
       // Check if it's a hommes image
@@ -1142,6 +1219,9 @@
         if (image) {
           image.url = url;
           localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
+          if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
+            saveHommesImagesToFirebase(hommesImages);
+          }
         }
       }
       
@@ -1169,11 +1249,17 @@
           const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
           const updated = femmesImages.filter(img => img.id !== imageId);
           localStorage.setItem('femmes_images', JSON.stringify(updated));
+          if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
+            saveFemmesImagesToFirebase(updated);
+          }
           loadFemmesCatalog();
         } else if (imageId.startsWith('homme_')) {
           const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
           const updated = hommesImages.filter(img => img.id !== imageId);
           localStorage.setItem('hommes_images', JSON.stringify(updated));
+          if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
+            saveHommesImagesToFirebase(updated);
+          }
           loadHommesCatalog();
         }
       }
@@ -1211,12 +1297,18 @@
         const teamMembers = JSON.parse(localStorage.getItem('team_members') || '[]');
         const updated = teamMembers.filter(m => m.id !== memberId);
         localStorage.setItem('team_members', JSON.stringify(updated));
+        if (firebaseInitialized && typeof saveTeamMembersToFirebase === 'function') {
+          saveTeamMembersToFirebase(updated);
+        }
         
         // Mark as deleted if it's a default member
         const deletedMembers = JSON.parse(localStorage.getItem('deleted_team_members') || '[]');
         if (!deletedMembers.includes(memberId)) {
           deletedMembers.push(memberId);
           localStorage.setItem('deleted_team_members', JSON.stringify(deletedMembers));
+          if (firebaseInitialized && typeof saveDeletedTeamMembersToFirebase === 'function') {
+            saveDeletedTeamMembersToFirebase(deletedMembers);
+          }
         }
       }
     }
