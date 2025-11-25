@@ -118,18 +118,9 @@
     loadSavedImages();
     
     // Load team members from localStorage
-    async function loadTeamMembers() {
+    function loadTeamMembers() {
       const teamGrid = document.getElementById('teamGrid');
       if (!teamGrid) return;
-      
-      // Load positions from server
-      let serverPositions = {};
-      try {
-        const response = await fetch('api/positions.php');
-        serverPositions = await response.json();
-      } catch (error) {
-        console.error('Erreur lors du chargement des positions:', error);
-      }
       
       const teamMembers = JSON.parse(localStorage.getItem('team_members') || '[]');
       const defaultMembers = [
@@ -182,7 +173,8 @@
         const card = document.createElement('div');
         card.className = 'team-card';
         
-        // Get saved image position from server
+        // Get saved image position
+        const savedPosition = localStorage.getItem(`image_position_${imageId}`);
         const defaultPositions = {
           'julio': 'center 35%',
           'soren': 'center 8%',
@@ -191,7 +183,7 @@
           'andres': 'center 0%',
           'yoruhime': 'center 18%'
         };
-        const imagePosition = serverPositions[imageId] || defaultPositions[imageId] || 'center 35%';
+        const imagePosition = savedPosition || defaultPositions[imageId] || 'center 35%';
         
         card.innerHTML = `
           <div class="team-image-wrapper">
@@ -234,8 +226,8 @@
       <a href="index.html" class="logo">
         <img src="img/V.png" alt="Logo Vespucci" class="logo-image">
         <div class="logo-text-wrapper">
-          <span class="logo-text">VESPUCCI</span>
-          <span class="logo-subtitle">ESTHÉTIQUE</span>
+        <span class="logo-text">VESPUCCI</span>
+        <span class="logo-subtitle">ESTHÉTIQUE</span>
         </div>
       </a>
       <div class="nav-links">
@@ -286,15 +278,15 @@
           <img src="img/2.png" alt="L'Esthétique Vespucci" class="hero-image">
           <div class="hero-status-overlay">
             <span class="hero-status-text">Patron</span>
-          </div>
+        </div>
         </div>
         <div class="hero-image-wrapper hero-image-wrapper-right">
           <div class="image-glow"></div>
           <img src="img/1.png" alt="L'Esthétique Vespucci" class="hero-image">
           <div class="hero-status-overlay">
             <span class="hero-status-text">Co-Patron</span>
-          </div>
         </div>
+      </div>
       </div>
     </div>
   </section>

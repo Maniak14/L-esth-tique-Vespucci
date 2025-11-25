@@ -712,38 +712,12 @@
       return saved || config.default;
     }
     
-    // Cache for positions loaded from server
-    let positionsCache = null;
-    
-    // Load positions from server
-    async function loadPositionsFromServer() {
-      if (positionsCache) return positionsCache;
-      
-      try {
-        const response = await fetch('api/positions.php');
-        const data = await response.json();
-        positionsCache = data;
-        return data;
-      } catch (error) {
-        console.error('Erreur lors du chargement des positions:', error);
-        return {};
-      }
-    }
-    
     // Get image position (object-position)
-    async function getImagePosition(imageId) {
-      // Try localStorage first (for immediate updates)
-      const localSaved = localStorage.getItem(`image_position_${imageId}`);
-      if (localSaved) {
-        return localSaved;
+    function getImagePosition(imageId) {
+      const saved = localStorage.getItem(`image_position_${imageId}`);
+      if (saved) {
+        return saved;
       }
-      
-      // Load from server
-      const serverPositions = await loadPositionsFromServer();
-      if (serverPositions[imageId]) {
-        return serverPositions[imageId];
-      }
-      
       // Default positions for team members
       const defaultPositions = {
         'julio': 'center 35%',
@@ -756,11 +730,9 @@
       return defaultPositions[imageId] || 'center center';
     }
     
-    // Save image position (local + prepare for server save)
+    // Save image position
     function saveImagePosition(imageId, position) {
-      // Save to localStorage for immediate preview
       localStorage.setItem(`image_position_${imageId}`, position);
-      
       // Update preview
       const previewImg = document.querySelector(`#preview_${imageId}`);
       if (previewImg) {
@@ -773,48 +745,9 @@
       }
     }
     
-    // Save all positions to server
-    async function savePositionsToServer() {
-      const allPositions = {};
-      
-      // Collect all positions from localStorage
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('image_position_')) {
-          const imageId = key.replace('image_position_', '');
-          allPositions[imageId] = localStorage.getItem(key);
-        }
-      }
-      
-      if (Object.keys(allPositions).length === 0) {
-        return true;
-      }
-      
-      try {
-        const response = await fetch('api/positions.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ positions: allPositions })
-        });
-        
-        const result = await response.json();
-        if (result.success) {
-          // Clear cache to force reload on next access
-          positionsCache = null;
-          return true;
-        }
-        return false;
-      } catch (error) {
-        console.error('Erreur lors de la sauvegarde des positions:', error);
-        return false;
-      }
-    }
-    
     // Adjust image position
-    async function adjustImagePosition(imageId, direction) {
-      const current = await getImagePosition(imageId);
+    function adjustImagePosition(imageId, direction) {
+      const current = getImagePosition(imageId);
       const parts = current.trim().split(/\s+/);
       let x = parts[0] || 'center';
       let y = parts[1] || 'center';
@@ -932,7 +865,7 @@
     }
 
     // Create image item HTML
-    async function createImageItem(config, container, isCustom = false) {
+    function createImageItem(config, container, isCustom = false) {
       const currentImage = getCurrentImage(config);
       const item = document.createElement('div');
       item.className = 'image-item';
@@ -958,7 +891,7 @@
       }
       
       // Get image position
-      const imagePosition = await getImagePosition(config.id);
+      const imagePosition = getImagePosition(config.id);
       const isCircularPreview = isTeamMember; // Circular for team, rectangular for others
       
       // Image preview with controls
@@ -1076,7 +1009,7 @@
     }
 
     // Add new gallery image
-    async function addNewGalleryImage() {
+    function addNewGalleryImage() {
       const galleryContainer = document.getElementById('galleryImages');
       const existingImages = galleryContainer.querySelectorAll('.image-item').length;
       const customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
@@ -1091,7 +1024,7 @@
       customImages.push(newId);
       localStorage.setItem('custom_gallery_images', JSON.stringify(customImages));
       
-      await createImageItem(newConfig, galleryContainer, true);
+      createImageItem(newConfig, galleryContainer, true);
     }
     
     // Delete custom image
@@ -1144,7 +1077,7 @@
     }
     
     // Load femmes catalog in admin
-    async function loadFemmesCatalog() {
+    function loadFemmesCatalog() {
       const container = document.getElementById('femmesCatalog');
       let femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
       
@@ -1156,19 +1089,18 @@
       }
       
       container.innerHTML = '';
-      for (let index = 0; index < femmesImages.length; index++) {
-        const item = femmesImages[index];
+      femmesImages.forEach((item, index) => {
         const config = {
           id: item.id,
           name: `Coupe ${index}`,
           default: item.url
         };
-        await createImageItem(config, container, true);
-      }
+        createImageItem(config, container, true);
+      });
     }
     
     // Load hommes catalog in admin
-    async function loadHommesCatalog() {
+    function loadHommesCatalog() {
       const container = document.getElementById('hommesCatalog');
       let hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
       
@@ -1180,15 +1112,14 @@
       }
       
       container.innerHTML = '';
-      for (let index = 0; index < hommesImages.length; index++) {
-        const item = hommesImages[index];
+      hommesImages.forEach((item, index) => {
         const config = {
           id: item.id,
           name: `Coupe ${index}`,
           default: item.url
         };
-        await createImageItem(config, container, true);
-      }
+        createImageItem(config, container, true);
+      });
     }
     
     // Update femmes/hommes image URL
@@ -1249,7 +1180,7 @@
     }
     
     // Add new team member
-    async function addNewTeamMember() {
+    function addNewTeamMember() {
       const teamContainer = document.getElementById('teamImages');
       const existingMembers = teamContainer.querySelectorAll('.image-item').length;
       const newId = `team_${Date.now()}`;
@@ -1263,7 +1194,7 @@
       // Save initial team member info
       saveTeamMemberInfo(newId, { firstName: '', lastName: '', grade: '', phone: '' });
       
-      await createImageItem(newConfig, teamContainer, true);
+      createImageItem(newConfig, teamContainer, true);
     }
     
     // Delete team member
@@ -1305,18 +1236,18 @@
     }
 
     // Load team members
-    async function loadTeamMembers() {
+    function loadTeamMembers() {
       const teamContainer = document.getElementById('teamImages');
       const teamMembers = JSON.parse(localStorage.getItem('team_members') || '[]');
       const defaultMembers = imageConfig.team.map(t => t.id);
       
       // Load default team members
-      for (const config of imageConfig.team) {
-        await createImageItem(config, teamContainer);
-      }
+      imageConfig.team.forEach(config => {
+        createImageItem(config, teamContainer);
+      });
       
       // Load custom team members
-      for (const member of teamMembers) {
+      teamMembers.forEach(member => {
         if (!defaultMembers.includes(member.id) && member.id.startsWith('team_')) {
           const savedImage = localStorage.getItem(`image_${member.id}`);
           const config = {
@@ -1324,25 +1255,25 @@
             name: `${member.firstName || ''} ${member.lastName || ''}`.trim() || 'Nouvel employé',
             default: savedImage || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E'
           };
-          await createImageItem(config, teamContainer, true);
+          createImageItem(config, teamContainer, true);
         }
-      }
+      });
     }
 
     // Initialize admin page
-    async function initAdmin() {
+    function initAdmin() {
       // Load team images
-      await loadTeamMembers();
+      loadTeamMembers();
 
       // Load gallery images
       const galleryContainer = document.getElementById('galleryImages');
-      for (const config of imageConfig.gallery) {
-        await createImageItem(config, galleryContainer);
-      }
+      imageConfig.gallery.forEach(config => {
+        createImageItem(config, galleryContainer);
+      });
       
       // Load custom gallery images
       const customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
-      for (const imageId of customImages) {
+      customImages.forEach(imageId => {
         const saved = localStorage.getItem(`image_${imageId}`);
         if (saved) {
           const name = `Galerie ${galleryContainer.querySelectorAll('.image-item').length + 1}`;
@@ -1351,23 +1282,23 @@
             name: name,
             default: saved
           };
-          await createImageItem(config, galleryContainer, true);
+          createImageItem(config, galleryContainer, true);
         }
-      }
+      });
 
       // Load hero image
       const heroContainer = document.getElementById('heroImage');
-      await createImageItem(imageConfig.hero, heroContainer);
+      createImageItem(imageConfig.hero, heroContainer);
 
       // Load map image
       const mapContainer = document.getElementById('mapImage');
-      await createImageItem(imageConfig.map, mapContainer);
+      createImageItem(imageConfig.map, mapContainer);
       
       // Load femmes catalog
-      await loadFemmesCatalog();
+      loadFemmesCatalog();
       
       // Load hommes catalog
-      await loadHommesCatalog();
+      loadHommesCatalog();
     }
 
     // Initialize on load
