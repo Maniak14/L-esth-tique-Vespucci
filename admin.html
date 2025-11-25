@@ -1235,17 +1235,25 @@
       
       // Save all images
       localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
-      if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
-        saveFemmesImagesToFirebase(femmesImages);
-      }
       
-      // Reload catalog
-      loadFemmesCatalog();
+      // Save to Firebase (async)
+      if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
+        try {
+          await saveFemmesImagesToFirebase(femmesImages);
+        } catch (error) {
+          console.error('Erreur sauvegarde Firebase:', error);
+        }
+      }
       
       // Update final status
       progressBar.style.width = '100%';
       statusText.textContent = `✅ ${imported} image(s) importée(s) avec succès !`;
       statusText.style.color = '#10b981';
+      
+      // Reload catalog after a small delay to allow UI to update
+      setTimeout(() => {
+        loadFemmesCatalog();
+      }, 100);
       
       // Hide progress after 3 seconds
       setTimeout(() => {
@@ -1335,17 +1343,25 @@
       
       // Save all images
       localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
-      if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
-        saveHommesImagesToFirebase(hommesImages);
-      }
       
-      // Reload catalog
-      loadHommesCatalog();
+      // Save to Firebase (async)
+      if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
+        try {
+          await saveHommesImagesToFirebase(hommesImages);
+        } catch (error) {
+          console.error('Erreur sauvegarde Firebase:', error);
+        }
+      }
       
       // Update final status
       progressBar.style.width = '100%';
       statusText.textContent = `✅ ${imported} image(s) importée(s) avec succès !`;
       statusText.style.color = '#10b981';
+      
+      // Reload catalog after a small delay to allow UI to update
+      setTimeout(() => {
+        loadHommesCatalog();
+      }, 100);
       
       // Hide progress after 3 seconds
       setTimeout(() => {
@@ -1444,8 +1460,8 @@
       }
     }
     
-    // Delete femmes/hommes image
-    function deleteCatalogImage(imageId) {
+    // Delete femmes/hommes image (global function)
+    window.deleteCatalogImage = function(imageId) {
       if (confirm('Êtes-vous sûr de vouloir supprimer cette image ?')) {
         // Remove from DOM
         const item = document.querySelector(`[data-image-id="${imageId}"]`);
