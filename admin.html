@@ -15,6 +15,11 @@
   <script src="firebase-config.js"></script>
   <script src="firebase-db.js"></script>
   <script>
+    // Vérifier l'authentification avant d'afficher la page
+    if (sessionStorage.getItem('adminAuthenticated') !== 'true') {
+      window.location.href = 'admin-login.html';
+    }
+    
     // Force scroll to top immediately on page load
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual';
@@ -573,8 +578,13 @@
 
   <div class="admin-container" style="padding-top: 8rem;">
     <div class="admin-header">
-      <h1>🔧 Administration - L'Esthétique Vespucci</h1>
-      <p style="color: var(--text-secondary);">Gérez les images de votre site</p>
+      <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h1>🔧 Administration - L'Esthétique Vespucci</h1>
+          <p style="color: var(--text-secondary);">Gérez les images de votre site</p>
+        </div>
+        <button onclick="logout()" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: all 0.3s ease; white-space: nowrap;" onmouseover="this.style.background='rgba(239, 68, 68, 0.2)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'">Déconnexion</button>
+      </div>
     </div>
 
     <!-- Team Images Section -->
@@ -1330,6 +1340,14 @@
       setTimeout(() => {
         window.location.reload();
       }, 1000);
+    }
+    
+    // Déconnexion (optionnel - vous pouvez ajouter un bouton de déconnexion)
+    function logout() {
+      if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+        sessionStorage.removeItem('adminAuthenticated');
+        window.location.href = 'admin-login.html';
+      }
     }
 
     // Load team members
