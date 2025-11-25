@@ -12,12 +12,12 @@
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-config.js"></script>
+  <script src=".secrets/firebase-config.js"></script>
   <script src="firebase-db.js"></script>
   <script>
     // Vérifier l'authentification avant d'afficher la page
     if (sessionStorage.getItem('adminAuthenticated') !== 'true') {
-      window.location.href = 'admin-login.html';
+      window.location.href = '.secrets/admin-login.html';
     }
     
     // Force scroll to top immediately on page load
@@ -1346,7 +1346,7 @@
     function logout() {
       if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
         sessionStorage.removeItem('adminAuthenticated');
-        window.location.href = 'admin-login.html';
+        window.location.href = '.secrets/admin-login.html';
       }
     }
 

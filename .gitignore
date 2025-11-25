@@ -2,6 +2,10 @@
 firebase-config.js
 admin-login.html
 
+# Dossier caché avec fichiers sensibles
+.secrets/
+*.secrets
+
 # Fichiers système
 .DS_Store
 Thumbs.db
