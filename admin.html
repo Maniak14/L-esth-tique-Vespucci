@@ -692,10 +692,14 @@
 
     // Initialize Firebase on page load
     // Note: firebaseInitialized is declared in firebase-db.js
+    // Create local reference to avoid errors
+    let firebaseInitialized = false;
+    
     document.addEventListener('DOMContentLoaded', async () => {
       if (initFirebaseDB && typeof initFirebaseDB === 'function') {
         const initialized = initFirebaseDB();
         window.firebaseInitialized = initialized;
+        firebaseInitialized = initialized; // Local reference
         if (initialized) {
           // Charger toutes les données depuis Firebase
           await loadAllDataFromFirebase();
@@ -1071,8 +1075,8 @@
       }
     }
 
-    // Add new gallery image
-    function addNewGalleryImage() {
+    // Add new gallery image (global function)
+    window.addNewGalleryImage = function() {
       const galleryContainer = document.getElementById('galleryImages');
       const existingImages = galleryContainer.querySelectorAll('.image-item').length;
       const customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
@@ -1091,7 +1095,7 @@
       }
       
       createImageItem(newConfig, galleryContainer, true);
-    }
+    };
     
     // Delete custom image
     function deleteCustomImage(imageId) {
@@ -1115,8 +1119,8 @@
       }
     }
     
-    // Add new femmes image
-    function addNewFemmesImage() {
+    // Add new femmes image (global function)
+    window.addNewFemmesImage = function() {
       const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
       const newId = `femme_${Date.now()}`;
       const newImage = {
@@ -1131,10 +1135,10 @@
       }
       
       loadFemmesCatalog();
-    }
+    };
     
-    // Add new hommes image
-    function addNewHommesImage() {
+    // Add new hommes image (global function)
+    window.addNewHommesImage = function() {
       const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
       const newId = `homme_${Date.now()}`;
       const newImage = {
@@ -1149,7 +1153,7 @@
       }
       
       loadHommesCatalog();
-    }
+    };
     
     // Load femmes catalog in admin
     function loadFemmesCatalog() {
