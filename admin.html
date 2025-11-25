@@ -1288,8 +1288,8 @@
       createImageItem(newConfig, teamContainer, true);
     };
     
-    // Delete team member
-    function deleteTeamMember(memberId) {
+    // Delete team member (global function)
+    window.deleteTeamMember = function deleteTeamMember(memberId) {
       if (confirm('Êtes-vous sûr de vouloir supprimer cet employé ?')) {
         // Remove from DOM
         const item = document.querySelector(`[data-image-id="${memberId}"]`);
@@ -1316,7 +1316,7 @@
           }
         }
       }
-    }
+    };
     
     // Save all images
     function saveAllImages() {
@@ -1335,12 +1335,20 @@
     // Load team members
     function loadTeamMembers() {
       const teamContainer = document.getElementById('teamImages');
+      if (!teamContainer) return;
+      
+      // Clear container first to avoid duplicates
+      teamContainer.innerHTML = '';
+      
       const teamMembers = JSON.parse(localStorage.getItem('team_members') || '[]');
+      const deletedMembers = JSON.parse(localStorage.getItem('deleted_team_members') || '[]');
       const defaultMembers = imageConfig.team.map(t => t.id);
       
-      // Load default team members
+      // Load default team members (excluding deleted ones)
       imageConfig.team.forEach(config => {
-        createImageItem(config, teamContainer);
+        if (!deletedMembers.includes(config.id)) {
+          createImageItem(config, teamContainer);
+        }
       });
       
       // Load custom team members
