@@ -173,8 +173,7 @@
         const card = document.createElement('div');
         card.className = 'team-card';
         
-        // Get saved image position
-        const savedPosition = localStorage.getItem(`image_position_${imageId}`);
+        // Get saved image position (will be loaded from server)
         const defaultPositions = {
           'julio': 'center 35%',
           'soren': 'center 8%',
@@ -183,7 +182,8 @@
           'andres': 'center 0%',
           'yoruhime': 'center 18%'
         };
-        const imagePosition = savedPosition || defaultPositions[imageId] || 'center 35%';
+        // Position will be set after loading from server
+        const imagePosition = defaultPositions[imageId] || 'center 35%';
         
         card.innerHTML = `
           <div class="team-image-wrapper">
