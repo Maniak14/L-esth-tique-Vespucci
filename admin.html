@@ -1165,7 +1165,8 @@
       const newId = `femme_${Date.now()}`;
       const newImage = {
         id: newId,
-        url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E'
+        url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E',
+        name: `Coupe ${femmesImages.length}`
       };
       
       femmesImages.push(newImage);
@@ -1212,11 +1213,18 @@
             reader.readAsDataURL(file);
           });
           
-          // Create new image entry
+          // Extract filename without extension
+          const fileName = file.name.replace(/\.[^/.]+$/, ""); // Remove extension
+          
+          // Get current count to determine the number
+          const currentCount = femmesImages.length;
+          
+          // Create new image entry with filename-based name
           const newId = `femme_${Date.now()}_${i}`;
           const newImage = {
             id: newId,
-            url: dataUrl
+            url: dataUrl,
+            name: fileName || `Coupe ${currentCount}` // Use filename or fallback to "Coupe X"
           };
           
           femmesImages.push(newImage);
@@ -1320,11 +1328,18 @@
             reader.readAsDataURL(file);
           });
           
-          // Create new image entry
+          // Extract filename without extension
+          const fileName = file.name.replace(/\.[^/.]+$/, ""); // Remove extension
+          
+          // Get current count to determine the number
+          const currentCount = hommesImages.length;
+          
+          // Create new image entry with filename-based name
           const newId = `homme_${Date.now()}_${i}`;
           const newImage = {
             id: newId,
-            url: dataUrl
+            url: dataUrl,
+            name: fileName || `Coupe ${currentCount}` // Use filename or fallback to "Coupe X"
           };
           
           hommesImages.push(newImage);
@@ -1391,7 +1406,7 @@
       femmesImages.forEach((item, index) => {
         const config = {
           id: item.id,
-          name: `Coupe ${index}`,
+          name: item.name || `Coupe ${index}`, // Use stored name or fallback to "Coupe X"
           default: item.url
         };
         createImageItem(config, container, true);
@@ -1414,7 +1429,7 @@
       hommesImages.forEach((item, index) => {
         const config = {
           id: item.id,
-          name: `Coupe ${index}`,
+          name: item.name || `Coupe ${index}`, // Use stored name or fallback to "Coupe X"
           default: item.url
         };
         createImageItem(config, container, true);
