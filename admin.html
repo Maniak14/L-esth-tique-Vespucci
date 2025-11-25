@@ -12,7 +12,6 @@
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
   <script src="firebase-config.js"></script>
   <script src="firebase-db.js"></script>
   <script>
@@ -1166,8 +1165,7 @@
       const newId = `femme_${Date.now()}`;
       const newImage = {
         id: newId,
-        url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E',
-        name: `Coupe ${femmesImages.length}`
+        url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E'
       };
       
       femmesImages.push(newImage);
@@ -1180,40 +1178,6 @@
     };
     
     // Handle multiple femmes images upload
-    // Function to upload image to Firebase Storage (goopics.net n'a pas d'API publique)
-    async function uploadToGoopics(file) {
-      try {
-        // Initialize Firebase if not already done
-        if (!firebaseStorage && typeof initFirebase === 'function') {
-          initFirebase();
-        }
-        
-        if (!firebaseStorage) {
-          throw new Error('Firebase Storage non initialisé');
-        }
-        
-        // Create a unique filename
-        const timestamp = Date.now();
-        const randomId = Math.random().toString(36).substring(2, 15);
-        const fileExtension = file.name.split('.').pop() || 'png';
-        const fileName = `catalog/${timestamp}_${randomId}.${fileExtension}`;
-        
-        // Upload to Firebase Storage
-        const storageRef = firebaseStorage.ref().child(fileName);
-        const snapshot = await storageRef.put(file);
-        
-        // Get download URL
-        const downloadURL = await snapshot.ref.getDownloadURL();
-        
-        // Return URL in goopics format for compatibility
-        // The URL will be from Firebase Storage but stored the same way
-        return downloadURL;
-      } catch (error) {
-        console.error('Erreur upload Firebase Storage:', error);
-        throw error;
-      }
-    }
-    
     window.handleMultipleFemmesUpload = async function(event) {
       const files = event.target.files;
       if (files.length === 0) return;
@@ -1240,26 +1204,19 @@
         }
         
         try {
-          // Extract filename without extension
-          const fileName = file.name.replace(/\.[^/.]+$/, ""); // Remove extension
+          // Convert file to base64
+          const dataUrl = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
           
-          // Get current count to determine the number
-          const currentCount = femmesImages.length;
-          
-          // Upload to goopics.net
-          statusText.textContent = `Upload de l'image ${i + 1} / ${total}...`;
-          const goopicsUrl = await uploadToGoopics(file);
-          
-          if (!goopicsUrl) {
-            throw new Error('URL non reçue de goopics');
-          }
-          
-          // Create new image entry with goopics URL
+          // Create new image entry
           const newId = `femme_${Date.now()}_${i}`;
           const newImage = {
             id: newId,
-            url: goopicsUrl,
-            name: fileName || `Coupe ${currentCount}` // Use filename or fallback to "Coupe X"
+            url: dataUrl
           };
           
           femmesImages.push(newImage);
@@ -1272,31 +1229,23 @@
           
         } catch (error) {
           console.error(`Erreur lors de l'import de l'image ${i + 1}:`, error);
-          statusText.textContent = `Erreur lors de l'import de l'image ${i + 1}: ${error.message}`;
+          statusText.textContent = `Erreur lors de l'import de l'image ${i + 1}`;
         }
       }
       
       // Save all images
       localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
-      
-      // Save to Firebase (async)
       if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
-        try {
-          await saveFemmesImagesToFirebase(femmesImages);
-        } catch (error) {
-          console.error('Erreur sauvegarde Firebase:', error);
-        }
+        saveFemmesImagesToFirebase(femmesImages);
       }
+      
+      // Reload catalog
+      loadFemmesCatalog();
       
       // Update final status
       progressBar.style.width = '100%';
       statusText.textContent = `✅ ${imported} image(s) importée(s) avec succès !`;
       statusText.style.color = '#10b981';
-      
-      // Reload catalog after a small delay to allow UI to update
-      setTimeout(() => {
-        loadFemmesCatalog();
-      }, 100);
       
       // Hide progress after 3 seconds
       setTimeout(() => {
@@ -1355,26 +1304,19 @@
         }
         
         try {
-          // Extract filename without extension
-          const fileName = file.name.replace(/\.[^/.]+$/, ""); // Remove extension
+          // Convert file to base64
+          const dataUrl = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
           
-          // Get current count to determine the number
-          const currentCount = hommesImages.length;
-          
-          // Upload to goopics.net
-          statusText.textContent = `Upload de l'image ${i + 1} / ${total}...`;
-          const goopicsUrl = await uploadToGoopics(file);
-          
-          if (!goopicsUrl) {
-            throw new Error('URL non reçue de goopics');
-          }
-          
-          // Create new image entry with goopics URL
+          // Create new image entry
           const newId = `homme_${Date.now()}_${i}`;
           const newImage = {
             id: newId,
-            url: goopicsUrl,
-            name: fileName || `Coupe ${currentCount}` // Use filename or fallback to "Coupe X"
+            url: dataUrl
           };
           
           hommesImages.push(newImage);
@@ -1387,31 +1329,23 @@
           
         } catch (error) {
           console.error(`Erreur lors de l'import de l'image ${i + 1}:`, error);
-          statusText.textContent = `Erreur lors de l'import de l'image ${i + 1}: ${error.message}`;
+          statusText.textContent = `Erreur lors de l'import de l'image ${i + 1}`;
         }
       }
       
       // Save all images
       localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
-      
-      // Save to Firebase (async)
       if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
-        try {
-          await saveHommesImagesToFirebase(hommesImages);
-        } catch (error) {
-          console.error('Erreur sauvegarde Firebase:', error);
-        }
+        saveHommesImagesToFirebase(hommesImages);
       }
+      
+      // Reload catalog
+      loadHommesCatalog();
       
       // Update final status
       progressBar.style.width = '100%';
       statusText.textContent = `✅ ${imported} image(s) importée(s) avec succès !`;
       statusText.style.color = '#10b981';
-      
-      // Reload catalog after a small delay to allow UI to update
-      setTimeout(() => {
-        loadHommesCatalog();
-      }, 100);
       
       // Hide progress after 3 seconds
       setTimeout(() => {
@@ -1441,7 +1375,7 @@
       femmesImages.forEach((item, index) => {
         const config = {
           id: item.id,
-          name: item.name || `Coupe ${index}`, // Use stored name or fallback to "Coupe X"
+          name: `Coupe ${index}`,
           default: item.url
         };
         createImageItem(config, container, true);
@@ -1464,7 +1398,7 @@
       hommesImages.forEach((item, index) => {
         const config = {
           id: item.id,
-          name: item.name || `Coupe ${index}`, // Use stored name or fallback to "Coupe X"
+          name: `Coupe ${index}`,
           default: item.url
         };
         createImageItem(config, container, true);
@@ -1510,8 +1444,8 @@
       }
     }
     
-    // Delete femmes/hommes image (global function)
-    window.deleteCatalogImage = function(imageId) {
+    // Delete femmes/hommes image
+    function deleteCatalogImage(imageId) {
       if (confirm('Êtes-vous sûr de vouloir supprimer cette image ?')) {
         // Remove from DOM
         const item = document.querySelector(`[data-image-id="${imageId}"]`);
