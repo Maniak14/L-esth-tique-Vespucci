@@ -127,7 +127,7 @@
       <p>Veuillez entrer le mot de passe pour accéder à la page d'administration</p>
     </div>
     
-    <form class="login-form" id="loginForm" onsubmit="return handleLogin(event)" method="post">
+    <div class="login-form" id="loginForm">
       <div class="form-group">
         <label for="password">Mot de passe</label>
         <input type="password" id="password" required autofocus>
@@ -137,8 +137,8 @@
         Mot de passe incorrect. Veuillez réessayer.
       </div>
       
-      <button type="submit" class="login-btn">Se connecter</button>
-    </form>
+      <button type="button" class="login-btn" id="loginButton">Se connecter</button>
+    </div>
   </div>
 
   <!-- Firebase SDK -->
@@ -240,13 +240,24 @@
       const loginForm = document.getElementById('loginForm');
       const passwordInput = document.getElementById('password');
       
-      // Empêcher la soumission par défaut du formulaire
+      // Empêcher TOUTE soumission par défaut du formulaire
       if (loginForm) {
-        loginForm.addEventListener('submit', async (e) => {
+        loginForm.addEventListener('submit', (e) => {
           e.preventDefault();
           e.stopPropagation();
-          await handleLogin(e);
+          e.stopImmediatePropagation();
           return false;
+        }, true); // Utiliser capture phase pour intercepter en premier
+      }
+      
+      // Bouton de connexion
+      const loginButton = document.getElementById('loginButton');
+      if (loginButton) {
+        loginButton.addEventListener('click', async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const fakeEvent = { preventDefault: () => {}, stopPropagation: () => {} };
+          await handleLogin(fakeEvent);
         });
       }
       
@@ -255,7 +266,9 @@
         passwordInput.addEventListener('keypress', async (e) => {
           if (e.key === 'Enter') {
             e.preventDefault();
-            await handleLogin(e);
+            e.stopPropagation();
+            const fakeEvent = { preventDefault: () => {}, stopPropagation: () => {} };
+            await handleLogin(fakeEvent);
           }
         });
       }
