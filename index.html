@@ -59,24 +59,7 @@
               console.log('Images mises à jour depuis Firebase');
               loadTeamMembers();
               // Reload gallery
-              const galleryItems = document.querySelectorAll('.gallery-item img');
-              const allGalleryImages = [];
-              for (let i = 1; i <= 6; i++) {
-                const saved = localStorage.getItem(`image_gallery${i}`);
-                allGalleryImages.push(saved || `img/carousel/${i}.png`);
-              }
-              const customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
-              customImages.forEach(imageId => {
-                const saved = localStorage.getItem(`image_${imageId}`);
-                if (saved) {
-                  allGalleryImages.push(saved);
-                }
-              });
-              galleryItems.forEach((img, index) => {
-                if (allGalleryImages[index]) {
-                  img.src = allGalleryImages[index];
-                }
-              });
+              updateGalleryImages();
               // Update hero images
               const heroImgs = document.querySelectorAll('.hero-image');
               heroImgs.forEach((img, index) => {
@@ -114,61 +97,7 @@
         loadTeamMembers();
         
         // Update gallery images
-        const galleryItems = document.querySelectorAll('.gallery-item img');
-        const allGalleryImages = [];
-        
-        // Load default gallery images
-        for (let i = 1; i <= 6; i++) {
-          const saved = localStorage.getItem(`image_gallery${i}`);
-          allGalleryImages.push(saved || `img/carousel/${i}.png`);
-        }
-        
-        // Load custom gallery images
-        const customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
-        customImages.forEach(imageId => {
-          const saved = localStorage.getItem(`image_${imageId}`);
-          if (saved) {
-            allGalleryImages.push(saved);
-          }
-        });
-        
-        // Update existing gallery items and add new ones if needed
-        galleryItems.forEach((img, index) => {
-          if (allGalleryImages[index]) {
-            img.src = allGalleryImages[index];
-          }
-        });
-        
-        // Add new gallery items for custom images (if more than 6)
-        if (allGalleryImages.length > 6) {
-          const galleryTrack = document.querySelector('.gallery-track');
-          if (galleryTrack) {
-            // Remove duplicates first
-            const existingItems = galleryTrack.querySelectorAll('.gallery-item');
-            const originalCount = 6;
-            const totalNeeded = allGalleryImages.length * 2; // For seamless loop
-            
-            // Add new items for custom images
-            for (let i = originalCount; i < allGalleryImages.length; i++) {
-              const newItem = document.createElement('div');
-              newItem.className = 'gallery-item';
-              newItem.innerHTML = `
-                <img src="${allGalleryImages[i]}" alt="Réalisation ${i + 1}">
-                <div class="gallery-overlay">
-                  <span>Voir plus</span>
-                </div>
-              `;
-              galleryTrack.insertBefore(newItem, galleryTrack.lastElementChild);
-            }
-            
-            // Duplicate for seamless loop
-            const itemsToDuplicate = galleryTrack.querySelectorAll('.gallery-item');
-            itemsToDuplicate.forEach(item => {
-              const clone = item.cloneNode(true);
-              galleryTrack.appendChild(clone);
-            });
-          }
-        }
+        setTimeout(() => updateGalleryImages(), 100);
         
         // Update hero images
         const heroImgs = document.querySelectorAll('.hero-image');
@@ -183,6 +112,106 @@
           const saved = localStorage.getItem('image_map');
           if (saved) mapImg.src = saved;
         }
+      });
+    }
+    
+    // Function to update gallery images
+    function updateGalleryImages() {
+      const galleryTrack = document.querySelector('.gallery-track');
+      if (!galleryTrack) return;
+      
+      const allGalleryImages = [];
+      
+      // Load default gallery images
+      for (let i = 1; i <= 6; i++) {
+        const saved = localStorage.getItem(`image_gallery${i}`);
+        allGalleryImages.push(saved || `img/carousel/${i}.png`);
+      }
+      
+      // Load custom gallery images
+      const customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
+      customImages.forEach(imageId => {
+        const saved = localStorage.getItem(`image_${imageId}`);
+        if (saved) {
+          allGalleryImages.push(saved);
+        }
+      });
+      
+      // Clear and rebuild gallery track
+      galleryTrack.innerHTML = '';
+      
+      // Create all gallery items
+      allGalleryImages.forEach((imageUrl, index) => {
+        const item = document.createElement('div');
+        item.className = 'gallery-item';
+        item.innerHTML = `
+          <img src="${imageUrl}" alt="Réalisation ${index + 1}">
+          <div class="gallery-overlay">
+            <span>Voir plus</span>
+          </div>
+        `;
+        galleryTrack.appendChild(item);
+      });
+      
+      // Duplicate all items for seamless infinite scroll
+      const itemsToDuplicate = galleryTrack.querySelectorAll('.gallery-item');
+      itemsToDuplicate.forEach(item => {
+        const clone = item.cloneNode(true);
+        galleryTrack.appendChild(clone);
+      });
+      
+      // Re-attach lightbox events
+      attachGalleryLightboxEvents();
+    }
+    
+    // Attach lightbox events to gallery items
+    function attachGalleryLightboxEvents() {
+      const galleryItems = document.querySelectorAll('.gallery-item');
+      galleryItems.forEach(item => {
+        // Remove existing listeners by cloning
+        const newItem = item.cloneNode(true);
+        item.parentNode.replaceChild(newItem, item);
+        
+        // Add click event
+        newItem.addEventListener('click', () => {
+          const img = newItem.querySelector('img');
+          if (img) {
+            const lightbox = document.createElement('div');
+            lightbox.className = 'lightbox';
+            lightbox.innerHTML = `
+              <div class="lightbox-content">
+                <img src="${img.src}" alt="${img.alt}">
+                <button class="lightbox-close">&times;</button>
+              </div>
+            `;
+            document.body.appendChild(lightbox);
+            setTimeout(() => lightbox.classList.add('active'), 10);
+            
+            // Function to close lightbox
+            const closeLightbox = () => {
+              lightbox.classList.remove('active');
+              setTimeout(() => lightbox.remove(), 300);
+            };
+            
+            // Close on button click
+            lightbox.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+            
+            // Close on click outside (on background)
+            lightbox.addEventListener('click', (e) => {
+              if (e.target === lightbox) {
+                closeLightbox();
+              }
+            });
+            
+            // Close on Escape key
+            document.addEventListener('keydown', function escapeHandler(e) {
+              if (e.key === 'Escape') {
+                closeLightbox();
+                document.removeEventListener('keydown', escapeHandler);
+              }
+            });
+          }
+        });
       });
     }
     
@@ -635,50 +664,12 @@
       });
     }
 
-    // Gallery Lightbox
-    const galleryItems = document.querySelectorAll('.gallery-item');
-    galleryItems.forEach(item => {
-      item.addEventListener('click', () => {
-        const img = item.querySelector('img');
-        if (img) {
-          const lightbox = document.createElement('div');
-          lightbox.className = 'lightbox';
-          lightbox.innerHTML = `
-            <div class="lightbox-content">
-              <img src="${img.src}" alt="${img.alt}">
-              <button class="lightbox-close">&times;</button>
-            </div>
-          `;
-          document.body.appendChild(lightbox);
-          setTimeout(() => lightbox.classList.add('active'), 10);
-          
-          // Function to close lightbox
-          const closeLightbox = () => {
-            lightbox.classList.remove('active');
-            setTimeout(() => lightbox.remove(), 300);
-          };
-          
-          // Close on button click
-          lightbox.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
-          
-          // Close on click outside (on background)
-          lightbox.addEventListener('click', (e) => {
-            if (e.target === lightbox) {
-              closeLightbox();
-            }
-          });
-          
-          // Close on Escape key
-          const handleEscape = (e) => {
-            if (e.key === 'Escape' && lightbox.classList.contains('active')) {
-              closeLightbox();
-              document.removeEventListener('keydown', handleEscape);
-            }
-          };
-          document.addEventListener('keydown', handleEscape);
-        }
-      });
-    });
+    // Gallery Lightbox - Initial attachment
+    // This is handled by attachGalleryLightboxEvents() which is called after updateGalleryImages()
+    // Wait for gallery to be updated, then attach events
+    setTimeout(() => {
+      attachGalleryLightboxEvents();
+    }, 200);
 
     // Gallery Pause on Hover
     const galleryTrack = document.querySelector('.gallery-track');
