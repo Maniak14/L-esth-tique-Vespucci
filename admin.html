@@ -12,6 +12,7 @@
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
   <script src="firebase-config.js"></script>
   <script src="firebase-db.js"></script>
   <script>
@@ -1179,64 +1180,36 @@
     };
     
     // Handle multiple femmes images upload
-    // Function to upload image to goopics.net
+    // Function to upload image to Firebase Storage (goopics.net n'a pas d'API publique)
     async function uploadToGoopics(file) {
       try {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('image', file); // Try both field names
-        
-        // Try main API endpoint
-        let response = await fetch('https://api.goopics.net/upload', {
-          method: 'POST',
-          body: formData
-        });
-        
-        // If that fails, try alternative endpoints
-        if (!response.ok) {
-          formData = new FormData();
-          formData.append('image', file);
-          response = await fetch('https://goopics.net/api/upload', {
-            method: 'POST',
-            body: formData
-          });
+        // Initialize Firebase if not already done
+        if (!firebaseStorage && typeof initFirebase === 'function') {
+          initFirebase();
         }
         
-        if (!response.ok) {
-          formData = new FormData();
-          formData.append('file', file);
-          response = await fetch('https://goopics.net/upload', {
-            method: 'POST',
-            body: formData
-          });
+        if (!firebaseStorage) {
+          throw new Error('Firebase Storage non initialisé');
         }
         
-        if (response.ok) {
-          const contentType = response.headers.get('content-type');
-          
-          if (contentType && contentType.includes('application/json')) {
-            const data = await response.json();
-            // Try different possible response formats
-            return data.url || data.link || data.image || data.data?.url || data.data?.link || data.imageUrl;
-          } else {
-            // If response is text/HTML, try to extract URL
-            const text = await response.text();
-            // Look for goopics.net URL pattern
-            const urlMatch = text.match(/https?:\/\/i\.goopics\.net\/[a-z0-9]+\.(png|jpg|jpeg|gif|webp)/i);
-            if (urlMatch) {
-              return urlMatch[0];
-            }
-            // Try to find any URL in the response
-            const anyUrlMatch = text.match(/https?:\/\/[^\s"']+\.(png|jpg|jpeg|gif|webp)/i);
-            if (anyUrlMatch) {
-              return anyUrlMatch[0];
-            }
-          }
-        }
+        // Create a unique filename
+        const timestamp = Date.now();
+        const randomId = Math.random().toString(36).substring(2, 15);
+        const fileExtension = file.name.split('.').pop() || 'png';
+        const fileName = `catalog/${timestamp}_${randomId}.${fileExtension}`;
         
-        throw new Error('Upload failed - no valid response');
+        // Upload to Firebase Storage
+        const storageRef = firebaseStorage.ref().child(fileName);
+        const snapshot = await storageRef.put(file);
+        
+        // Get download URL
+        const downloadURL = await snapshot.ref.getDownloadURL();
+        
+        // Return URL in goopics format for compatibility
+        // The URL will be from Firebase Storage but stored the same way
+        return downloadURL;
       } catch (error) {
-        console.error('Erreur upload goopics:', error);
+        console.error('Erreur upload Firebase Storage:', error);
         throw error;
       }
     }

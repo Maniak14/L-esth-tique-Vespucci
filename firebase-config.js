@@ -11,16 +11,19 @@ const firebaseConfig = {
 // Initialiser Firebase
 let firebaseApp;
 let firebaseFirestore;
+let firebaseStorage;
 
 function initFirebase() {
   try {
     if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
       firebaseApp = firebase.initializeApp(firebaseConfig);
       firebaseFirestore = firebase.firestore();
+      firebaseStorage = firebase.storage();
       return true;
     } else if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
       firebaseApp = firebase.app();
       firebaseFirestore = firebase.firestore();
+      firebaseStorage = firebase.storage();
       return true;
     }
     return false;
