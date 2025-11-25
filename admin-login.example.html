@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connexion Admin - L'Esthétique Vespucci</title>
+  <link rel="icon" type="image/png" href="img/V.png">
+  <link rel="stylesheet" href="assets/styles-logo.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: var(--bg-dark);
+      margin: 0;
+      padding: 2rem;
+    }
+    
+    .login-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3rem;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .login-header h1 {
+      color: var(--text-primary);
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      font-family: 'Playfair Display', serif;
+    }
+    
+    .login-header p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .form-group label {
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    
+    .form-group input {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.3s ease;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+    
+    .login-btn {
+      background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+      border: none;
+      border-radius: 10px;
+      padding: 1rem;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+    }
+    
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+    }
+    
+    .login-btn:active {
+      transform: translateY(0);
+    }
+    
+    .error-message {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 10px;
+      padding: 1rem;
+      color: #ef4444;
+      font-size: 0.9rem;
+      text-align: center;
+      display: none;
+    }
+    
+    .error-message.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-header">
+      <h1>Accès Admin</h1>
+      <p>Veuillez entrer le mot de passe pour accéder à la page d'administration</p>
+    </div>
+    
+    <form class="login-form" id="loginForm" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" name="password" required autofocus>
+      </div>
+      
+      <div class="error-message" id="errorMessage">
+        Mot de passe incorrect. Veuillez réessayer.
+      </div>
+      
+      <button type="submit" class="login-btn">Se connecter</button>
+    </form>
+  </div>
+
+  <script>
+    // ⚠️ IMPORTANT: Changez ce mot de passe par défaut !
+    // Pour plus de sécurité, utilisez un mot de passe fort
+    const ADMIN_PASSWORD = 'CHANGEZ_MOI'; // ⚠️ MODIFIEZ CE MOT DE PASSE !
+    
+    // Vérifier si l'utilisateur est déjà connecté
+    if (sessionStorage.getItem('adminAuthenticated') === 'true') {
+      window.location.href = 'admin.html';
+    }
+    
+    function handleLogin(event) {
+      event.preventDefault();
+      
+      const passwordInput = document.getElementById('password');
+      const password = passwordInput.value;
+      const errorMessage = document.getElementById('errorMessage');
+      
+      // Vérifier le mot de passe
+      if (password === ADMIN_PASSWORD) {
+        // Stocker l'authentification dans sessionStorage (se supprime à la fermeture du navigateur)
+        sessionStorage.setItem('adminAuthenticated', 'true');
+        
+        // Rediriger vers admin.html
+        window.location.href = 'admin.html';
+      } else {
+        // Afficher l'erreur
+        errorMessage.classList.add('show');
+        passwordInput.value = '';
+        passwordInput.focus();
+        
+        // Masquer l'erreur après 3 secondes
+        setTimeout(() => {
+          errorMessage.classList.remove('show');
+        }, 3000);
+      }
+    }
+    
+    // Permettre la soumission avec Enter
+    document.getElementById('password').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        handleLogin(e);
+      }
+    });
+  </script>
+</body>
+</html>
+

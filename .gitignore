@@ -1,24 +1,27 @@
-# OS files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+# Fichiers de configuration sensibles
+firebase-config.js
+admin-login.html
 
-# Editor files
-.vscode/
-.idea/
+# Fichiers système
+.DS_Store
+Thumbs.db
 *.swp
 *.swo
 *~
+
+# Fichiers d'éditeur
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
 
 # Logs
 *.log
 npm-debug.log*
 
-# Temporary files
+# Dependencies (si vous utilisez npm)
+node_modules/
+
+# Fichiers temporaires
 *.tmp
 *.temp
-
