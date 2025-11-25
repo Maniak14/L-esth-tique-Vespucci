@@ -638,18 +638,6 @@
           <div>+</div>
           <span>Ajouter une image</span>
         </div>
-        <div class="add-image-btn" onclick="document.getElementById('uploadMultipleHommes').click()" title="Importer plusieurs images" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-          <div>📁</div>
-          <span>Importer plusieurs images</span>
-        </div>
-        <input type="file" id="uploadMultipleHommes" multiple accept="image/*" style="display: none;" onchange="handleMultipleHommesUpload(event)">
-      </div>
-      <div id="uploadProgressHommes" style="display: none; margin-top: 1rem; padding: 1rem; background: var(--surface); border-radius: 10px; border: 1px solid var(--border);">
-        <div style="color: var(--text-primary); margin-bottom: 0.5rem;">Import en cours...</div>
-        <div style="background: var(--bg-dark); border-radius: 5px; height: 8px; overflow: hidden;">
-          <div id="uploadProgressBarHommes" style="background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
-        </div>
-        <div id="uploadStatusHommes" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;"></div>
       </div>
     </div>
 
@@ -1181,88 +1169,6 @@
       }
       
       loadHommesCatalog();
-    };
-    
-    // Handle multiple hommes images upload
-    window.handleMultipleHommesUpload = async function(event) {
-      const files = event.target.files;
-      if (files.length === 0) return;
-      
-      const progressContainer = document.getElementById('uploadProgressHommes');
-      const progressBar = document.getElementById('uploadProgressBarHommes');
-      const statusText = document.getElementById('uploadStatusHommes');
-      const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
-      
-      // Show progress
-      progressContainer.style.display = 'block';
-      statusText.textContent = `0 / ${files.length} images importées...`;
-      
-      let imported = 0;
-      const total = files.length;
-      
-      // Process each file
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        
-        if (!file.type.startsWith('image/')) {
-          statusText.textContent = `Fichier ${i + 1} ignoré (n'est pas une image)`;
-          continue;
-        }
-        
-        try {
-          // Convert file to base64
-          const dataUrl = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-          });
-          
-          // Create new image entry
-          const newId = `homme_${Date.now()}_${i}`;
-          const newImage = {
-            id: newId,
-            url: dataUrl
-          };
-          
-          hommesImages.push(newImage);
-          imported++;
-          
-          // Update progress
-          const progress = Math.round((imported / total) * 100);
-          progressBar.style.width = progress + '%';
-          statusText.textContent = `${imported} / ${total} images importées...`;
-          
-        } catch (error) {
-          console.error(`Erreur lors de l'import de l'image ${i + 1}:`, error);
-          statusText.textContent = `Erreur lors de l'import de l'image ${i + 1}`;
-        }
-      }
-      
-      // Save all images
-      localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
-      if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
-        saveHommesImagesToFirebase(hommesImages);
-      }
-      
-      // Reload catalog
-      loadHommesCatalog();
-      
-      // Update final status
-      progressBar.style.width = '100%';
-      statusText.textContent = `✅ ${imported} image(s) importée(s) avec succès !`;
-      statusText.style.color = '#10b981';
-      
-      // Hide progress after 3 seconds
-      setTimeout(() => {
-        progressContainer.style.display = 'none';
-        progressBar.style.width = '0%';
-        statusText.textContent = '';
-        statusText.style.color = 'var(--text-secondary)';
-      }, 3000);
-      
-      // Reset input
-      event.target.value = '';
     };
     
     // Load femmes catalog in admin
