@@ -127,47 +127,24 @@
       <p>Veuillez entrer le mot de passe pour accéder à la page d'administration</p>
     </div>
     
-    <div class="login-form" id="loginForm">
+    <form class="login-form" id="loginForm" onsubmit="handleLogin(event)">
       <div class="form-group">
         <label for="password">Mot de passe</label>
-        <input type="password" id="password" required autofocus>
+        <input type="password" id="password" name="password" required autofocus>
       </div>
       
       <div class="error-message" id="errorMessage">
         Mot de passe incorrect. Veuillez réessayer.
       </div>
       
-      <button type="button" class="login-btn" id="loginButton">Se connecter</button>
-    </div>
+      <button type="submit" class="login-btn">Se connecter</button>
+    </form>
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-config.js"></script>
-  <script src="firebase-db.js"></script>
   <script>
-    // Fonction pour hasher le mot de passe (SHA-256)
-    async function hashPassword(password) {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(password);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-    
-    let db;
-    let firebaseInitialized = false;
-    
-    // Initialiser Firebase
-    document.addEventListener('DOMContentLoaded', async () => {
-      if (initFirebaseDB && typeof initFirebaseDB === 'function') {
-        firebaseInitialized = initFirebaseDB();
-        if (firebaseInitialized) {
-          db = firebaseFirestore;
-        }
-      }
-    });
+    // Mot de passe par défaut (vous pouvez le changer)
+    // Pour plus de sécurité, vous pouvez utiliser un hash ou Firebase Auth
+    const ADMIN_PASSWORD = 'admin123'; // Changez ce mot de passe !
     
     // Vérifier si l'utilisateur est déjà connecté
     if (sessionStorage.getItem('adminAuthenticated') === 'true') {
@@ -176,101 +153,38 @@
       window.location.href = rootPath + '/admin.html';
     }
     
-    async function handleLogin(event) {
+    function handleLogin(event) {
       event.preventDefault();
-      event.stopPropagation();
       
       const passwordInput = document.getElementById('password');
       const password = passwordInput.value;
       const errorMessage = document.getElementById('errorMessage');
       
-      if (!firebaseInitialized || !db) {
-        errorMessage.textContent = 'Erreur de connexion. Veuillez réessayer.';
+      // Vérifier le mot de passe
+      if (password === ADMIN_PASSWORD) {
+        // Stocker l'authentification dans sessionStorage (se supprime à la fermeture du navigateur)
+        sessionStorage.setItem('adminAuthenticated', 'true');
+        
+        // Rediriger vers admin.html avec chemin absolu depuis la racine
+        const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+        window.location.href = rootPath + '/admin.html';
+      } else {
+        // Afficher l'erreur
         errorMessage.classList.add('show');
-        return false;
-      }
-      
-      try {
-        // Récupérer le hash du mot de passe depuis Firestore
-        const passwordDoc = await db.collection('admin').doc('password').get();
+        passwordInput.value = '';
+        passwordInput.focus();
         
-        if (!passwordDoc.exists) {
-          errorMessage.textContent = 'Configuration manquante. Contactez l\'administrateur.';
-          errorMessage.classList.add('show');
-          return false;
-        }
-        
-        const storedHash = passwordDoc.data().hash;
-        
-        // Hasher le mot de passe saisi
-        const inputHash = await hashPassword(password);
-        
-        // Comparer les hash
-        if (inputHash === storedHash) {
-          // Stocker l'authentification dans sessionStorage
-          sessionStorage.setItem('adminAuthenticated', 'true');
-          
-          // Rediriger vers admin.html (utiliser replace pour éviter le retour en arrière)
-          const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
-          window.location.replace(rootPath + '/admin.html');
-          return false;
-        } else {
-          // Afficher l'erreur
-          errorMessage.textContent = 'Mot de passe incorrect. Veuillez réessayer.';
-          errorMessage.classList.add('show');
-          passwordInput.value = '';
-          passwordInput.focus();
-          
-          // Masquer l'erreur après 3 secondes
-          setTimeout(() => {
-            errorMessage.classList.remove('show');
-          }, 3000);
-          return false;
-        }
-      } catch (error) {
-        console.error('Erreur authentification:', error);
-        errorMessage.textContent = 'Erreur de connexion. Veuillez réessayer.';
-        errorMessage.classList.add('show');
-        return false;
+        // Masquer l'erreur après 3 secondes
+        setTimeout(() => {
+          errorMessage.classList.remove('show');
+        }, 3000);
       }
     }
     
-    // Empêcher la soumission par défaut du formulaire
-    document.addEventListener('DOMContentLoaded', () => {
-      const loginForm = document.getElementById('loginForm');
-      const passwordInput = document.getElementById('password');
-      
-      // Empêcher TOUTE soumission par défaut du formulaire
-      if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          e.stopImmediatePropagation();
-          return false;
-        }, true); // Utiliser capture phase pour intercepter en premier
-      }
-      
-      // Bouton de connexion
-      const loginButton = document.getElementById('loginButton');
-      if (loginButton) {
-        loginButton.addEventListener('click', async (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const fakeEvent = { preventDefault: () => {}, stopPropagation: () => {} };
-          await handleLogin(fakeEvent);
-        });
-      }
-      
-      // Permettre la soumission avec Enter
-      if (passwordInput) {
-        passwordInput.addEventListener('keypress', async (e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            e.stopPropagation();
-            const fakeEvent = { preventDefault: () => {}, stopPropagation: () => {} };
-            await handleLogin(fakeEvent);
-          }
-        });
+    // Permettre la soumission avec Enter
+    document.getElementById('password').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        handleLogin(e);
       }
     });
   </script>
