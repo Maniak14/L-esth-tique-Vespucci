@@ -141,10 +141,33 @@
     </form>
   </div>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="firebase-db.js"></script>
   <script>
-    // Mot de passe par défaut (vous pouvez le changer)
-    // Pour plus de sécurité, vous pouvez utiliser un hash ou Firebase Auth
-    const ADMIN_PASSWORD = 'admin123'; // Changez ce mot de passe !
+    // Fonction pour hasher le mot de passe (SHA-256)
+    async function hashPassword(password) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    
+    let db;
+    let firebaseInitialized = false;
+    
+    // Initialiser Firebase
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (initFirebaseDB && typeof initFirebaseDB === 'function') {
+        firebaseInitialized = initFirebaseDB();
+        if (firebaseInitialized) {
+          db = firebaseFirestore;
+        }
+      }
+    });
     
     // Vérifier si l'utilisateur est déjà connecté
     if (sessionStorage.getItem('adminAuthenticated') === 'true') {
@@ -153,38 +176,70 @@
       window.location.href = rootPath + '/admin.html';
     }
     
-    function handleLogin(event) {
+    async function handleLogin(event) {
       event.preventDefault();
       
       const passwordInput = document.getElementById('password');
       const password = passwordInput.value;
       const errorMessage = document.getElementById('errorMessage');
       
-      // Vérifier le mot de passe
-      if (password === ADMIN_PASSWORD) {
-        // Stocker l'authentification dans sessionStorage (se supprime à la fermeture du navigateur)
-        sessionStorage.setItem('adminAuthenticated', 'true');
-        
-        // Rediriger vers admin.html avec chemin absolu depuis la racine
-        const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
-        window.location.href = rootPath + '/admin.html';
-      } else {
-        // Afficher l'erreur
+      if (!firebaseInitialized || !db) {
+        errorMessage.textContent = 'Erreur de connexion. Veuillez réessayer.';
         errorMessage.classList.add('show');
-        passwordInput.value = '';
-        passwordInput.focus();
+        return;
+      }
+      
+      try {
+        // Récupérer le hash du mot de passe depuis Firestore
+        const passwordDoc = await db.collection('admin').doc('password').get();
         
-        // Masquer l'erreur après 3 secondes
-        setTimeout(() => {
-          errorMessage.classList.remove('show');
-        }, 3000);
+        if (!passwordDoc.exists) {
+          errorMessage.textContent = 'Configuration manquante. Contactez l\'administrateur.';
+          errorMessage.classList.add('show');
+          return;
+        }
+        
+        const storedHash = passwordDoc.data().hash;
+        
+        // Hasher le mot de passe saisi
+        const inputHash = await hashPassword(password);
+        
+        // Comparer les hash
+        if (inputHash === storedHash) {
+          // Stocker l'authentification dans sessionStorage
+          sessionStorage.setItem('adminAuthenticated', 'true');
+          
+          // Rediriger vers admin.html
+          const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+          window.location.href = rootPath + '/admin.html';
+        } else {
+          // Afficher l'erreur
+          errorMessage.textContent = 'Mot de passe incorrect. Veuillez réessayer.';
+          errorMessage.classList.add('show');
+          passwordInput.value = '';
+          passwordInput.focus();
+          
+          // Masquer l'erreur après 3 secondes
+          setTimeout(() => {
+            errorMessage.classList.remove('show');
+          }, 3000);
+        }
+      } catch (error) {
+        console.error('Erreur authentification:', error);
+        errorMessage.textContent = 'Erreur de connexion. Veuillez réessayer.';
+        errorMessage.classList.add('show');
       }
     }
     
     // Permettre la soumission avec Enter
-    document.getElementById('password').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        handleLogin(e);
+    document.addEventListener('DOMContentLoaded', () => {
+      const passwordInput = document.getElementById('password');
+      if (passwordInput) {
+        passwordInput.addEventListener('keypress', async (e) => {
+          if (e.key === 'Enter') {
+            await handleLogin(e);
+          }
+        });
       }
     });
   </script>
