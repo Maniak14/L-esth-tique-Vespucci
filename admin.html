@@ -1179,6 +1179,68 @@
     };
     
     // Handle multiple femmes images upload
+    // Function to upload image to goopics.net
+    async function uploadToGoopics(file) {
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('image', file); // Try both field names
+        
+        // Try main API endpoint
+        let response = await fetch('https://api.goopics.net/upload', {
+          method: 'POST',
+          body: formData
+        });
+        
+        // If that fails, try alternative endpoints
+        if (!response.ok) {
+          formData = new FormData();
+          formData.append('image', file);
+          response = await fetch('https://goopics.net/api/upload', {
+            method: 'POST',
+            body: formData
+          });
+        }
+        
+        if (!response.ok) {
+          formData = new FormData();
+          formData.append('file', file);
+          response = await fetch('https://goopics.net/upload', {
+            method: 'POST',
+            body: formData
+          });
+        }
+        
+        if (response.ok) {
+          const contentType = response.headers.get('content-type');
+          
+          if (contentType && contentType.includes('application/json')) {
+            const data = await response.json();
+            // Try different possible response formats
+            return data.url || data.link || data.image || data.data?.url || data.data?.link || data.imageUrl;
+          } else {
+            // If response is text/HTML, try to extract URL
+            const text = await response.text();
+            // Look for goopics.net URL pattern
+            const urlMatch = text.match(/https?:\/\/i\.goopics\.net\/[a-z0-9]+\.(png|jpg|jpeg|gif|webp)/i);
+            if (urlMatch) {
+              return urlMatch[0];
+            }
+            // Try to find any URL in the response
+            const anyUrlMatch = text.match(/https?:\/\/[^\s"']+\.(png|jpg|jpeg|gif|webp)/i);
+            if (anyUrlMatch) {
+              return anyUrlMatch[0];
+            }
+          }
+        }
+        
+        throw new Error('Upload failed - no valid response');
+      } catch (error) {
+        console.error('Erreur upload goopics:', error);
+        throw error;
+      }
+    }
+    
     window.handleMultipleFemmesUpload = async function(event) {
       const files = event.target.files;
       if (files.length === 0) return;
@@ -1205,25 +1267,25 @@
         }
         
         try {
-          // Convert file to base64
-          const dataUrl = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-          });
-          
           // Extract filename without extension
           const fileName = file.name.replace(/\.[^/.]+$/, ""); // Remove extension
           
           // Get current count to determine the number
           const currentCount = femmesImages.length;
           
-          // Create new image entry with filename-based name
+          // Upload to goopics.net
+          statusText.textContent = `Upload de l'image ${i + 1} / ${total}...`;
+          const goopicsUrl = await uploadToGoopics(file);
+          
+          if (!goopicsUrl) {
+            throw new Error('URL non reçue de goopics');
+          }
+          
+          // Create new image entry with goopics URL
           const newId = `femme_${Date.now()}_${i}`;
           const newImage = {
             id: newId,
-            url: dataUrl,
+            url: goopicsUrl,
             name: fileName || `Coupe ${currentCount}` // Use filename or fallback to "Coupe X"
           };
           
@@ -1237,7 +1299,7 @@
           
         } catch (error) {
           console.error(`Erreur lors de l'import de l'image ${i + 1}:`, error);
-          statusText.textContent = `Erreur lors de l'import de l'image ${i + 1}`;
+          statusText.textContent = `Erreur lors de l'import de l'image ${i + 1}: ${error.message}`;
         }
       }
       
@@ -1320,25 +1382,25 @@
         }
         
         try {
-          // Convert file to base64
-          const dataUrl = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-          });
-          
           // Extract filename without extension
           const fileName = file.name.replace(/\.[^/.]+$/, ""); // Remove extension
           
           // Get current count to determine the number
           const currentCount = hommesImages.length;
           
-          // Create new image entry with filename-based name
+          // Upload to goopics.net
+          statusText.textContent = `Upload de l'image ${i + 1} / ${total}...`;
+          const goopicsUrl = await uploadToGoopics(file);
+          
+          if (!goopicsUrl) {
+            throw new Error('URL non reçue de goopics');
+          }
+          
+          // Create new image entry with goopics URL
           const newId = `homme_${Date.now()}_${i}`;
           const newImage = {
             id: newId,
-            url: dataUrl,
+            url: goopicsUrl,
             name: fileName || `Coupe ${currentCount}` // Use filename or fallback to "Coupe X"
           };
           
@@ -1352,7 +1414,7 @@
           
         } catch (error) {
           console.error(`Erreur lors de l'import de l'image ${i + 1}:`, error);
-          statusText.textContent = `Erreur lors de l'import de l'image ${i + 1}`;
+          statusText.textContent = `Erreur lors de l'import de l'image ${i + 1}: ${error.message}`;
         }
       }
       
