@@ -48,14 +48,16 @@
       
       // Initialize Firebase and load team members
       document.addEventListener('DOMContentLoaded', async () => {
-        // Charger depuis les JSON statiques en priorité (INSTANTANÉ)
-        await loadDataFromJSON();
-        
-        // Load team members
+        // AFFICHER IMMÉDIATEMENT depuis le cache (0ms d'attente)
         loadTeamMembers();
+        updateGalleryImages();
         
-        // Update gallery images
-        setTimeout(() => updateGalleryImages(), 100);
+        // Charger depuis les JSON statiques en arrière-plan (sans bloquer)
+        loadDataFromJSON().then(() => {
+          // Mettre à jour après chargement du JSON
+          loadTeamMembers();
+          updateGalleryImages();
+        });
         
         // Firebase en arrière-plan uniquement pour mise à jour (optionnel)
         if (initFirebaseDB && typeof initFirebaseDB === 'function') {
@@ -228,6 +230,19 @@
     
     loadSavedImages();
     
+    // Afficher immédiatement depuis le cache si disponible (avant DOMContentLoaded)
+    (function() {
+      if (document.readyState !== 'loading') {
+        const teamMembers = JSON.parse(localStorage.getItem('team_members') || '[]');
+        if (teamMembers.length > 0) {
+          const teamGrid = document.getElementById('teamGrid');
+          if (teamGrid) {
+            loadTeamMembers();
+          }
+        }
+      }
+    })();
+    
     // Charger les données depuis les fichiers JSON statiques
     async function loadDataFromJSON() {
       try {
@@ -275,39 +290,48 @@
       // Get deleted members
       const deletedMembers = JSON.parse(localStorage.getItem('deleted_team_members') || '[]');
       
-      // Merge default members with saved members (excluding deleted ones)
-      const allMembers = [];
-      defaultMembers.forEach(defaultMember => {
-        if (!deletedMembers.includes(defaultMember.id)) {
-          const saved = teamMembers.find(m => m.id === defaultMember.id);
-          if (saved) {
-            allMembers.push({ ...defaultMember, ...saved });
-          } else {
+      // Si on a des membres dans le JSON, les utiliser directement
+      let allMembers = [];
+      if (teamMembers.length > 0) {
+        // Utiliser directement les membres du JSON (nouveau système)
+        allMembers = teamMembers.filter(m => !deletedMembers.includes(m.id));
+      } else {
+        // Fallback sur les membres par défaut (ancien système)
+        defaultMembers.forEach(defaultMember => {
+          if (!deletedMembers.includes(defaultMember.id)) {
             allMembers.push(defaultMember);
           }
-        }
-      });
-      
-      // Add custom members
-      teamMembers.forEach(member => {
-        if (member.id.startsWith('team_') && !allMembers.find(m => m.id === member.id)) {
-          allMembers.push(member);
-        }
-      });
+        });
+      }
       
       teamGrid.innerHTML = '';
       allMembers.forEach(member => {
+        // Utiliser imageId si défini, sinon utiliser l'id du membre
         const imageId = member.imageId || member.id;
         const savedImage = localStorage.getItem(`image_${imageId}`);
+        
+        // Mapping des anciens IDs vers les images par défaut (pour compatibilité)
         const defaultImages = {
           'julio': 'https://i.goopics.net/pjtgz1.png',
           'soren': 'https://i.goopics.net/8y3mgo.png',
           'sun': 'https://i.goopics.net/t7adhn.png',
           'inaya': 'https://i.goopics.net/zyg7y5.png',
           'andres': 'https://i.goopics.net/xloucg.png',
-          'yoruhime': 'https://i.goopics.net/15utm9.png'
+          'yoruhime': 'https://i.goopics.net/15utm9.png',
+          // Mapping par prénom pour les nouveaux IDs
+          'Julio': 'https://i.goopics.net/pjtgz1.png',
+          'Soren': 'https://i.goopics.net/8y3mgo.png',
+          'Sun': 'https://i.goopics.net/t7adhn.png',
+          'Inaya': 'https://i.goopics.net/zyg7y5.png',
+          'Andres': 'https://i.goopics.net/xloucg.png',
+          'Yoruhime': 'https://i.goopics.net/15utm9.png'
         };
-        const imageUrl = savedImage || defaultImages[imageId] || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage%3C/text%3E%3C/svg%3E';
+        
+        // Essayer d'abord l'image sauvegardée, puis par imageId, puis par prénom, puis défaut
+        const imageUrl = savedImage || 
+                        defaultImages[imageId] || 
+                        defaultImages[member.firstName] || 
+                        'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage%3C/text%3E%3C/svg%3E';
         const fullName = `${member.firstName || ''} ${member.lastName || ''}`.trim() || 'Nouvel employé';
         
         const card = document.createElement('div');
