@@ -300,9 +300,9 @@
       });
       
       hommesImages.forEach((item, index) => {
-        // Extraire le numéro directement de l'ID (homme_1 → 1, homme_2 → 2, etc.)
+        // Extraire le numéro de l'ID et soustraire 1 (homme_1 → Coupe 0, homme_2 → Coupe 1, etc.)
         const match = item.id.match(/homme_(\d+)/);
-        const number = match ? parseInt(match[1]) : (index + 1);
+        const number = match ? parseInt(match[1]) - 1 : index;
         
         const card = document.createElement('div');
         card.className = 'catalog-item';
