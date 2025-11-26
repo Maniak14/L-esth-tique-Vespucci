@@ -810,16 +810,38 @@
     }
 
     // Get current image URL (saved or default)
-    function getCurrentImage(config) {
-      // Check if it's a catalog image
+    async function getCurrentImage(config) {
+      // Check if it's a catalog image - charger depuis Firebase
       if (config.id.startsWith('femme_')) {
-        const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
-        const image = femmesImages.find(img => img.id === config.id);
-        return image ? image.url : config.default;
+        if (window.firebaseInitialized && typeof firebaseFirestore !== 'undefined') {
+          try {
+            const doc = await firebaseFirestore.collection('data').doc('femmes_images').get();
+            if (doc.exists) {
+              const data = doc.data();
+              const femmesImages = data.images || [];
+              const image = femmesImages.find(img => img.id === config.id);
+              if (image) return image.url;
+            }
+          } catch (error) {
+            console.error('Erreur chargement image femme:', error);
+          }
+        }
+        return config.default;
       } else if (config.id.startsWith('homme_')) {
-        const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
-        const image = hommesImages.find(img => img.id === config.id);
-        return image ? image.url : config.default;
+        if (window.firebaseInitialized && typeof firebaseFirestore !== 'undefined') {
+          try {
+            const doc = await firebaseFirestore.collection('data').doc('hommes_images').get();
+            if (doc.exists) {
+              const data = doc.data();
+              const hommesImages = data.images || [];
+              const image = hommesImages.find(img => img.id === config.id);
+              if (image) return image.url;
+            }
+          } catch (error) {
+            console.error('Erreur chargement image homme:', error);
+          }
+        }
+        return config.default;
       }
       
       const saved = getSavedImage(config.id);
@@ -1173,35 +1195,52 @@
     }
     
     // Add new femmes image (global function)
-    window.addNewFemmesImage = function() {
-      const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
-      
-      // Trouver le prochain numéro disponible
-      let nextNumber = 1;
-      if (femmesImages.length > 0) {
-        const numbers = femmesImages
-          .map(img => {
-            const match = img.id.match(/femme_(\d+)/);
-            return match ? parseInt(match[1]) : 0;
-          })
-          .filter(n => n > 0)
-          .sort((a, b) => b - a);
-        nextNumber = numbers.length > 0 ? numbers[0] + 1 : femmesImages.length + 1;
+    window.addNewFemmesImage = async function() {
+      if (!window.firebaseInitialized || typeof firebaseFirestore === 'undefined') {
+        alert('Firebase non initialisé');
+        return;
       }
       
-      const newId = `femme_${nextNumber}`;
-      const newImage = {
-        id: newId,
-        url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E'
-      };
-      
-      femmesImages.push(newImage);
-      localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
-      if (window.firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
-        saveFemmesImagesToFirebase(femmesImages);
+      try {
+        // Charger depuis Firebase
+        const doc = await firebaseFirestore.collection('data').doc('femmes_images').get();
+        let femmesImages = [];
+        if (doc.exists) {
+          const data = doc.data();
+          femmesImages = data.images || [];
+        }
+        
+        // Trouver le prochain numéro disponible
+        let nextNumber = 1;
+        if (femmesImages.length > 0) {
+          const numbers = femmesImages
+            .map(img => {
+              const match = img.id.match(/femme_(\d+)/);
+              return match ? parseInt(match[1]) : 0;
+            })
+            .filter(n => n > 0)
+            .sort((a, b) => b - a);
+          nextNumber = numbers.length > 0 ? numbers[0] + 1 : femmesImages.length + 1;
+        }
+        
+        const newId = `femme_${nextNumber}`;
+        const newImage = {
+          id: newId,
+          url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E'
+        };
+        
+        femmesImages.push(newImage);
+        
+        // Sauvegarder dans Firebase
+        if (typeof saveFemmesImagesToFirebase === 'function') {
+          saveFemmesImagesToFirebase(femmesImages);
+        }
+        
+        loadFemmesCatalog();
+      } catch (error) {
+        console.error('Erreur ajout image femme:', error);
+        alert('Erreur lors de l\'ajout de l\'image');
       }
-      
-      loadFemmesCatalog();
     };
     
     // Add new hommes image (global function)
@@ -1236,72 +1275,100 @@
       loadHommesCatalog();
     };
     
-    // Load femmes catalog in admin
-    function loadFemmesCatalog() {
+    // Load femmes catalog in admin (depuis Firebase)
+    async function loadFemmesCatalog() {
       const container = document.getElementById('femmesCatalog');
-      let femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
-      
-      if (femmesImages.length === 0) {
-        for (let i = 1; i <= 6; i++) {
-          femmesImages.push({ id: `femme_${i}`, url: `img/femmes/${i}.png` });
-        }
-        localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
-      }
+      if (!container) return;
       
       container.innerHTML = '';
-      // Trier les images par numéro d'ID pour garantir l'ordre
-      femmesImages.sort((a, b) => {
-        const matchA = a.id.match(/femme_(\d+)/);
-        const matchB = b.id.match(/femme_(\d+)/);
-        const numA = matchA ? parseInt(matchA[1]) : 0;
-        const numB = matchB ? parseInt(matchB[1]) : 0;
-        return numA - numB;
-      });
-      femmesImages.forEach((item, index) => {
-        // Utiliser index pour que les coupes commencent à 0
-        const number = index;
+      
+      if (!window.firebaseInitialized || typeof firebaseFirestore === 'undefined') {
+        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Firebase non initialisé</p>';
+        return;
+      }
+      
+      try {
+        // Charger directement depuis Firebase
+        const doc = await firebaseFirestore.collection('data').doc('femmes_images').get();
         
-        const config = {
-          id: item.id,
-          name: `Coupe ${number}`,
-          default: item.url
-        };
-        createImageItem(config, container, true);
-      });
+        let femmesImages = [];
+        if (doc.exists) {
+          const data = doc.data();
+          femmesImages = data.images || [];
+        }
+        
+        // Trier les images par numéro d'ID pour garantir l'ordre
+        femmesImages.sort((a, b) => {
+          const matchA = a.id.match(/femme_(\d+)/);
+          const matchB = b.id.match(/femme_(\d+)/);
+          const numA = matchA ? parseInt(matchA[1]) : 0;
+          const numB = matchB ? parseInt(matchB[1]) : 0;
+          return numA - numB;
+        });
+        
+        femmesImages.forEach((item, index) => {
+          // Utiliser index pour que les coupes commencent à 0
+          const number = index;
+          
+          const config = {
+            id: item.id,
+            name: `Coupe ${number}`,
+            default: item.url
+          };
+          createImageItem(config, container, true);
+        });
+      } catch (error) {
+        console.error('Erreur chargement femmes images:', error);
+        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Erreur de chargement</p>';
+      }
     }
     
-    // Load hommes catalog in admin
-    function loadHommesCatalog() {
+    // Load hommes catalog in admin (depuis Firebase)
+    async function loadHommesCatalog() {
       const container = document.getElementById('hommesCatalog');
-      let hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
-      
-      if (hommesImages.length === 0) {
-        for (let i = 1; i <= 6; i++) {
-          hommesImages.push({ id: `homme_${i}`, url: `img/hommes/${i}.png` });
-        }
-        localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
-      }
+      if (!container) return;
       
       container.innerHTML = '';
-      // Trier les images par numéro d'ID pour garantir l'ordre
-      hommesImages.sort((a, b) => {
-        const matchA = a.id.match(/homme_(\d+)/);
-        const matchB = b.id.match(/homme_(\d+)/);
-        const numA = matchA ? parseInt(matchA[1]) : 0;
-        const numB = matchB ? parseInt(matchB[1]) : 0;
-        return numA - numB;
-      });
-      hommesImages.forEach((item, index) => {
-        // Utiliser index pour que les coupes commencent à 0
-        const number = index;
+      
+      if (!window.firebaseInitialized || typeof firebaseFirestore === 'undefined') {
+        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Firebase non initialisé</p>';
+        return;
+      }
+      
+      try {
+        // Charger directement depuis Firebase
+        const doc = await firebaseFirestore.collection('data').doc('hommes_images').get();
         
-        const config = {
-          id: item.id,
-          name: `Coupe ${number}`,
-          default: item.url
-        };
-        createImageItem(config, container, true);
-      });
+        let hommesImages = [];
+        if (doc.exists) {
+          const data = doc.data();
+          hommesImages = data.images || [];
+        }
+        
+        // Trier les images par numéro d'ID pour garantir l'ordre
+        hommesImages.sort((a, b) => {
+          const matchA = a.id.match(/homme_(\d+)/);
+          const matchB = b.id.match(/homme_(\d+)/);
+          const numA = matchA ? parseInt(matchA[1]) : 0;
+          const numB = matchB ? parseInt(matchB[1]) : 0;
+          return numA - numB;
+        });
+        
+        hommesImages.forEach((item, index) => {
+          // Utiliser index pour que les coupes commencent à 0
+          const number = index;
+          
+          const config = {
+            id: item.id,
+            name: `Coupe ${number}`,
+            default: item.url
+          };
+          createImageItem(config, container, true);
+        });
+      } catch (error) {
+        console.error('Erreur chargement hommes images:', error);
+        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Erreur de chargement</p>';
+      }
     }
     
     // Update femmes/hommes image URL
