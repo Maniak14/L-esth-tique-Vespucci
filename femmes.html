@@ -72,11 +72,7 @@
     </p>
 
     <div id="femmesCatalog" class="catalog-grid">
-      <!-- Images will be loaded dynamically from Firebase -->
-      <div id="loadingIndicator" style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-secondary);">
-        <div style="font-size: 1.2rem; margin-bottom: 1rem;">⏳ Chargement des images...</div>
-        <div style="font-size: 0.9rem;">Veuillez patienter</div>
-      </div>
+      <!-- Images will be loaded IMMEDIATELY from cache -->
     </div>
   </section>
 
@@ -216,59 +212,63 @@
     }
 
     // Initialize Firebase and load catalog
-    // Solution REAL-TIME: onSnapshot charge IMMÉDIATEMENT sans attendre
+    // AFFICHAGE INSTANTANÉ - ZÉRO ATTENTE
     let firebaseInitialized = false;
+    
+    // Charger IMMÉDIATEMENT (même avant DOMContentLoaded si possible)
+    (function() {
+      // AFFICHER IMMÉDIATEMENT depuis le cache (0ms d'attente)
+      const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
+      if (femmesImages.length > 0) {
+        // Si le DOM est prêt, afficher tout de suite
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', () => displayFemmesCatalog(femmesImages));
+        } else {
+          displayFemmesCatalog(femmesImages);
+        }
+      }
+    })();
+    
     document.addEventListener('DOMContentLoaded', () => {
-      // 1. AFFICHER IMMÉDIATEMENT depuis le cache (instantané)
-      loadFemmesCatalog();
+      // Si pas encore affiché, afficher maintenant
+      const container = document.getElementById('femmesCatalog');
+      if (container && container.children.length === 0) {
+        loadFemmesCatalog();
+      }
       
-      // 2. Initialiser Firebase et utiliser REAL-TIME (onSnapshot)
+      // Initialiser Firebase en arrière-plan (sans bloquer)
       if (initFirebaseDB && typeof initFirebaseDB === 'function') {
         firebaseInitialized = initFirebaseDB();
         if (firebaseInitialized && typeof firebaseFirestore !== 'undefined') {
-          // REAL-TIME: onSnapshot charge IMMÉDIATEMENT (pas besoin d'attendre)
-          // Il retourne les données dès qu'elles sont disponibles
+          // REAL-TIME: onSnapshot charge en arrière-plan
           firebaseFirestore.collection('data').doc('femmes_images').onSnapshot((doc) => {
             if (doc.exists) {
               const data = doc.data();
               if (data.images && Array.isArray(data.images)) {
-                // Mettre à jour le cache et l'affichage IMMÉDIATEMENT
                 localStorage.setItem('femmes_images', JSON.stringify(data.images));
-                console.log('⚡ Chargement REAL-TIME depuis Firebase (instantané)');
                 displayFemmesCatalog(data.images);
               }
-            } else {
-              // Document n'existe pas encore
-              console.log('⚠️ Document Firebase vide, utilisation du cache');
             }
           }, (error) => {
-            console.error('Erreur Firebase real-time:', error);
-            // En cas d'erreur, utiliser le cache
+            console.error('Erreur Firebase:', error);
           });
         }
       }
     });
 
     // Load femmes catalog images
-    // AFFICHAGE INSTANTANÉ depuis cache (comme une DB Apache)
+    // AFFICHAGE INSTANTANÉ - ZÉRO ATTENTE
     function loadFemmesCatalog() {
       const container = document.getElementById('femmesCatalog');
       if (!container) return;
       
-      // Masquer le loader immédiatement
-      const loader = document.getElementById('loadingIndicator');
-      if (loader) loader.style.display = 'none';
-      
-      // 1. AFFICHER IMMÉDIATEMENT depuis le cache localStorage (instantané comme Apache)
+      // AFFICHER IMMÉDIATEMENT depuis le cache
       let femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
       
       if (femmesImages.length > 0) {
-        // Cache existe → AFFICHAGE INSTANTANÉ (comme une DB serveur)
-        console.log('⚡ Affichage instantané depuis le cache');
         displayFemmesCatalog(femmesImages);
       } else {
-        // Cache vide → utiliser images par défaut (Firebase chargera en arrière-plan)
-        console.log('⚠️ Cache vide, affichage images par défaut (Firebase charge en arrière-plan)');
+        // Cache vide → images par défaut (instantané)
         loadDefaultFemmesImages();
       }
     }
