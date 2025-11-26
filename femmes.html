@@ -216,88 +216,61 @@
     }
 
     // Initialize Firebase and load catalog
-    // Stratégie: Firebase = source de vérité, localStorage = cache pour performance
+    // Solution REAL-TIME: onSnapshot charge IMMÉDIATEMENT sans attendre
     let firebaseInitialized = false;
-    document.addEventListener('DOMContentLoaded', async () => {
-      // 1. Initialiser Firebase (source de vérité)
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. AFFICHER IMMÉDIATEMENT depuis le cache (instantané)
+      loadFemmesCatalog();
+      
+      // 2. Initialiser Firebase et utiliser REAL-TIME (onSnapshot)
       if (initFirebaseDB && typeof initFirebaseDB === 'function') {
         firebaseInitialized = initFirebaseDB();
-        if (firebaseInitialized) {
-          // 2. Charger TOUTES les données depuis Firebase AVANT d'afficher (source de vérité)
-          console.log('📡 Chargement depuis Firebase...');
-          await loadAllDataFromFirebase();
-          console.log('✅ Données Firebase chargées (source de vérité)');
-          
-          // 3. Maintenant que Firebase est chargé, afficher le catalogue
-          loadFemmesCatalog();
-          
-          // 4. Écouter les changements en temps réel depuis Firebase
-          // Chaque changement met à jour automatiquement localStorage (cache)
-          if (typeof firebaseFirestore !== 'undefined') {
-            firebaseFirestore.collection('data').doc('femmes_images').onSnapshot((doc) => {
-              if (doc.exists) {
-                const data = doc.data();
-                if (data.images && Array.isArray(data.images)) {
-                  // Mettre à jour le cache localStorage avec les données Firebase
-                  localStorage.setItem('femmes_images', JSON.stringify(data.images));
-                  console.log('🔄 Mise à jour depuis Firebase (temps réel)');
-                  displayFemmesCatalog(data.images);
-                }
+        if (firebaseInitialized && typeof firebaseFirestore !== 'undefined') {
+          // REAL-TIME: onSnapshot charge IMMÉDIATEMENT (pas besoin d'attendre)
+          // Il retourne les données dès qu'elles sont disponibles
+          firebaseFirestore.collection('data').doc('femmes_images').onSnapshot((doc) => {
+            if (doc.exists) {
+              const data = doc.data();
+              if (data.images && Array.isArray(data.images)) {
+                // Mettre à jour le cache et l'affichage IMMÉDIATEMENT
+                localStorage.setItem('femmes_images', JSON.stringify(data.images));
+                console.log('⚡ Chargement REAL-TIME depuis Firebase (instantané)');
+                displayFemmesCatalog(data.images);
               }
-            });
-          }
-        } else {
-          // Si Firebase n'est pas disponible, utiliser le cache ou les images par défaut
-          loadFemmesCatalog();
+            } else {
+              // Document n'existe pas encore
+              console.log('⚠️ Document Firebase vide, utilisation du cache');
+            }
+          }, (error) => {
+            console.error('Erreur Firebase real-time:', error);
+            // En cas d'erreur, utiliser le cache
+          });
         }
-      } else {
-        // Si Firebase n'est pas disponible, utiliser le cache ou les images par défaut
-        loadFemmesCatalog();
       }
     });
 
     // Load femmes catalog images
-    // Priorité: Firebase (source de vérité) > localStorage (cache) > images par défaut
+    // AFFICHAGE INSTANTANÉ depuis cache (comme une DB Apache)
     function loadFemmesCatalog() {
       const container = document.getElementById('femmesCatalog');
       if (!container) return;
       
-      // Masquer le loader
+      // Masquer le loader immédiatement
       const loader = document.getElementById('loadingIndicator');
       if (loader) loader.style.display = 'none';
       
-      // 1. Utiliser le cache localStorage (mis à jour par loadAllDataFromFirebase)
+      // 1. AFFICHER IMMÉDIATEMENT depuis le cache localStorage (instantané comme Apache)
       let femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
       
-      // 2. Si cache existe (chargé depuis Firebase), l'afficher directement
       if (femmesImages.length > 0) {
-        console.log('✅ Affichage des images depuis Firebase (via cache)');
+        // Cache existe → AFFICHAGE INSTANTANÉ (comme une DB serveur)
+        console.log('⚡ Affichage instantané depuis le cache');
         displayFemmesCatalog(femmesImages);
-        return;
+      } else {
+        // Cache vide → utiliser images par défaut (Firebase chargera en arrière-plan)
+        console.log('⚠️ Cache vide, affichage images par défaut (Firebase charge en arrière-plan)');
+        loadDefaultFemmesImages();
       }
-      
-      // 3. Si cache vide et Firebase disponible, charger depuis Firebase
-      if (firebaseInitialized && typeof loadFemmesImagesFromFirebase === 'function') {
-        console.log('📡 Cache vide, chargement depuis Firebase...');
-        loadFemmesImagesFromFirebase((data) => {
-          femmesImages = data || [];
-          if (femmesImages.length > 0) {
-            // Mettre à jour le cache avec les données Firebase
-            localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
-            console.log('✅ Images chargées depuis Firebase');
-            displayFemmesCatalog(femmesImages);
-          } else {
-            // 4. Si Firebase vide aussi, utiliser les images par défaut
-            console.log('⚠️ Firebase vide, utilisation des images par défaut');
-            loadDefaultFemmesImages();
-          }
-        });
-        return;
-      }
-      
-      // 5. Dernier recours: images par défaut (si Firebase n'est pas disponible)
-      console.log('⚠️ Firebase non disponible, utilisation des images par défaut');
-      loadDefaultFemmesImages();
     }
     
     // Charger les images par défaut
