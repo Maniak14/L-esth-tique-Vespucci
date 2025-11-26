@@ -756,13 +756,6 @@
             if (typeof loadTeamMembers === 'function') {
               loadTeamMembers();
             }
-            // Recharger les catalogues
-            if (typeof loadFemmesCatalog === 'function') {
-              loadFemmesCatalog();
-            }
-            if (typeof loadHommesCatalog === 'function') {
-              loadHommesCatalog();
-            }
           });
           watchPositions(() => {
             console.log('Positions mises à jour depuis Firebase');
@@ -783,6 +776,20 @@
             console.log('Membres de l\'équipe mis à jour depuis Firebase');
             if (typeof loadTeamMembers === 'function') {
               loadTeamMembers();
+            }
+          });
+          // Écouter les changements de femmes images
+          watchFemmesImages(() => {
+            console.log('Images femmes mises à jour depuis Firebase');
+            if (typeof loadFemmesCatalog === 'function') {
+              loadFemmesCatalog();
+            }
+          });
+          // Écouter les changements de hommes images
+          watchHommesImages(() => {
+            console.log('Images hommes mises à jour depuis Firebase');
+            if (typeof loadHommesCatalog === 'function') {
+              loadHommesCatalog();
             }
           });
         }
@@ -1190,7 +1197,7 @@
       
       femmesImages.push(newImage);
       localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
-      if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
+      if (window.firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
         saveFemmesImagesToFirebase(femmesImages);
       }
       
@@ -1222,7 +1229,7 @@
       
       hommesImages.push(newImage);
       localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
-      if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
+      if (window.firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
         saveHommesImagesToFirebase(hommesImages);
       }
       
@@ -1308,7 +1315,7 @@
         if (image) {
           image.url = url;
           localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
-          if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
+          if (window.firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
             saveFemmesImagesToFirebase(femmesImages);
           }
         }
@@ -1320,7 +1327,7 @@
         if (image) {
           image.url = url;
           localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
-          if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
+          if (window.firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
             saveHommesImagesToFirebase(hommesImages);
           }
         }
@@ -1350,7 +1357,7 @@
           const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
           const updated = femmesImages.filter(img => img.id !== imageId);
           localStorage.setItem('femmes_images', JSON.stringify(updated));
-          if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
+          if (window.firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
             saveFemmesImagesToFirebase(updated);
           }
           loadFemmesCatalog();
@@ -1358,7 +1365,7 @@
           const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
           const updated = hommesImages.filter(img => img.id !== imageId);
           localStorage.setItem('hommes_images', JSON.stringify(updated));
-          if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
+          if (window.firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
             saveHommesImagesToFirebase(updated);
           }
           loadHommesCatalog();
@@ -1523,10 +1530,10 @@
       const mapContainer = document.getElementById('mapImage');
       createImageItem(imageConfig.map, mapContainer);
       
-      // Load femmes catalog
+      // Load femmes catalog (les données sont déjà chargées depuis Firebase dans loadAllDataFromFirebase)
       loadFemmesCatalog();
       
-      // Load hommes catalog
+      // Load hommes catalog (les données sont déjà chargées depuis Firebase dans loadAllDataFromFirebase)
       loadHommesCatalog();
     }
 

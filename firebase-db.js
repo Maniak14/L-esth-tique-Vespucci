@@ -341,6 +341,24 @@ function loadFemmesImagesFromFirebase(callback) {
   }
 }
 
+// Écouter les changements de femmes images en temps réel
+function watchFemmesImages(callback) {
+  if (!window.firebaseInitialized || !db) return;
+  
+  try {
+    db.collection('data').doc('femmes_images').onSnapshot((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        const images = data.images || [];
+        localStorage.setItem('femmes_images', JSON.stringify(images));
+        if (callback) callback(images);
+      }
+    });
+  } catch (error) {
+    console.error('Erreur watch femmes images:', error);
+  }
+}
+
 // ========== HOMMES CATALOG ==========
 
 // Sauvegarder le catalogue hommes
@@ -378,6 +396,24 @@ function loadHommesImagesFromFirebase(callback) {
   } catch (error) {
     console.error('Erreur chargement hommes images:', error);
     if (callback) callback([]);
+  }
+}
+
+// Écouter les changements de hommes images en temps réel
+function watchHommesImages(callback) {
+  if (!window.firebaseInitialized || !db) return;
+  
+  try {
+    db.collection('data').doc('hommes_images').onSnapshot((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        const images = data.images || [];
+        localStorage.setItem('hommes_images', JSON.stringify(images));
+        if (callback) callback(images);
+      }
+    });
+  } catch (error) {
+    console.error('Erreur watch hommes images:', error);
   }
 }
 
