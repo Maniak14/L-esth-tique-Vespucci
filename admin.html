@@ -592,6 +592,16 @@
       </div>
     </div>
 
+    <!-- Export Global Section -->
+    <div id="globalExportResult" style="display: none; background: var(--bg-dark); border: 2px solid var(--primary); border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 style="color: var(--text-primary); font-size: 1.2rem; margin: 0;">📋 Fichier catalog-images.json (téléchargé automatiquement)</h3>
+        <button onclick="copyGlobalExport()" class="btn-small" style="background: var(--primary); color: white;">📋 Copier le JSON</button>
+      </div>
+      <textarea id="globalExportData" readonly style="width: 100%; min-height: 300px; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-family: monospace; font-size: 0.85rem; resize: vertical;"></textarea>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 1rem; margin-bottom: 0;">💡 Le fichier a été téléchargé automatiquement. Vous pouvez aussi copier le JSON ci-dessus pour le coller dans catalog-images.json</p>
+    </div>
+
     <!-- Team Images Section -->
     <div class="admin-section">
       <h2>Photos de l'Équipe</h2>
@@ -1598,7 +1608,16 @@
       };
       const jsonString = JSON.stringify(exportData, null, 2);
       
-      // Créer un lien de téléchargement
+      // Afficher le JSON dans la zone d'export
+      const resultDiv = document.getElementById('globalExportResult');
+      const textarea = document.getElementById('globalExportData');
+      if (resultDiv && textarea) {
+        textarea.value = jsonString;
+        resultDiv.style.display = 'block';
+        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      
+      // Télécharger automatiquement le fichier
       const blob = new Blob([jsonString], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -1608,8 +1627,16 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      
-      alert('✅ Fichier catalog-images.json téléchargé ! Remplacez le fichier existant avec celui-ci.');
+    };
+    
+    // Copy global export (global function)
+    window.copyGlobalExport = function() {
+      const textarea = document.getElementById('globalExportData');
+      if (textarea) {
+        textarea.select();
+        document.execCommand('copy');
+        alert('✅ JSON copié ! Vous pouvez maintenant le coller dans catalog-images.json');
+      }
     };
     
     // Add new hommes image (global function)
