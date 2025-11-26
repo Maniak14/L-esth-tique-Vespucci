@@ -309,11 +309,13 @@
     let selectedCategory = 'femmes';
     let firebaseInitialized = false;
 
-    // Initialize Firebase
+    // Initialize Firebase (exactement comme dans admin.html)
     document.addEventListener('DOMContentLoaded', async () => {
       if (initFirebaseDB && typeof initFirebaseDB === 'function') {
-        firebaseInitialized = initFirebaseDB();
-        if (firebaseInitialized) {
+        const initialized = initFirebaseDB();
+        window.firebaseInitialized = initialized;
+        firebaseInitialized = initialized; // Local reference
+        if (initialized) {
           await loadAllDataFromFirebase();
           console.log('Firebase initialisé');
         }
@@ -373,17 +375,21 @@
       resultsDiv.style.display = 'block';
       resultsDiv.innerHTML = '';
       
-      // Charger les images existantes pour déterminer le prochain numéro
-      // Utiliser la même logique que dans admin.html (addNewFemmesImage/addNewHommesImage)
-      const existingImages = await getExistingImages();
+      // Charger les images existantes (exactement comme dans addNewFemmesImage/addNewHommesImage)
+      let existingImages;
+      if (selectedCategory === 'femmes') {
+        existingImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
+      } else {
+        existingImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
+      }
       
-      // Trouver le prochain numéro disponible (même logique que admin.html)
+      // Trouver le prochain numéro disponible (EXACTEMENT comme dans admin.html)
       let nextNumber = 1;
       if (existingImages.length > 0) {
-        const prefix = selectedCategory === 'femmes' ? 'femme_' : 'homme_';
+        const regex = selectedCategory === 'femmes' ? /femme_(\d+)/ : /homme_(\d+)/;
         const numbers = existingImages
           .map(img => {
-            const match = img.id.match(new RegExp(`${prefix}(\\d+)`));
+            const match = img.id.match(regex);
             return match ? parseInt(match[1]) : 0;
           })
           .filter(n => n > 0)
@@ -405,16 +411,15 @@
           const imageUrl = await uploadToImgbb(file, imgbbKey);
           
           if (imageUrl) {
-            // Créer l'objet image avec le bon numéro (même format que admin.html)
-            const prefix = selectedCategory === 'femmes' ? 'femme' : 'homme';
-            const newId = `${prefix}_${currentNumber}`;
-            const imageData = {
+            // Créer l'objet image (EXACTEMENT comme dans addNewFemmesImage/addNewHommesImage)
+            const newId = selectedCategory === 'femmes' ? `femme_${currentNumber}` : `homme_${currentNumber}`;
+            const newImage = {
               id: newId,
               url: imageUrl
             };
             
-            // Ajouter à la liste existante (comme dans addNewFemmesImage/addNewHommesImage)
-            existingImages.push(imageData);
+            // Ajouter à la liste (EXACTEMENT comme dans admin.html)
+            existingImages.push(newImage);
             
             results.push({
               success: true,
@@ -449,22 +454,21 @@
         displayResult(results[results.length - 1]);
       }
       
-      // Sauvegarder toutes les images dans Firebase et localStorage
-      // Utiliser la même méthode que dans admin.html (addNewFemmesImage/addNewHommesImage)
+      // Sauvegarder toutes les images (EXACTEMENT comme dans addNewFemmesImage/addNewHommesImage)
       if (uploadedCount > 0) {
         try {
           if (selectedCategory === 'femmes') {
-            // Sauvegarder dans localStorage (comme dans admin.html)
+            // Sauvegarder dans localStorage (EXACTEMENT comme dans admin.html ligne 1165)
             localStorage.setItem('femmes_images', JSON.stringify(existingImages));
-            // Sauvegarder dans Firebase (comme dans admin.html)
-            if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
+            // Sauvegarder dans Firebase (EXACTEMENT comme dans admin.html ligne 1166-1168)
+            if (window.firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
               saveFemmesImagesToFirebase(existingImages);
             }
           } else {
-            // Sauvegarder dans localStorage (comme dans admin.html)
+            // Sauvegarder dans localStorage (EXACTEMENT comme dans admin.html ligne 1197)
             localStorage.setItem('hommes_images', JSON.stringify(existingImages));
-            // Sauvegarder dans Firebase (comme dans admin.html)
-            if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
+            // Sauvegarder dans Firebase (EXACTEMENT comme dans admin.html ligne 1198-1200)
+            if (window.firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
               saveHommesImagesToFirebase(existingImages);
             }
           }
@@ -489,41 +493,6 @@
       uploadBtn.textContent = 'Uploader et Ajouter à la DB';
     }
 
-    async function getExistingImages() {
-      // Utiliser la même méthode que dans admin.html pour charger les images
-      const key = selectedCategory === 'femmes' ? 'femmes_images' : 'hommes_images';
-      let images = JSON.parse(localStorage.getItem(key) || '[]');
-      
-      // Si pas d'images dans localStorage, charger depuis Firebase
-      // (même logique que dans admin.html qui charge depuis Firebase au démarrage)
-      if (images.length === 0 && firebaseInitialized) {
-        if (selectedCategory === 'femmes' && typeof loadFemmesImagesFromFirebase === 'function') {
-          await new Promise((resolve) => {
-            loadFemmesImagesFromFirebase((data) => {
-              images = data || [];
-              // Mettre à jour localStorage pour cohérence
-              if (images.length > 0) {
-                localStorage.setItem('femmes_images', JSON.stringify(images));
-              }
-              resolve();
-            });
-          });
-        } else if (selectedCategory === 'hommes' && typeof loadHommesImagesFromFirebase === 'function') {
-          await new Promise((resolve) => {
-            loadHommesImagesFromFirebase((data) => {
-              images = data || [];
-              // Mettre à jour localStorage pour cohérence
-              if (images.length > 0) {
-                localStorage.setItem('hommes_images', JSON.stringify(images));
-              }
-              resolve();
-            });
-          });
-        }
-      }
-      
-      return images;
-    }
 
     async function uploadToImgbb(file, apiKey) {
       return new Promise((resolve, reject) => {
