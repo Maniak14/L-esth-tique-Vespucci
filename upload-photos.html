@@ -307,15 +307,21 @@
 
   <script>
     let selectedCategory = 'femmes';
-    let firebaseInitialized = false;
 
-    // Initialize Firebase
+    // Initialize Firebase (comme dans admin.html)
     document.addEventListener('DOMContentLoaded', async () => {
       if (initFirebaseDB && typeof initFirebaseDB === 'function') {
-        firebaseInitialized = initFirebaseDB();
-        if (firebaseInitialized) {
+        const initialized = initFirebaseDB();
+        window.firebaseInitialized = initialized;
+        if (initialized) {
           await loadAllDataFromFirebase();
-          console.log('Firebase initialisé');
+          console.log('Firebase initialisé et données chargées');
+          console.log('Fonctions disponibles:', {
+            saveFemmesImagesToFirebase: typeof saveFemmesImagesToFirebase,
+            saveHommesImagesToFirebase: typeof saveHommesImagesToFirebase
+          });
+        } else {
+          console.warn('Firebase non initialisé');
         }
       }
     });
@@ -448,19 +454,30 @@
         displayResult(results[results.length - 1]);
       }
       
-      // Sauvegarder toutes les images dans Firebase
+      // Sauvegarder toutes les images dans Firebase (comme dans admin.html)
       if (uploadedCount > 0) {
         try {
+          console.log('Sauvegarde des images:', existingImages.length, 'images');
+          console.log('Firebase initialisé:', window.firebaseInitialized);
+          
           if (selectedCategory === 'femmes') {
-            if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
-              saveFemmesImagesToFirebase(existingImages);
-            }
             localStorage.setItem('femmes_images', JSON.stringify(existingImages));
-          } else {
-            if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
-              saveHommesImagesToFirebase(existingImages);
+            console.log('Sauvegarde localStorage femmes_images:', existingImages.length);
+            if (window.firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
+              console.log('Appel saveFemmesImagesToFirebase');
+              saveFemmesImagesToFirebase(existingImages);
+            } else {
+              console.warn('Firebase non initialisé ou fonction non disponible');
             }
+          } else {
             localStorage.setItem('hommes_images', JSON.stringify(existingImages));
+            console.log('Sauvegarde localStorage hommes_images:', existingImages.length);
+            if (window.firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
+              console.log('Appel saveHommesImagesToFirebase');
+              saveHommesImagesToFirebase(existingImages);
+            } else {
+              console.warn('Firebase non initialisé ou fonction non disponible');
+            }
           }
           
           updateProgress(100, `✅ ${uploadedCount} photo(s) ajoutée(s) avec succès !`);
@@ -479,8 +496,8 @@
       const key = selectedCategory === 'femmes' ? 'femmes_images' : 'hommes_images';
       let images = JSON.parse(localStorage.getItem(key) || '[]');
       
-      // Si pas d'images, charger depuis Firebase
-      if (images.length === 0 && firebaseInitialized) {
+      // Si pas d'images, charger depuis Firebase (comme dans admin.html)
+      if (images.length === 0 && window.firebaseInitialized) {
         if (selectedCategory === 'femmes' && typeof loadFemmesImagesFromFirebase === 'function') {
           await new Promise((resolve) => {
             loadFemmesImagesFromFirebase((data) => {
