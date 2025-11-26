@@ -129,84 +129,63 @@
     }
 
     // Initialize Firebase and load catalog
+    let firebaseInitialized = false;
     document.addEventListener('DOMContentLoaded', async () => {
       if (initFirebaseDB && typeof initFirebaseDB === 'function') {
-        const initialized = initFirebaseDB();
-        window.firebaseInitialized = initialized;
-        if (initialized) {
-          // Charger directement depuis Firebase
-          loadHommesCatalogFromFirebase();
-          // Écouter les changements en temps réel
-          if (typeof watchHommesImages === 'function') {
-            watchHommesImages(() => {
-              loadHommesCatalogFromFirebase();
+        firebaseInitialized = initFirebaseDB();
+        if (firebaseInitialized) {
+          await loadAllDataFromFirebase();
+          // Watch for updates
+          if (typeof firebaseFirestore !== 'undefined') {
+            firebaseFirestore.collection('data').doc('hommes_images').onSnapshot((doc) => {
+              if (doc.exists) {
+                const data = doc.data();
+                if (data.images && Array.isArray(data.images)) {
+                  localStorage.setItem('hommes_images', JSON.stringify(data.images));
+                  loadHommesCatalog();
+                }
+              }
             });
           }
         }
       }
+      loadHommesCatalog();
     });
 
-    // Load hommes catalog images directement depuis Firebase
-    async function loadHommesCatalogFromFirebase() {
+    // Load hommes catalog images
+    function loadHommesCatalog() {
       const container = document.getElementById('hommesCatalog');
-      if (!container) return;
+      const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
+      
+      if (hommesImages.length === 0) {
+        // Default images
+        for (let i = 1; i <= 6; i++) {
+          hommesImages.push({ id: `homme_${i}`, url: `img/hommes/${i}.png` });
+        }
+        localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
+      }
       
       container.innerHTML = '';
+      hommesImages.forEach((item, index) => {
+        // Extraire le numéro de l'ID (homme_1, homme_2, etc.) ou utiliser index + 1
+        const match = item.id.match(/homme_(\d+)/);
+        const number = match ? parseInt(match[1]) : (index + 1);
+        
+        const card = document.createElement('div');
+        card.className = 'service-card';
+        card.setAttribute('data-tilt', '');
+        card.style.cssText = 'padding: 0; overflow: hidden; cursor: pointer;';
+        card.innerHTML = `
+          <img src="${item.url}" alt="Coupe Homme ${number}" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+          <div class="service-content" style="padding: 0.75rem; text-align: center;">
+            <h3 style="font-size: 0.9rem; margin: 0; color: var(--text-secondary); font-weight: 500;">Coupe ${number}</h3>
+          </div>
+        `;
+        container.appendChild(card);
+      });
       
-      if (!window.firebaseInitialized || typeof firebaseFirestore === 'undefined') {
-        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); grid-column: 1 / -1;">Firebase non initialisé</p>';
-        return;
-      }
-      
-      try {
-        // Charger directement depuis Firebase
-        const doc = await firebaseFirestore.collection('data').doc('hommes_images').get();
-        
-        if (!doc.exists) {
-          container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); grid-column: 1 / -1;">Aucune image disponible</p>';
-          return;
-        }
-        
-        const data = doc.data();
-        const hommesImages = data.images || [];
-        
-        if (hommesImages.length === 0) {
-          container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); grid-column: 1 / -1;">Aucune image disponible</p>';
-          return;
-        }
-        
-        // Trier les images par numéro d'ID pour garantir l'ordre
-        hommesImages.sort((a, b) => {
-          const matchA = a.id.match(/homme_(\d+)/);
-          const matchB = b.id.match(/homme_(\d+)/);
-          const numA = matchA ? parseInt(matchA[1]) : 0;
-          const numB = matchB ? parseInt(matchB[1]) : 0;
-          return numA - numB;
-        });
-        
-        hommesImages.forEach((item, index) => {
-          // Utiliser index pour que les coupes commencent à 0
-          const number = index;
-          
-          const card = document.createElement('div');
-          card.className = 'service-card';
-          card.setAttribute('data-tilt', '');
-          card.style.cssText = 'padding: 0; overflow: hidden; cursor: pointer;';
-          card.innerHTML = `
-            <img src="${item.url}" alt="Coupe Homme ${number}" style="width: 100%; height: 300px; object-fit: cover; display: block;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22%3E%3Crect fill=%22%23333%22 width=%22300%22 height=%22300%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage%20non%20disponible%3C/text%3E%3C/svg%3E'">
-            <div class="service-content" style="padding: 0.75rem; text-align: center;">
-              <h3 style="font-size: 0.9rem; margin: 0; color: var(--text-secondary); font-weight: 500;">Coupe ${number}</h3>
-            </div>
-          `;
-          container.appendChild(card);
-        });
-        
-        // Re-attach lightbox and tilt events
-        attachCatalogEvents();
-      } catch (error) {
-        console.error('Erreur chargement hommes images:', error);
-        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); grid-column: 1 / -1;">Erreur de chargement</p>';
-      }
+      // Re-attach lightbox and tilt events
+      attachCatalogEvents();
     }
     
     // Attach events to catalog items

@@ -11,19 +11,16 @@ const firebaseConfig = {
 // Initialiser Firebase
 let firebaseApp;
 let firebaseFirestore;
-let firebaseAuth;
 
 function initFirebase() {
   try {
     if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
       firebaseApp = firebase.initializeApp(firebaseConfig);
       firebaseFirestore = firebase.firestore();
-      firebaseAuth = firebase.auth();
       return true;
     } else if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
       firebaseApp = firebase.app();
       firebaseFirestore = firebase.firestore();
-      firebaseAuth = firebase.auth();
       return true;
     }
     return false;

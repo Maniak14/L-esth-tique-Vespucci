@@ -12,42 +12,15 @@
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="firebase-config.js"></script>
   <script src="firebase-db.js"></script>
   <script>
-    // Vérifier l'authentification Firebase avant d'afficher la page
-    document.addEventListener('DOMContentLoaded', () => {
-      if (initFirebaseDB && typeof initFirebaseDB === 'function') {
-        initFirebaseDB();
-        
-        if (typeof firebaseAuth !== 'undefined') {
-          firebaseAuth.onAuthStateChanged((user) => {
-            if (!user) {
-              // L'utilisateur n'est pas authentifié, rediriger vers la page de connexion
-              const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
-              window.location.href = rootPath + '/admin-login.html';
-            } else {
-              // L'utilisateur est authentifié, mettre à jour sessionStorage pour compatibilité
-              sessionStorage.setItem('adminAuthenticated', 'true');
-              sessionStorage.setItem('adminEmail', user.email);
-            }
-          });
-        } else {
-          // Fallback: vérifier sessionStorage si Firebase Auth n'est pas disponible
-          if (sessionStorage.getItem('adminAuthenticated') !== 'true') {
-            const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
-            window.location.href = rootPath + '/admin-login.html';
-          }
-        }
-      } else {
-        // Fallback: vérifier sessionStorage
-        if (sessionStorage.getItem('adminAuthenticated') !== 'true') {
-          const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
-          window.location.href = rootPath + '/admin-login.html';
-        }
-      }
-    });
+    // Vérifier l'authentification avant d'afficher la page
+    if (sessionStorage.getItem('adminAuthenticated') !== 'true') {
+      // Utiliser un chemin absolu depuis la racine
+      const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+      window.location.href = rootPath + '/admin-login.html';
+    }
     
     // Force scroll to top immediately on page load
     if ('scrollRestoration' in history) {
@@ -756,6 +729,13 @@
             if (typeof loadTeamMembers === 'function') {
               loadTeamMembers();
             }
+            // Recharger les catalogues
+            if (typeof loadFemmesCatalog === 'function') {
+              loadFemmesCatalog();
+            }
+            if (typeof loadHommesCatalog === 'function') {
+              loadHommesCatalog();
+            }
           });
           watchPositions(() => {
             console.log('Positions mises à jour depuis Firebase');
@@ -778,20 +758,6 @@
               loadTeamMembers();
             }
           });
-          // Écouter les changements de femmes images
-          watchFemmesImages(() => {
-            console.log('Images femmes mises à jour depuis Firebase');
-            if (typeof loadFemmesCatalog === 'function') {
-              loadFemmesCatalog();
-            }
-          });
-          // Écouter les changements de hommes images
-          watchHommesImages(() => {
-            console.log('Images hommes mises à jour depuis Firebase');
-            if (typeof loadHommesCatalog === 'function') {
-              loadHommesCatalog();
-            }
-          });
         }
       }
     });
@@ -811,7 +777,7 @@
 
     // Get current image URL (saved or default)
     function getCurrentImage(config) {
-      // Check if it's a catalog image - utiliser localStorage mis à jour par Firebase
+      // Check if it's a catalog image
       if (config.id.startsWith('femme_')) {
         const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
         const image = femmesImages.find(img => img.id === config.id);
@@ -1173,325 +1139,189 @@
     }
     
     // Add new femmes image (global function)
-    window.addNewFemmesImage = async function() {
-      if (!window.firebaseInitialized || typeof firebaseFirestore === 'undefined') {
-        alert('Firebase non initialisé');
-        return;
+    window.addNewFemmesImage = function() {
+      const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
+      
+      // Trouver le prochain numéro disponible
+      let nextNumber = 1;
+      if (femmesImages.length > 0) {
+        const numbers = femmesImages
+          .map(img => {
+            const match = img.id.match(/femme_(\d+)/);
+            return match ? parseInt(match[1]) : 0;
+          })
+          .filter(n => n > 0)
+          .sort((a, b) => b - a);
+        nextNumber = numbers.length > 0 ? numbers[0] + 1 : femmesImages.length + 1;
       }
       
-      try {
-        // Charger depuis Firebase
-        const doc = await firebaseFirestore.collection('data').doc('femmes_images').get();
-        let femmesImages = [];
-        if (doc.exists) {
-          const data = doc.data();
-          femmesImages = data.images || [];
-        }
-        
-        // Trouver le prochain numéro disponible
-        let nextNumber = 1;
-        if (femmesImages.length > 0) {
-          const numbers = femmesImages
-            .map(img => {
-              const match = img.id.match(/femme_(\d+)/);
-              return match ? parseInt(match[1]) : 0;
-            })
-            .filter(n => n > 0)
-            .sort((a, b) => b - a);
-          nextNumber = numbers.length > 0 ? numbers[0] + 1 : femmesImages.length + 1;
-        }
-        
-        const newId = `femme_${nextNumber}`;
-        const newImage = {
-          id: newId,
-          url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E'
-        };
-        
-        femmesImages.push(newImage);
-        
-        // Mettre à jour localStorage pour affichage immédiat
-        localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
-        
-        // Sauvegarder dans Firebase
-        if (typeof saveFemmesImagesToFirebase === 'function') {
-          saveFemmesImagesToFirebase(femmesImages);
-        }
-        
-        loadFemmesCatalog();
-      } catch (error) {
-        console.error('Erreur ajout image femme:', error);
-        alert('Erreur lors de l\'ajout de l\'image');
+      const newId = `femme_${nextNumber}`;
+      const newImage = {
+        id: newId,
+        url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E'
+      };
+      
+      femmesImages.push(newImage);
+      localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
+      if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
+        saveFemmesImagesToFirebase(femmesImages);
       }
+      
+      loadFemmesCatalog();
     };
     
     // Add new hommes image (global function)
-    window.addNewHommesImage = async function() {
-      if (!window.firebaseInitialized || typeof firebaseFirestore === 'undefined') {
-        alert('Firebase non initialisé');
-        return;
+    window.addNewHommesImage = function() {
+      const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
+      
+      // Trouver le prochain numéro disponible
+      let nextNumber = 1;
+      if (hommesImages.length > 0) {
+        const numbers = hommesImages
+          .map(img => {
+            const match = img.id.match(/homme_(\d+)/);
+            return match ? parseInt(match[1]) : 0;
+          })
+          .filter(n => n > 0)
+          .sort((a, b) => b - a);
+        nextNumber = numbers.length > 0 ? numbers[0] + 1 : hommesImages.length + 1;
       }
       
-      try {
-        // Charger depuis Firebase
-        const doc = await firebaseFirestore.collection('data').doc('hommes_images').get();
-        let hommesImages = [];
-        if (doc.exists) {
-          const data = doc.data();
-          hommesImages = data.images || [];
-        }
-        
-        // Trouver le prochain numéro disponible
-        let nextNumber = 1;
-        if (hommesImages.length > 0) {
-          const numbers = hommesImages
-            .map(img => {
-              const match = img.id.match(/homme_(\d+)/);
-              return match ? parseInt(match[1]) : 0;
-            })
-            .filter(n => n > 0)
-            .sort((a, b) => b - a);
-          nextNumber = numbers.length > 0 ? numbers[0] + 1 : hommesImages.length + 1;
-        }
-        
-        const newId = `homme_${nextNumber}`;
-        const newImage = {
-          id: newId,
-          url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E'
-        };
-        
-        hommesImages.push(newImage);
-        
-        // Mettre à jour localStorage pour affichage immédiat
-        localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
-        
-        // Sauvegarder dans Firebase
-        if (typeof saveHommesImagesToFirebase === 'function') {
-          saveHommesImagesToFirebase(hommesImages);
-        }
-        
-        loadHommesCatalog();
-      } catch (error) {
-        console.error('Erreur ajout image homme:', error);
-        alert('Erreur lors de l\'ajout de l\'image');
+      const newId = `homme_${nextNumber}`;
+      const newImage = {
+        id: newId,
+        url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E'
+      };
+      
+      hommesImages.push(newImage);
+      localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
+      if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
+        saveHommesImagesToFirebase(hommesImages);
       }
+      
+      loadHommesCatalog();
     };
     
-    // Load femmes catalog in admin (depuis Firebase)
-    async function loadFemmesCatalog() {
+    // Load femmes catalog in admin
+    function loadFemmesCatalog() {
       const container = document.getElementById('femmesCatalog');
-      if (!container) return;
+      let femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
+      
+      if (femmesImages.length === 0) {
+        for (let i = 1; i <= 6; i++) {
+          femmesImages.push({ id: `femme_${i}`, url: `img/femmes/${i}.png` });
+        }
+        localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
+      }
       
       container.innerHTML = '';
-      
-      if (!window.firebaseInitialized || typeof firebaseFirestore === 'undefined') {
-        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Firebase non initialisé</p>';
-        return;
-      }
-      
-      try {
-        // Charger directement depuis Firebase
-        const doc = await firebaseFirestore.collection('data').doc('femmes_images').get();
+      femmesImages.forEach((item, index) => {
+        // Extraire le numéro de l'ID (femme_1, femme_2, etc.) ou utiliser index + 1
+        const match = item.id.match(/femme_(\d+)/);
+        const number = match ? parseInt(match[1]) : (index + 1);
         
-        let femmesImages = [];
-        if (doc.exists) {
-          const data = doc.data();
-          femmesImages = data.images || [];
-          // Mettre à jour localStorage pour getCurrentImage
-          localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
-        }
-        
-        // Trier les images par numéro d'ID pour garantir l'ordre
-        femmesImages.sort((a, b) => {
-          const matchA = a.id.match(/femme_(\d+)/);
-          const matchB = b.id.match(/femme_(\d+)/);
-          const numA = matchA ? parseInt(matchA[1]) : 0;
-          const numB = matchB ? parseInt(matchB[1]) : 0;
-          return numA - numB;
-        });
-        
-        femmesImages.forEach((item, index) => {
-          // Utiliser index pour que les coupes commencent à 0
-          const number = index;
-          
-          const config = {
-            id: item.id,
-            name: `Coupe ${number}`,
-            default: item.url
-          };
-          createImageItem(config, container, true);
-        });
-      } catch (error) {
-        console.error('Erreur chargement femmes images:', error);
-        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Erreur de chargement</p>';
-      }
+        const config = {
+          id: item.id,
+          name: `Coupe ${number}`,
+          default: item.url
+        };
+        createImageItem(config, container, true);
+      });
     }
     
-    // Load hommes catalog in admin (depuis Firebase)
-    async function loadHommesCatalog() {
+    // Load hommes catalog in admin
+    function loadHommesCatalog() {
       const container = document.getElementById('hommesCatalog');
-      if (!container) return;
+      let hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
+      
+      if (hommesImages.length === 0) {
+        for (let i = 1; i <= 6; i++) {
+          hommesImages.push({ id: `homme_${i}`, url: `img/hommes/${i}.png` });
+        }
+        localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
+      }
       
       container.innerHTML = '';
-      
-      if (!window.firebaseInitialized || typeof firebaseFirestore === 'undefined') {
-        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Firebase non initialisé</p>';
-        return;
-      }
-      
-      try {
-        // Charger directement depuis Firebase
-        const doc = await firebaseFirestore.collection('data').doc('hommes_images').get();
+      hommesImages.forEach((item, index) => {
+        // Extraire le numéro de l'ID (homme_1, homme_2, etc.) ou utiliser index + 1
+        const match = item.id.match(/homme_(\d+)/);
+        const number = match ? parseInt(match[1]) : (index + 1);
         
-        let hommesImages = [];
-        if (doc.exists) {
-          const data = doc.data();
-          hommesImages = data.images || [];
-          // Mettre à jour localStorage pour getCurrentImage
-          localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
-        }
-        
-        // Trier les images par numéro d'ID pour garantir l'ordre
-        hommesImages.sort((a, b) => {
-          const matchA = a.id.match(/homme_(\d+)/);
-          const matchB = b.id.match(/homme_(\d+)/);
-          const numA = matchA ? parseInt(matchA[1]) : 0;
-          const numB = matchB ? parseInt(matchB[1]) : 0;
-          return numA - numB;
-        });
-        
-        hommesImages.forEach((item, index) => {
-          // Utiliser index pour que les coupes commencent à 0
-          const number = index;
-          
-          const config = {
-            id: item.id,
-            name: `Coupe ${number}`,
-            default: item.url
-          };
-          createImageItem(config, container, true);
-        });
-      } catch (error) {
-        console.error('Erreur chargement hommes images:', error);
-        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Erreur de chargement</p>';
-      }
+        const config = {
+          id: item.id,
+          name: `Coupe ${number}`,
+          default: item.url
+        };
+        createImageItem(config, container, true);
+      });
     }
     
     // Update femmes/hommes image URL
-    async function updateCatalogImageUrl(imageId, url) {
+    function updateCatalogImageUrl(imageId, url) {
       if (!url) return;
       
-      if (!window.firebaseInitialized || typeof firebaseFirestore === 'undefined') {
-        alert('Firebase non initialisé');
-        return;
+      // Check if it's a femmes image
+      if (imageId.startsWith('femme_')) {
+        const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
+        const image = femmesImages.find(img => img.id === imageId);
+        if (image) {
+          image.url = url;
+          localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
+          if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
+            saveFemmesImagesToFirebase(femmesImages);
+          }
+        }
+      }
+      // Check if it's a hommes image
+      else if (imageId.startsWith('homme_')) {
+        const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
+        const image = hommesImages.find(img => img.id === imageId);
+        if (image) {
+          image.url = url;
+          localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
+          if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
+            saveHommesImagesToFirebase(hommesImages);
+          }
+        }
       }
       
-      try {
-        // Check if it's a femmes image
-        if (imageId.startsWith('femme_')) {
-          const doc = await firebaseFirestore.collection('data').doc('femmes_images').get();
-          let femmesImages = [];
-          if (doc.exists) {
-            const data = doc.data();
-            femmesImages = data.images || [];
-          }
-          
-          const image = femmesImages.find(img => img.id === imageId);
-          if (image) {
-            image.url = url;
-            // Mettre à jour localStorage pour affichage immédiat
-            localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
-            if (typeof saveFemmesImagesToFirebase === 'function') {
-              saveFemmesImagesToFirebase(femmesImages);
-            }
-          }
+      // Update the displayed image
+      const item = document.querySelector(`[data-image-id="${imageId}"]`);
+      if (item) {
+        const img = item.querySelector('img');
+        if (img) {
+          img.src = url;
         }
-        // Check if it's a hommes image
-        else if (imageId.startsWith('homme_')) {
-          const doc = await firebaseFirestore.collection('data').doc('hommes_images').get();
-          let hommesImages = [];
-          if (doc.exists) {
-            const data = doc.data();
-            hommesImages = data.images || [];
-          }
-          
-          const image = hommesImages.find(img => img.id === imageId);
-          if (image) {
-            image.url = url;
-            // Mettre à jour localStorage pour affichage immédiat
-            localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
-            if (typeof saveHommesImagesToFirebase === 'function') {
-              saveHommesImagesToFirebase(hommesImages);
-            }
-          }
-        }
-        
-        // Update the displayed image
-        const item = document.querySelector(`[data-image-id="${imageId}"]`);
-        if (item) {
-          const img = item.querySelector('img');
-          if (img) {
-            img.src = url;
-          }
-        }
-      } catch (error) {
-        console.error('Erreur mise à jour image:', error);
-        alert('Erreur lors de la mise à jour de l\'image');
       }
     }
     
     // Delete femmes/hommes image
-    async function deleteCatalogImage(imageId) {
-      if (!confirm('Êtes-vous sûr de vouloir supprimer cette image ?')) {
-        return;
-      }
-      
-      if (!window.firebaseInitialized || typeof firebaseFirestore === 'undefined') {
-        alert('Firebase non initialisé');
-        return;
-      }
-      
-      try {
+    function deleteCatalogImage(imageId) {
+      if (confirm('Êtes-vous sûr de vouloir supprimer cette image ?')) {
         // Remove from DOM
         const item = document.querySelector(`[data-image-id="${imageId}"]`);
         if (item) {
           item.remove();
         }
         
-        // Remove from Firebase
+        // Remove from localStorage
         if (imageId.startsWith('femme_')) {
-          const doc = await firebaseFirestore.collection('data').doc('femmes_images').get();
-          let femmesImages = [];
-          if (doc.exists) {
-            const data = doc.data();
-            femmesImages = data.images || [];
-          }
-          
+          const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
           const updated = femmesImages.filter(img => img.id !== imageId);
-          // Mettre à jour localStorage pour affichage immédiat
           localStorage.setItem('femmes_images', JSON.stringify(updated));
-          if (typeof saveFemmesImagesToFirebase === 'function') {
+          if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
             saveFemmesImagesToFirebase(updated);
           }
           loadFemmesCatalog();
         } else if (imageId.startsWith('homme_')) {
-          const doc = await firebaseFirestore.collection('data').doc('hommes_images').get();
-          let hommesImages = [];
-          if (doc.exists) {
-            const data = doc.data();
-            hommesImages = data.images || [];
-          }
-          
+          const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
           const updated = hommesImages.filter(img => img.id !== imageId);
-          // Mettre à jour localStorage pour affichage immédiat
           localStorage.setItem('hommes_images', JSON.stringify(updated));
-          if (typeof saveHommesImagesToFirebase === 'function') {
+          if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
             saveHommesImagesToFirebase(updated);
           }
           loadHommesCatalog();
         }
-      } catch (error) {
-        console.error('Erreur suppression image:', error);
-        alert('Erreur lors de la suppression de l\'image');
       }
     }
     
@@ -1557,31 +1387,13 @@
       }, 1000);
     }
     
-    // Déconnexion
+    // Déconnexion (optionnel - vous pouvez ajouter un bouton de déconnexion)
     function logout() {
       if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
-        // Déconnecter de Firebase Auth
-        if (typeof firebaseAuth !== 'undefined') {
-          firebaseAuth.signOut().then(() => {
-            sessionStorage.removeItem('adminAuthenticated');
-            sessionStorage.removeItem('adminEmail');
-            const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
-            window.location.href = rootPath + '/admin-login.html';
-          }).catch((error) => {
-            console.error('Erreur déconnexion:', error);
-            // Déconnexion de sessionStorage même en cas d'erreur
-            sessionStorage.removeItem('adminAuthenticated');
-            sessionStorage.removeItem('adminEmail');
-            const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
-            window.location.href = rootPath + '/admin-login.html';
-          });
-        } else {
-          // Fallback
-          sessionStorage.removeItem('adminAuthenticated');
-          sessionStorage.removeItem('adminEmail');
-          const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
-          window.location.href = rootPath + '/admin-login.html';
-        }
+        sessionStorage.removeItem('adminAuthenticated');
+        // Utiliser un chemin absolu depuis la racine
+        const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+        window.location.href = rootPath + '/admin-login.html';
       }
     }
 
@@ -1652,10 +1464,10 @@
       const mapContainer = document.getElementById('mapImage');
       createImageItem(imageConfig.map, mapContainer);
       
-      // Load femmes catalog (les données sont déjà chargées depuis Firebase dans loadAllDataFromFirebase)
+      // Load femmes catalog
       loadFemmesCatalog();
       
-      // Load hommes catalog (les données sont déjà chargées depuis Firebase dans loadAllDataFromFirebase)
+      // Load hommes catalog
       loadHommesCatalog();
     }
 
