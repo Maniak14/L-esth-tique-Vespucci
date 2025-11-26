@@ -214,11 +214,15 @@
     // Initialize Firebase and load catalog
     let firebaseInitialized = false;
     document.addEventListener('DOMContentLoaded', async () => {
+      // Charger d'abord depuis Firebase si disponible
       if (initFirebaseDB && typeof initFirebaseDB === 'function') {
         firebaseInitialized = initFirebaseDB();
         if (firebaseInitialized) {
+          // Attendre que toutes les données soient chargées depuis Firebase
           await loadAllDataFromFirebase();
-          // Watch for updates
+          console.log('✅ Données Firebase chargées pour femmes');
+          
+          // Watch for updates en temps réel
           if (typeof firebaseFirestore !== 'undefined') {
             firebaseFirestore.collection('data').doc('femmes_images').onSnapshot((doc) => {
               if (doc.exists) {
@@ -232,23 +236,61 @@
           }
         }
       }
+      
+      // Charger le catalogue (après avoir chargé depuis Firebase si disponible)
       loadFemmesCatalog();
     });
 
     // Load femmes catalog images
     function loadFemmesCatalog() {
       const container = document.getElementById('femmesCatalog');
-      const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
+      if (!container) return;
       
-      if (femmesImages.length === 0) {
-        // Default images
-        for (let i = 1; i <= 6; i++) {
-          femmesImages.push({ id: `femme_${i}`, url: `img/femmes/${i}.png` });
-        }
-        localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
+      let femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
+      
+      // Si pas d'images et Firebase est disponible, essayer de charger depuis Firebase
+      if (femmesImages.length === 0 && firebaseInitialized && typeof loadFemmesImagesFromFirebase === 'function') {
+        console.log('⚠️ Pas d\'images dans localStorage, chargement depuis Firebase...');
+        loadFemmesImagesFromFirebase((data) => {
+          femmesImages = data || [];
+          if (femmesImages.length > 0) {
+            localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
+            // Recharger après avoir récupéré les données
+            displayFemmesCatalog(femmesImages);
+          } else {
+            // Si toujours vide, utiliser les images par défaut
+            loadDefaultFemmesImages();
+          }
+        });
+        return; // Sortir, displayFemmesCatalog sera appelé dans le callback
       }
       
+      // Si toujours vide après vérification Firebase, utiliser les images par défaut
+      if (femmesImages.length === 0) {
+        loadDefaultFemmesImages();
+        return;
+      }
+      
+      displayFemmesCatalog(femmesImages);
+    }
+    
+    // Charger les images par défaut
+    function loadDefaultFemmesImages() {
+      const femmesImages = [];
+      for (let i = 1; i <= 6; i++) {
+        femmesImages.push({ id: `femme_${i}`, url: `img/femmes/${i}.png` });
+      }
+      localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
+      displayFemmesCatalog(femmesImages);
+    }
+    
+    // Afficher le catalogue
+    function displayFemmesCatalog(femmesImages) {
+      const container = document.getElementById('femmesCatalog');
+      if (!container) return;
+      
       container.innerHTML = '';
+      
       // Trier les images par numéro d'ID pour garantir l'ordre
       femmesImages.sort((a, b) => {
         const matchA = a.id.match(/femme_(\d+)/);
@@ -257,6 +299,7 @@
         const numB = matchB ? parseInt(matchB[1]) : 0;
         return numA - numB;
       });
+      
       femmesImages.forEach((item, index) => {
         // Utiliser index + 1 pour que les coupes commencent à 1 (index commence à 0)
         const number = index + 1;
