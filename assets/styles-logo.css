@@ -1349,6 +1349,20 @@ section {
   text-align: center;
 }
 
+.heritage-image-wrapper {
+  margin-bottom: 3rem;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.heritage-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 20px;
+}
+
 .heritage-title {
   font-size: clamp(2rem, 4vw, 2.5rem);
   font-weight: 700;
