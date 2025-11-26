@@ -1326,6 +1326,64 @@ section {
 }
 
 /* ============================================
+   HERITAGE SECTION
+   ============================================ */
+.heritage-section {
+  padding: 6rem 2rem;
+  background: linear-gradient(135deg, rgba(150, 100, 200, 0.05) 0%, rgba(50, 50, 50, 0.1) 100%);
+  position: relative;
+}
+
+.heritage-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.heritage-content {
+  background: var(--surface);
+  border: 2px solid var(--primary);
+  border-radius: 25px;
+  padding: 4rem 3rem;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 60px rgba(150, 100, 200, 0.2);
+  text-align: center;
+}
+
+.heritage-title {
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2.5rem;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.heritage-text {
+  color: var(--text-secondary);
+  line-height: 2;
+  font-size: 1.1rem;
+}
+
+.heritage-text p {
+  margin-bottom: 1.5rem;
+}
+
+.heritage-text p:last-child {
+  margin-bottom: 0;
+}
+
+.heritage-memory {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+  font-style: italic;
+  color: var(--text-primary);
+  font-size: 1.15rem;
+}
+
+/* ============================================
    FOOTER
    ============================================ */
 .main-footer {
