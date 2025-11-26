@@ -585,7 +585,10 @@
           <h1>🔧 Administration - L'Esthétique Vespucci</h1>
           <p style="color: var(--text-secondary);">Gérez les images de votre site</p>
         </div>
-        <button onclick="logout()" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: all 0.3s ease; white-space: nowrap;" onmouseover="this.style.background='rgba(239, 68, 68, 0.2)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'">Déconnexion</button>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+          <a href="upload-photos.html" style="background: var(--primary); color: white; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; font-size: 0.9rem; transition: all 0.3s ease; white-space: nowrap; display: inline-block;">📤 Upload Photos</a>
+          <button onclick="logout()" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: all 0.3s ease; white-space: nowrap;" onmouseover="this.style.background='rgba(239, 68, 68, 0.2)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'">Déconnexion</button>
+        </div>
       </div>
     </div>
 
@@ -1138,7 +1141,21 @@
     // Add new femmes image (global function)
     window.addNewFemmesImage = function() {
       const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
-      const newId = `femme_${Date.now()}`;
+      
+      // Trouver le prochain numéro disponible
+      let nextNumber = 1;
+      if (femmesImages.length > 0) {
+        const numbers = femmesImages
+          .map(img => {
+            const match = img.id.match(/femme_(\d+)/);
+            return match ? parseInt(match[1]) : 0;
+          })
+          .filter(n => n > 0)
+          .sort((a, b) => b - a);
+        nextNumber = numbers.length > 0 ? numbers[0] + 1 : femmesImages.length + 1;
+      }
+      
+      const newId = `femme_${nextNumber}`;
       const newImage = {
         id: newId,
         url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E'
@@ -1156,7 +1173,21 @@
     // Add new hommes image (global function)
     window.addNewHommesImage = function() {
       const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
-      const newId = `homme_${Date.now()}`;
+      
+      // Trouver le prochain numéro disponible
+      let nextNumber = 1;
+      if (hommesImages.length > 0) {
+        const numbers = hommesImages
+          .map(img => {
+            const match = img.id.match(/homme_(\d+)/);
+            return match ? parseInt(match[1]) : 0;
+          })
+          .filter(n => n > 0)
+          .sort((a, b) => b - a);
+        nextNumber = numbers.length > 0 ? numbers[0] + 1 : hommesImages.length + 1;
+      }
+      
+      const newId = `homme_${nextNumber}`;
       const newImage = {
         id: newId,
         url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E'
@@ -1185,9 +1216,13 @@
       
       container.innerHTML = '';
       femmesImages.forEach((item, index) => {
+        // Extraire le numéro de l'ID (femme_1, femme_2, etc.) ou utiliser index + 1
+        const match = item.id.match(/femme_(\d+)/);
+        const number = match ? parseInt(match[1]) : (index + 1);
+        
         const config = {
           id: item.id,
-          name: `Coupe ${index}`,
+          name: `Coupe ${number}`,
           default: item.url
         };
         createImageItem(config, container, true);
@@ -1208,9 +1243,13 @@
       
       container.innerHTML = '';
       hommesImages.forEach((item, index) => {
+        // Extraire le numéro de l'ID (homme_1, homme_2, etc.) ou utiliser index + 1
+        const match = item.id.match(/homme_(\d+)/);
+        const number = match ? parseInt(match[1]) : (index + 1);
+        
         const config = {
           id: item.id,
-          name: `Coupe ${index}`,
+          name: `Coupe ${number}`,
           default: item.url
         };
         createImageItem(config, container, true);

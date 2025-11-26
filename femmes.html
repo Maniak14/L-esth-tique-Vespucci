@@ -172,14 +172,18 @@
       
       container.innerHTML = '';
       femmesImages.forEach((item, index) => {
+        // Extraire le numéro de l'ID (femme_1, femme_2, etc.) ou utiliser index + 1
+        const match = item.id.match(/femme_(\d+)/);
+        const number = match ? parseInt(match[1]) : (index + 1);
+        
         const card = document.createElement('div');
         card.className = 'service-card';
         card.setAttribute('data-tilt', '');
         card.style.cssText = 'padding: 0; overflow: hidden; cursor: pointer;';
         card.innerHTML = `
-          <img src="${item.url}" alt="Coupe Femme ${index}" style="width: 100%; height: 300px; object-fit: cover; display: block;">
+          <img src="${item.url}" alt="Coupe Femme ${number}" style="width: 100%; height: 300px; object-fit: cover; display: block;">
           <div class="service-content" style="padding: 0.75rem; text-align: center;">
-            <h3 style="font-size: 0.9rem; margin: 0; color: var(--text-secondary); font-weight: 500;">Coupe ${index}</h3>
+            <h3 style="font-size: 0.9rem; margin: 0; color: var(--text-secondary); font-weight: 500;">Coupe ${number}</h3>
           </div>
         `;
         container.appendChild(card);
