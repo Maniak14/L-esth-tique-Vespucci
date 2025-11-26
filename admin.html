@@ -1224,8 +1224,9 @@
         return numA - numB;
       });
       femmesImages.forEach((item, index) => {
-        // Utiliser index + 1 pour que les coupes commencent à 1 (index commence à 0)
-        const number = index + 1;
+        // Extraire le numéro de l'ID et soustraire 1 (femme_1 → Coupe 0, femme_2 → Coupe 1, etc.)
+        const match = item.id.match(/femme_(\d+)/);
+        const number = match ? parseInt(match[1]) - 1 : index;
         
         const config = {
           id: item.id,
@@ -1258,8 +1259,9 @@
         return numA - numB;
       });
       hommesImages.forEach((item, index) => {
-        // Utiliser index + 1 pour que les coupes commencent à 1 (index commence à 0)
-        const number = index + 1;
+        // Extraire le numéro de l'ID et soustraire 1 (homme_1 → Coupe 0, homme_2 → Coupe 1, etc.)
+        const match = item.id.match(/homme_(\d+)/);
+        const number = match ? parseInt(match[1]) - 1 : index;
         
         const config = {
           id: item.id,
