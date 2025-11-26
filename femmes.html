@@ -306,63 +306,10 @@
       return femmesImages;
     }
     
-    // Cache des images avec Cache API
-    const CACHE_NAME = 'vespucci-femmes-images-v1';
-    
-    async function cacheImage(url) {
-      try {
-        if ('caches' in window) {
-          const cache = await caches.open(CACHE_NAME);
-          const cachedResponse = await cache.match(url);
-          
-          if (!cachedResponse) {
-            // Image pas encore en cache, la télécharger et la mettre en cache
-            const response = await fetch(url);
-            if (response.ok) {
-              await cache.put(url, response.clone());
-            }
-          }
-        }
-      } catch (error) {
-        console.log('Erreur de cache:', error);
-      }
-    }
-    
-    async function getCachedImageUrl(url) {
-      try {
-        if ('caches' in window) {
-          const cache = await caches.open(CACHE_NAME);
-          const cachedResponse = await cache.match(url);
-          
-          if (cachedResponse) {
-            // Créer une URL blob depuis le cache
-            const blob = await cachedResponse.blob();
-            return URL.createObjectURL(blob);
-          }
-        }
-      } catch (error) {
-        console.log('Erreur de récupération du cache:', error);
-      }
-      return url; // Retourner l'URL originale si le cache échoue
-    }
-    
-    // Précharger et mettre en cache toutes les images
-    async function preloadAndCacheImages(femmesImages) {
-      if (!('caches' in window)) return;
-      
-      // Mettre en cache toutes les images en arrière-plan
-      femmesImages.forEach(item => {
-        cacheImage(item.url).catch(() => {}); // Ignorer les erreurs silencieusement
-      });
-    }
-    
-    // Afficher le catalogue (optimisé pour performance avec cache)
-    async function displayFemmesCatalog(femmesImages) {
+    // Afficher le catalogue (optimisé pour performance)
+    function displayFemmesCatalog(femmesImages) {
       const container = document.getElementById('femmesCatalog');
       if (!container) return;
-      
-      // Précharger et mettre en cache les images en arrière-plan
-      preloadAndCacheImages(femmesImages);
       
       // Utiliser requestAnimationFrame pour un rendu fluide
       requestAnimationFrame(() => {
@@ -378,32 +325,17 @@
           return numA - numB;
         });
         
-        // Créer les cartes - le cache sera utilisé automatiquement par le navigateur
         femmesImages.forEach((item, index) => {
+          // Extraire le numéro de l'ID et soustraire 1 (femme_1 → Coupe 0, femme_2 → Coupe 1, etc.)
           const match = item.id.match(/femme_(\d+)/);
           const number = match ? parseInt(match[1]) - 1 : index;
           
           const card = document.createElement('div');
           card.className = 'catalog-item';
-          
-          const img = document.createElement('img');
-          img.src = item.url;
-          img.alt = `Coupe Femme ${number}`;
-          img.loading = 'lazy';
-          
-          // Essayer de charger depuis le cache de manière asynchrone
-          getCachedImageUrl(item.url).then(cachedUrl => {
-            if (cachedUrl !== item.url) {
-              img.src = cachedUrl;
-            }
-          }).catch(() => {});
-          
-          const label = document.createElement('div');
-          label.className = 'catalog-label';
-          label.textContent = `Coupe ${number}`;
-          
-          card.appendChild(img);
-          card.appendChild(label);
+          card.innerHTML = `
+            <img src="${item.url}" alt="Coupe Femme ${number}" loading="lazy">
+            <div class="catalog-label">Coupe ${number}</div>
+          `;
           fragment.appendChild(card);
         });
         
