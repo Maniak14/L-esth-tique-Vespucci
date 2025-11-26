@@ -619,6 +619,16 @@
     <!-- Femmes Catalog Section -->
     <div class="admin-section">
       <h2>Catalogue Femmes</h2>
+      
+      <!-- Ajout en masse d'URLs -->
+      <div style="background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="color: var(--text-primary); font-size: 1.2rem; margin-bottom: 1rem;">📋 Ajout en masse d'URLs</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">Collez vos URLs (une par ligne) dans l'ordre souhaité. Elles seront ajoutées automatiquement.</p>
+        <textarea id="femmesUrlsBulk" placeholder="https://i.ibb.co/example1.png&#10;https://i.ibb.co/example2.png&#10;https://i.ibb.co/example3.png" style="width: 100%; min-height: 120px; padding: 0.75rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-family: monospace; font-size: 0.85rem; margin-bottom: 1rem; resize: vertical;"></textarea>
+        <button class="btn-small" onclick="addBulkFemmesUrls()" style="width: 100%;">➕ Ajouter toutes les URLs</button>
+        <div id="femmesBulkResult" style="margin-top: 1rem; display: none;"></div>
+      </div>
+      
       <div class="image-grid" id="femmesCatalog">
         <!-- Femmes images will be loaded here -->
       </div>
@@ -633,6 +643,16 @@
     <!-- Hommes Catalog Section -->
     <div class="admin-section">
       <h2>Catalogue Hommes</h2>
+      
+      <!-- Ajout en masse d'URLs -->
+      <div style="background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="color: var(--text-primary); font-size: 1.2rem; margin-bottom: 1rem;">📋 Ajout en masse d'URLs</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">Collez vos URLs (une par ligne) dans l'ordre souhaité. Elles seront ajoutées automatiquement.</p>
+        <textarea id="hommesUrlsBulk" placeholder="https://i.ibb.co/example1.png&#10;https://i.ibb.co/example2.png&#10;https://i.ibb.co/example3.png" style="width: 100%; min-height: 120px; padding: 0.75rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-family: monospace; font-size: 0.85rem; margin-bottom: 1rem; resize: vertical;"></textarea>
+        <button class="btn-small" onclick="addBulkHommesUrls()" style="width: 100%;">➕ Ajouter toutes les URLs</button>
+        <div id="hommesBulkResult" style="margin-top: 1rem; display: none;"></div>
+      </div>
+      
       <div class="image-grid" id="hommesCatalog">
         <!-- Hommes images will be loaded here -->
       </div>
@@ -1138,6 +1158,82 @@
       }
     }
     
+    // Add bulk femmes URLs (global function)
+    window.addBulkFemmesUrls = function() {
+      const textarea = document.getElementById('femmesUrlsBulk');
+      const resultDiv = document.getElementById('femmesBulkResult');
+      if (!textarea) return;
+      
+      const urlsText = textarea.value.trim();
+      if (!urlsText) {
+        alert('Veuillez entrer au moins une URL');
+        return;
+      }
+      
+      // Séparer les URLs par ligne (supprimer les lignes vides)
+      const urls = urlsText.split('\n')
+        .map(url => url.trim())
+        .filter(url => url.length > 0 && (url.startsWith('http://') || url.startsWith('https://')));
+      
+      if (urls.length === 0) {
+        alert('Aucune URL valide trouvée. Les URLs doivent commencer par http:// ou https://');
+        return;
+      }
+      
+      // Charger les images existantes
+      let femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
+      
+      // Trouver le prochain numéro disponible
+      let nextNumber = 1;
+      if (femmesImages.length > 0) {
+        const numbers = femmesImages
+          .map(img => {
+            const match = img.id.match(/femme_(\d+)/);
+            return match ? parseInt(match[1]) : 0;
+          })
+          .filter(n => n > 0)
+          .sort((a, b) => b - a);
+        nextNumber = numbers.length > 0 ? numbers[0] + 1 : femmesImages.length + 1;
+      }
+      
+      // Ajouter toutes les URLs dans l'ordre
+      urls.forEach((url, index) => {
+        const currentNumber = nextNumber + index;
+        const newId = `femme_${currentNumber}`;
+        const newImage = {
+          id: newId,
+          url: url
+        };
+        femmesImages.push(newImage);
+      });
+      
+      // Sauvegarder
+      localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
+      if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
+        saveFemmesImagesToFirebase(femmesImages);
+      }
+      
+      // Afficher le résultat
+      resultDiv.style.display = 'block';
+      resultDiv.style.background = 'rgba(0, 255, 0, 0.1)';
+      resultDiv.style.border = '1px solid #4caf50';
+      resultDiv.style.borderRadius = '10px';
+      resultDiv.style.padding = '1rem';
+      resultDiv.style.color = '#4caf50';
+      resultDiv.innerHTML = `✅ ${urls.length} image(s) ajoutée(s) avec succès ! (de femme_${nextNumber} à femme_${nextNumber + urls.length - 1})`;
+      
+      // Vider le textarea
+      textarea.value = '';
+      
+      // Recharger le catalogue
+      loadFemmesCatalog();
+      
+      // Masquer le message après 5 secondes
+      setTimeout(() => {
+        resultDiv.style.display = 'none';
+      }, 5000);
+    };
+    
     // Add new femmes image (global function)
     window.addNewFemmesImage = function() {
       const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
@@ -1168,6 +1264,82 @@
       }
       
       loadFemmesCatalog();
+    };
+    
+    // Add bulk hommes URLs (global function)
+    window.addBulkHommesUrls = function() {
+      const textarea = document.getElementById('hommesUrlsBulk');
+      const resultDiv = document.getElementById('hommesBulkResult');
+      if (!textarea) return;
+      
+      const urlsText = textarea.value.trim();
+      if (!urlsText) {
+        alert('Veuillez entrer au moins une URL');
+        return;
+      }
+      
+      // Séparer les URLs par ligne (supprimer les lignes vides)
+      const urls = urlsText.split('\n')
+        .map(url => url.trim())
+        .filter(url => url.length > 0 && (url.startsWith('http://') || url.startsWith('https://')));
+      
+      if (urls.length === 0) {
+        alert('Aucune URL valide trouvée. Les URLs doivent commencer par http:// ou https://');
+        return;
+      }
+      
+      // Charger les images existantes
+      let hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
+      
+      // Trouver le prochain numéro disponible
+      let nextNumber = 1;
+      if (hommesImages.length > 0) {
+        const numbers = hommesImages
+          .map(img => {
+            const match = img.id.match(/homme_(\d+)/);
+            return match ? parseInt(match[1]) : 0;
+          })
+          .filter(n => n > 0)
+          .sort((a, b) => b - a);
+        nextNumber = numbers.length > 0 ? numbers[0] + 1 : hommesImages.length + 1;
+      }
+      
+      // Ajouter toutes les URLs dans l'ordre
+      urls.forEach((url, index) => {
+        const currentNumber = nextNumber + index;
+        const newId = `homme_${currentNumber}`;
+        const newImage = {
+          id: newId,
+          url: url
+        };
+        hommesImages.push(newImage);
+      });
+      
+      // Sauvegarder
+      localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
+      if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
+        saveHommesImagesToFirebase(hommesImages);
+      }
+      
+      // Afficher le résultat
+      resultDiv.style.display = 'block';
+      resultDiv.style.background = 'rgba(0, 255, 0, 0.1)';
+      resultDiv.style.border = '1px solid #4caf50';
+      resultDiv.style.borderRadius = '10px';
+      resultDiv.style.padding = '1rem';
+      resultDiv.style.color = '#4caf50';
+      resultDiv.innerHTML = `✅ ${urls.length} image(s) ajoutée(s) avec succès ! (de homme_${nextNumber} à homme_${nextNumber + urls.length - 1})`;
+      
+      // Vider le textarea
+      textarea.value = '';
+      
+      // Recharger le catalogue
+      loadHommesCatalog();
+      
+      // Masquer le message après 5 secondes
+      setTimeout(() => {
+        resultDiv.style.display = 'none';
+      }, 5000);
     };
     
     // Add new hommes image (global function)
