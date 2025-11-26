@@ -1199,18 +1199,37 @@
       const cleanUrls = urls
         .map(url => {
           // Enlever les caractères de fin de ligne ou de ponctuation
-          url = url.replace(/[.,;:!?)\]}]+$/, '');
-          // Si c'est un lien Goopics de page, essayer d'extraire l'URL directe
-          if (url.includes('goopics.net/') && !url.includes('i.goopics.net')) {
-            // Convertir goopics.net/xxx en i.goopics.net/xxx.png
-            const match = url.match(/goopics\.net\/([a-zA-Z0-9]+)/);
+          url = url.replace(/[.,;:!?)\]}]+$/, '').trim();
+          
+          // Traiter les URLs Goopics - Format souhaité: https://i.goopics.net/ID.png (sans chemins)
+          if (url.includes('goopics.net')) {
+            // Cas 1: URL avec chemin comme https://i.goopics.net/800/gp7sfx.png
+            // → Extraire uniquement l'ID final (gp7sfx) → https://i.goopics.net/gp7sfx.png
+            let match = url.match(/i\.goopics\.net\/[^\/]+\/([a-zA-Z0-9]+)(?:\.(png|jpg|jpeg|gif|webp))?/i);
+            if (match) {
+              return `https://i.goopics.net/${match[1]}.png`;
+            }
+            
+            // Cas 2: URL déjà au bon format https://i.goopics.net/ID.png
+            match = url.match(/i\.goopics\.net\/([a-zA-Z0-9]+)(?:\.(png|jpg|jpeg|gif|webp))?/i);
+            if (match) {
+              // Ignorer les URLs comme https://i.goopics.net/i.png
+              if (match[1] === 'i' && (!match[2] || match[2] === 'png')) {
+                return null;
+              }
+              return `https://i.goopics.net/${match[1]}.png`;
+            }
+            
+            // Cas 3: URL de page goopics.net/ID → convertir en i.goopics.net/ID.png
+            match = url.match(/goopics\.net\/([a-zA-Z0-9]+)(?:\/|$)/i);
             if (match) {
               return `https://i.goopics.net/${match[1]}.png`;
             }
           }
-          return url.trim();
+          
+          return url;
         })
-        .filter(url => url.length > 0 && (url.startsWith('http://') || url.startsWith('https://')))
+        .filter(url => url && url.length > 0 && (url.startsWith('http://') || url.startsWith('https://')))
         .filter((url, index, self) => self.indexOf(url) === index); // Supprimer les doublons
       
       if (cleanUrls.length === 0) {
@@ -1256,18 +1275,37 @@
       const cleanUrls = urls
         .map(url => {
           // Enlever les caractères de fin de ligne ou de ponctuation
-          url = url.replace(/[.,;:!?)\]}]+$/, '');
-          // Si c'est un lien Goopics de page, essayer d'extraire l'URL directe
-          if (url.includes('goopics.net/') && !url.includes('i.goopics.net')) {
-            // Convertir goopics.net/xxx en i.goopics.net/xxx.png
-            const match = url.match(/goopics\.net\/([a-zA-Z0-9]+)/);
+          url = url.replace(/[.,;:!?)\]}]+$/, '').trim();
+          
+          // Traiter les URLs Goopics - Format souhaité: https://i.goopics.net/ID.png (sans chemins)
+          if (url.includes('goopics.net')) {
+            // Cas 1: URL avec chemin comme https://i.goopics.net/800/gp7sfx.png
+            // → Extraire uniquement l'ID final (gp7sfx) → https://i.goopics.net/gp7sfx.png
+            let match = url.match(/i\.goopics\.net\/[^\/]+\/([a-zA-Z0-9]+)(?:\.(png|jpg|jpeg|gif|webp))?/i);
+            if (match) {
+              return `https://i.goopics.net/${match[1]}.png`;
+            }
+            
+            // Cas 2: URL déjà au bon format https://i.goopics.net/ID.png
+            match = url.match(/i\.goopics\.net\/([a-zA-Z0-9]+)(?:\.(png|jpg|jpeg|gif|webp))?/i);
+            if (match) {
+              // Ignorer les URLs comme https://i.goopics.net/i.png
+              if (match[1] === 'i' && (!match[2] || match[2] === 'png')) {
+                return null;
+              }
+              return `https://i.goopics.net/${match[1]}.png`;
+            }
+            
+            // Cas 3: URL de page goopics.net/ID → convertir en i.goopics.net/ID.png
+            match = url.match(/goopics\.net\/([a-zA-Z0-9]+)(?:\/|$)/i);
             if (match) {
               return `https://i.goopics.net/${match[1]}.png`;
             }
           }
-          return url.trim();
+          
+          return url;
         })
-        .filter(url => url.length > 0 && (url.startsWith('http://') || url.startsWith('https://')))
+        .filter(url => url && url.length > 0 && (url.startsWith('http://') || url.startsWith('https://')))
         .filter((url, index, self) => self.indexOf(url) === index); // Supprimer les doublons
       
       if (cleanUrls.length === 0) {
