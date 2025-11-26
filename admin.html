@@ -1215,10 +1215,17 @@
       }
       
       container.innerHTML = '';
+      // Trier les images par numéro d'ID pour garantir l'ordre
+      femmesImages.sort((a, b) => {
+        const matchA = a.id.match(/femme_(\d+)/);
+        const matchB = b.id.match(/femme_(\d+)/);
+        const numA = matchA ? parseInt(matchA[1]) : 0;
+        const numB = matchB ? parseInt(matchB[1]) : 0;
+        return numA - numB;
+      });
       femmesImages.forEach((item, index) => {
-        // Extraire le numéro de l'ID (femme_1, femme_2, etc.) ou utiliser index + 1
-        const match = item.id.match(/femme_(\d+)/);
-        const number = match ? parseInt(match[1]) : (index + 1);
+        // Utiliser index + 1 pour que les coupes commencent à 1 (index commence à 0)
+        const number = index + 1;
         
         const config = {
           id: item.id,
@@ -1242,10 +1249,17 @@
       }
       
       container.innerHTML = '';
+      // Trier les images par numéro d'ID pour garantir l'ordre
+      hommesImages.sort((a, b) => {
+        const matchA = a.id.match(/homme_(\d+)/);
+        const matchB = b.id.match(/homme_(\d+)/);
+        const numA = matchA ? parseInt(matchA[1]) : 0;
+        const numB = matchB ? parseInt(matchB[1]) : 0;
+        return numA - numB;
+      });
       hommesImages.forEach((item, index) => {
-        // Extraire le numéro de l'ID (homme_1, homme_2, etc.) ou utiliser index + 1
-        const match = item.id.match(/homme_(\d+)/);
-        const number = match ? parseInt(match[1]) : (index + 1);
+        // Utiliser index + 1 pour que les coupes commencent à 1 (index commence à 0)
+        const number = index + 1;
         
         const config = {
           id: item.id,
