@@ -300,8 +300,9 @@
       });
       
       femmesImages.forEach((item, index) => {
-        // Utiliser index + 1 pour que les coupes commencent à 1 (index commence à 0)
-        const number = index + 1;
+        // Extraire le numéro directement de l'ID (femme_1 → 1, femme_2 → 2, etc.)
+        const match = item.id.match(/femme_(\d+)/);
+        const number = match ? parseInt(match[1]) : (index + 1);
         
         const card = document.createElement('div');
         card.className = 'catalog-item';
