@@ -48,25 +48,36 @@
       
       // Initialize Firebase and load team members
       document.addEventListener('DOMContentLoaded', async () => {
-        // Initialize Firebase
+        // Charger depuis les JSON statiques en priorité (INSTANTANÉ)
+        await loadDataFromJSON();
+        
+        // Load team members
+        loadTeamMembers();
+        
+        // Update gallery images
+        setTimeout(() => updateGalleryImages(), 100);
+        
+        // Firebase en arrière-plan uniquement pour mise à jour (optionnel)
         if (initFirebaseDB && typeof initFirebaseDB === 'function') {
           firebaseInitialized = initFirebaseDB();
           if (firebaseInitialized) {
-            // Load all data from Firebase
-            await loadAllDataFromFirebase();
+            // Load all data from Firebase en arrière-plan
+            loadAllDataFromFirebase().then(() => {
+              // Mettre à jour si Firebase a des données plus récentes
+              loadTeamMembers();
+              updateGalleryImages();
+            });
+            
             // Watch for real-time updates
             watchImages(() => {
               console.log('Images mises à jour depuis Firebase');
               loadTeamMembers();
-              // Reload gallery
               updateGalleryImages();
-              // Update hero images
               const heroImgs = document.querySelectorAll('.hero-image');
               heroImgs.forEach((img, index) => {
                 const saved = localStorage.getItem(`image_hero${index + 1}`);
                 if (saved) img.src = saved;
               });
-              // Update map
               const mapImg = document.querySelector('.location-map img');
               if (mapImg) {
                 const saved = localStorage.getItem('image_map');
@@ -75,7 +86,6 @@
             });
             watchPositions(() => {
               console.log('Positions mises à jour depuis Firebase');
-              // Update team image positions
               document.querySelectorAll('.team-image-wrapper img').forEach(img => {
                 const imageId = img.getAttribute('data-image-id');
                 if (imageId) {
@@ -92,12 +102,6 @@
             });
           }
         }
-        
-        // Load team members
-        loadTeamMembers();
-        
-        // Update gallery images
-        setTimeout(() => updateGalleryImages(), 100);
         
         // Update hero images
         const heroImgs = document.querySelectorAll('.hero-image');
@@ -128,12 +132,19 @@
         allGalleryImages.push(saved || `img/carousel/${i}.png`);
       }
       
-      // Load custom gallery images
+      // Load custom gallery images depuis JSON ou localStorage
       const customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
-      customImages.forEach(imageId => {
-        const saved = localStorage.getItem(`image_${imageId}`);
-        if (saved) {
-          allGalleryImages.push(saved);
+      customImages.forEach(image => {
+        // Si c'est un objet avec url, utiliser directement
+        if (typeof image === 'object' && image.url) {
+          allGalleryImages.push(image.url);
+        } 
+        // Sinon, c'est un ID, chercher dans localStorage
+        else if (typeof image === 'string') {
+          const saved = localStorage.getItem(`image_${image}`);
+          if (saved) {
+            allGalleryImages.push(saved);
+          }
         }
       });
       
@@ -216,6 +227,35 @@
     }
     
     loadSavedImages();
+    
+    // Charger les données depuis les fichiers JSON statiques
+    async function loadDataFromJSON() {
+      try {
+        // Charger team members
+        const teamResponse = await fetch('team-members.json');
+        if (teamResponse.ok) {
+          const teamData = await teamResponse.json();
+          if (teamData.team_members && Array.isArray(teamData.team_members)) {
+            localStorage.setItem('team_members', JSON.stringify(teamData.team_members));
+          }
+        }
+      } catch (error) {
+        console.log('team-members.json non disponible, utilisation du cache');
+      }
+      
+      try {
+        // Charger gallery images
+        const galleryResponse = await fetch('gallery-images.json');
+        if (galleryResponse.ok) {
+          const galleryData = await galleryResponse.json();
+          if (galleryData.gallery && Array.isArray(galleryData.gallery)) {
+            localStorage.setItem('custom_gallery_images', JSON.stringify(galleryData.gallery));
+          }
+        }
+      } catch (error) {
+        console.log('gallery-images.json non disponible, utilisation du cache');
+      }
+    }
     
     // Load team members from localStorage
     function loadTeamMembers() {

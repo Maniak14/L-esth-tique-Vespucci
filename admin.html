@@ -608,9 +608,19 @@
       <div class="image-grid" id="teamImages">
         <!-- Team images will be loaded here -->
       </div>
-      <div class="add-image-btn" onclick="addNewTeamMember()" title="Ajouter un nouvel employé">
-        <div>+</div>
-        <span>Ajouter un employé</span>
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+        <div class="add-image-btn" onclick="addNewTeamMember()" title="Ajouter un nouvel employé">
+          <div>+</div>
+          <span>Ajouter un employé</span>
+        </div>
+        <button class="btn-small" onclick="exportTeamData()" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e;">📥 Exporter les données</button>
+      </div>
+      <div id="teamExportResult" style="display: none; margin-top: 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h3 style="color: var(--text-primary); font-size: 1.1rem; margin: 0;">📋 Données exportées (copiez ceci) :</h3>
+          <button onclick="copyTeamExport()" class="btn-small" style="background: var(--primary); color: white;">📋 Copier</button>
+        </div>
+        <textarea id="teamExportData" readonly style="width: 100%; min-height: 200px; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-family: monospace; font-size: 0.85rem; resize: vertical;"></textarea>
       </div>
     </div>
 
@@ -620,9 +630,19 @@
       <div class="image-grid" id="galleryImages">
         <!-- Gallery images will be loaded here -->
       </div>
-      <div class="add-image-btn" onclick="addNewGalleryImage()" title="Ajouter une nouvelle image">
-        <div>+</div>
-        <span>Ajouter une image</span>
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+        <div class="add-image-btn" onclick="addNewGalleryImage()" title="Ajouter une nouvelle image">
+          <div>+</div>
+          <span>Ajouter une image</span>
+        </div>
+        <button class="btn-small" onclick="exportGalleryData()" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e;">📥 Exporter les données</button>
+      </div>
+      <div id="galleryExportResult" style="display: none; margin-top: 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h3 style="color: var(--text-primary); font-size: 1.1rem; margin: 0;">📋 Données exportées (copiez ceci) :</h3>
+          <button onclick="copyGalleryExport()" class="btn-small" style="background: var(--primary); color: white;">📋 Copier</button>
+        </div>
+        <textarea id="galleryExportData" readonly style="width: 100%; min-height: 200px; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-family: monospace; font-size: 0.85rem; resize: vertical;"></textarea>
       </div>
     </div>
 
@@ -1636,6 +1656,82 @@
         textarea.select();
         document.execCommand('copy');
         alert('✅ JSON copié ! Vous pouvez maintenant le coller dans catalog-images.json');
+      }
+    };
+    
+    // Export team data (global function)
+    window.exportTeamData = function() {
+      const teamMembers = JSON.parse(localStorage.getItem('team_members') || '[]');
+      const exportData = {
+        team_members: teamMembers
+      };
+      const jsonString = JSON.stringify(exportData, null, 2);
+      
+      const resultDiv = document.getElementById('teamExportResult');
+      const textarea = document.getElementById('teamExportData');
+      if (resultDiv && textarea) {
+        textarea.value = jsonString;
+        resultDiv.style.display = 'block';
+        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      
+      // Télécharger automatiquement le fichier
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'team-members.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
+    
+    // Copy team export (global function)
+    window.copyTeamExport = function() {
+      const textarea = document.getElementById('teamExportData');
+      if (textarea) {
+        textarea.select();
+        document.execCommand('copy');
+        alert('✅ Données copiées !');
+      }
+    };
+    
+    // Export gallery data (global function)
+    window.exportGalleryData = function() {
+      const customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
+      const exportData = {
+        gallery: customImages
+      };
+      const jsonString = JSON.stringify(exportData, null, 2);
+      
+      const resultDiv = document.getElementById('galleryExportResult');
+      const textarea = document.getElementById('galleryExportData');
+      if (resultDiv && textarea) {
+        textarea.value = jsonString;
+        resultDiv.style.display = 'block';
+        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      
+      // Télécharger automatiquement le fichier
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'gallery-images.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
+    
+    // Copy gallery export (global function)
+    window.copyGalleryExport = function() {
+      const textarea = document.getElementById('galleryExportData');
+      if (textarea) {
+        textarea.select();
+        document.execCommand('copy');
+        alert('✅ Données copiées !');
       }
     };
     
