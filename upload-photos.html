@@ -374,12 +374,12 @@
       resultsDiv.innerHTML = '';
       
       // Charger les images existantes pour déterminer le prochain numéro
+      // Utiliser la même logique que dans admin.html (addNewFemmesImage/addNewHommesImage)
       const existingImages = await getExistingImages();
       
-      // Trouver le prochain numéro disponible
+      // Trouver le prochain numéro disponible (même logique que admin.html)
       let nextNumber = 1;
       if (existingImages.length > 0) {
-        // Extraire tous les numéros existants
         const prefix = selectedCategory === 'femmes' ? 'femme_' : 'homme_';
         const numbers = existingImages
           .map(img => {
@@ -388,8 +388,6 @@
           })
           .filter(n => n > 0)
           .sort((a, b) => b - a);
-        
-        // Le prochain numéro est le plus grand + 1
         nextNumber = numbers.length > 0 ? numbers[0] + 1 : existingImages.length + 1;
       }
       
@@ -407,20 +405,23 @@
           const imageUrl = await uploadToImgbb(file, imgbbKey);
           
           if (imageUrl) {
-            // Créer l'objet image avec le bon numéro
+            // Créer l'objet image avec le bon numéro (même format que admin.html)
+            const prefix = selectedCategory === 'femmes' ? 'femme' : 'homme';
+            const newId = `${prefix}_${currentNumber}`;
             const imageData = {
-              id: `${selectedCategory === 'femmes' ? 'femme' : 'homme'}_${currentNumber}`,
+              id: newId,
               url: imageUrl
             };
             
-            // Ajouter à la liste existante
+            // Ajouter à la liste existante (comme dans addNewFemmesImage/addNewHommesImage)
             existingImages.push(imageData);
             
             results.push({
               success: true,
               filename: file.name,
               url: imageUrl,
-              number: currentNumber
+              number: currentNumber,
+              id: newId
             });
             
             uploadedCount++;
@@ -448,25 +449,38 @@
         displayResult(results[results.length - 1]);
       }
       
-      // Sauvegarder toutes les images dans Firebase
+      // Sauvegarder toutes les images dans Firebase et localStorage
+      // Utiliser la même méthode que dans admin.html (addNewFemmesImage/addNewHommesImage)
       if (uploadedCount > 0) {
         try {
           if (selectedCategory === 'femmes') {
+            // Sauvegarder dans localStorage (comme dans admin.html)
+            localStorage.setItem('femmes_images', JSON.stringify(existingImages));
+            // Sauvegarder dans Firebase (comme dans admin.html)
             if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
               saveFemmesImagesToFirebase(existingImages);
             }
-            localStorage.setItem('femmes_images', JSON.stringify(existingImages));
           } else {
+            // Sauvegarder dans localStorage (comme dans admin.html)
+            localStorage.setItem('hommes_images', JSON.stringify(existingImages));
+            // Sauvegarder dans Firebase (comme dans admin.html)
             if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
               saveHommesImagesToFirebase(existingImages);
             }
-            localStorage.setItem('hommes_images', JSON.stringify(existingImages));
           }
           
-          updateProgress(100, `✅ ${uploadedCount} photo(s) ajoutée(s) avec succès !`);
+          updateProgress(100, `✅ ${uploadedCount} photo(s) ajoutée(s) avec succès ! Les images sont maintenant disponibles dans le catalogue.`);
+          
+          // Afficher un message de confirmation
+          setTimeout(() => {
+            const confirmMessage = confirm(`${uploadedCount} photo(s) ajoutée(s) avec succès !\n\nVoulez-vous aller à la page admin pour voir les résultats ?`);
+            if (confirmMessage) {
+              window.location.href = 'admin.html';
+            }
+          }, 500);
         } catch (error) {
           console.error('Erreur sauvegarde Firebase:', error);
-          alert('Erreur lors de la sauvegarde dans Firebase. Les URLs ont été copiées mais pas sauvegardées.');
+          alert('Erreur lors de la sauvegarde dans Firebase. Les images ont été ajoutées à localStorage mais pas à Firebase.');
         }
       }
       
@@ -476,15 +490,21 @@
     }
 
     async function getExistingImages() {
+      // Utiliser la même méthode que dans admin.html pour charger les images
       const key = selectedCategory === 'femmes' ? 'femmes_images' : 'hommes_images';
       let images = JSON.parse(localStorage.getItem(key) || '[]');
       
-      // Si pas d'images, charger depuis Firebase
+      // Si pas d'images dans localStorage, charger depuis Firebase
+      // (même logique que dans admin.html qui charge depuis Firebase au démarrage)
       if (images.length === 0 && firebaseInitialized) {
         if (selectedCategory === 'femmes' && typeof loadFemmesImagesFromFirebase === 'function') {
           await new Promise((resolve) => {
             loadFemmesImagesFromFirebase((data) => {
               images = data || [];
+              // Mettre à jour localStorage pour cohérence
+              if (images.length > 0) {
+                localStorage.setItem('femmes_images', JSON.stringify(images));
+              }
               resolve();
             });
           });
@@ -492,6 +512,10 @@
           await new Promise((resolve) => {
             loadHommesImagesFromFirebase((data) => {
               images = data || [];
+              // Mettre à jour localStorage pour cohérence
+              if (images.length > 0) {
+                localStorage.setItem('hommes_images', JSON.stringify(images));
+              }
               resolve();
             });
           });
@@ -562,8 +586,9 @@
         resultItem.innerHTML = `
           <img src="${result.url}" alt="${result.filename}" />
           <div class="result-info">
-            <div class="filename">✅ ${result.filename} - Photo #${result.number}</div>
+            <div class="filename">✅ ${result.filename} - ${result.id || `Photo #${result.number}`}</div>
             <div class="url">${result.url}</div>
+            <div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--primary);">✓ Ajouté à la base de données</div>
           </div>
         `;
       } else {
