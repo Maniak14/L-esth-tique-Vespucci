@@ -38,26 +38,19 @@
       
       // Gallery images
       const galleryImages = {
-        'gallery1': 'img/carousel/1.png',
-        'gallery2': 'img/carousel/2.png',
-        'gallery3': 'img/carousel/3.png',
-        'gallery4': 'img/carousel/4.png',
-        'gallery5': 'img/carousel/5.png',
-        'gallery6': 'img/carousel/6.png'
+        'gallery1': 'https://i.goopics.net/x6ndav.png',
+        'gallery2': 'https://i.goopics.net/36r8hs.png',
+        'gallery3': 'https://i.goopics.net/tu7axw.png',
+        'gallery4': 'https://i.goopics.net/84cvti.png',
+        'gallery5': 'https://i.goopics.net/uh4ppc.png',
+        'gallery6': 'https://i.goopics.net/gu631x.png'
       };
       
       // Initialize Firebase and load team members
       document.addEventListener('DOMContentLoaded', async () => {
-        // AFFICHER IMMÉDIATEMENT depuis le cache (0ms d'attente)
-        loadTeamMembers();
-        updateGalleryImages();
-        
-        // Charger depuis les JSON statiques en arrière-plan (sans bloquer)
-        loadDataFromJSON().then(() => {
-          // Mettre à jour après chargement du JSON
-          loadTeamMembers();
-          updateGalleryImages();
-        });
+        // Charger DIRECTEMENT depuis les JSON statiques (INSTANTANÉ)
+        await loadTeamMembersFromJSON();
+        await updateGalleryImagesFromJSON();
         
         // Firebase en arrière-plan uniquement pour mise à jour (optionnel)
         if (initFirebaseDB && typeof initFirebaseDB === 'function') {
@@ -66,15 +59,15 @@
             // Load all data from Firebase en arrière-plan
             loadAllDataFromFirebase().then(() => {
               // Mettre à jour si Firebase a des données plus récentes
-              loadTeamMembers();
-              updateGalleryImages();
+              loadTeamMembersFromJSON();
+              updateGalleryImagesFromJSON();
             });
             
             // Watch for real-time updates
             watchImages(() => {
               console.log('Images mises à jour depuis Firebase');
-              loadTeamMembers();
-              updateGalleryImages();
+              loadTeamMembersFromJSON();
+              updateGalleryImagesFromJSON();
               const heroImgs = document.querySelectorAll('.hero-image');
               heroImgs.forEach((img, index) => {
                 const saved = localStorage.getItem(`image_hero${index + 1}`);
@@ -100,7 +93,7 @@
             });
             watchTeamMembers(() => {
               console.log('Membres de l\'équipe mis à jour depuis Firebase');
-              loadTeamMembers();
+              loadTeamMembersFromJSON();
             });
           }
         }
@@ -121,8 +114,8 @@
       });
     }
     
-    // Function to update gallery images
-    function updateGalleryImages() {
+    // Charger DIRECTEMENT depuis gallery-images.json
+    async function updateGalleryImagesFromJSON() {
       const galleryTrack = document.querySelector('.gallery-track');
       if (!galleryTrack) return;
       
@@ -134,8 +127,26 @@
         allGalleryImages.push(saved || `img/carousel/${i}.png`);
       }
       
-      // Load custom gallery images depuis JSON ou localStorage
-      const customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
+      // Charger DIRECTEMENT depuis gallery-images.json
+      let customImages = [];
+      try {
+        const galleryResponse = await fetch('gallery-images.json');
+        if (galleryResponse.ok) {
+          const galleryData = await galleryResponse.json();
+          if (galleryData.gallery && Array.isArray(galleryData.gallery)) {
+            customImages = galleryData.gallery;
+          }
+        }
+      } catch (error) {
+        console.log('gallery-images.json non disponible');
+      }
+      
+      // Si pas de données JSON, utiliser localStorage en fallback
+      if (customImages.length === 0) {
+        customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
+      }
+      
+      // Ajouter les images personnalisées
       customImages.forEach(image => {
         // Si c'est un objet avec url, utiliser directement
         if (typeof image === 'object' && image.url) {
@@ -230,79 +241,33 @@
     
     loadSavedImages();
     
-    // Afficher immédiatement depuis le cache si disponible (avant DOMContentLoaded)
-    (function() {
-      if (document.readyState !== 'loading') {
-        const teamMembers = JSON.parse(localStorage.getItem('team_members') || '[]');
-        if (teamMembers.length > 0) {
-          const teamGrid = document.getElementById('teamGrid');
-          if (teamGrid) {
-            loadTeamMembers();
-          }
-        }
-      }
-    })();
-    
-    // Charger les données depuis les fichiers JSON statiques
-    async function loadDataFromJSON() {
+    // Charger DIRECTEMENT depuis team-members.json
+    async function loadTeamMembersFromJSON() {
+      const teamGrid = document.getElementById('teamGrid');
+      if (!teamGrid) return;
+      
+      let teamMembers = [];
       try {
-        // Charger team members
         const teamResponse = await fetch('team-members.json');
         if (teamResponse.ok) {
           const teamData = await teamResponse.json();
           if (teamData.team_members && Array.isArray(teamData.team_members)) {
-            localStorage.setItem('team_members', JSON.stringify(teamData.team_members));
+            teamMembers = teamData.team_members;
           }
         }
       } catch (error) {
-        console.log('team-members.json non disponible, utilisation du cache');
+        console.log('team-members.json non disponible');
       }
       
-      try {
-        // Charger gallery images
-        const galleryResponse = await fetch('gallery-images.json');
-        if (galleryResponse.ok) {
-          const galleryData = await galleryResponse.json();
-          if (galleryData.gallery && Array.isArray(galleryData.gallery)) {
-            localStorage.setItem('custom_gallery_images', JSON.stringify(galleryData.gallery));
-          }
-        }
-      } catch (error) {
-        console.log('gallery-images.json non disponible, utilisation du cache');
+      // Si pas de données JSON, utiliser localStorage en fallback
+      if (teamMembers.length === 0) {
+        teamMembers = JSON.parse(localStorage.getItem('team_members') || '[]');
       }
-    }
-    
-    // Load team members from localStorage
-    function loadTeamMembers() {
-      const teamGrid = document.getElementById('teamGrid');
-      if (!teamGrid) return;
-      
-      const teamMembers = JSON.parse(localStorage.getItem('team_members') || '[]');
-      const defaultMembers = [
-        { id: 'julio', firstName: 'Julio', lastName: 'Alvarez', grade: 'Patron', phone: '682-6030', imageId: 'julio' },
-        { id: 'soren', firstName: 'Soren', lastName: 'Wanks', grade: 'Co-Patron', phone: '575-5535', imageId: 'soren' },
-        { id: 'sun', firstName: 'Sun', lastName: 'Price', grade: 'DRH', phone: '740-3572', imageId: 'sun' },
-        { id: 'inaya', firstName: 'Inaya', lastName: 'Kinslow', grade: 'DRH', phone: '344-6279', imageId: 'inaya' },
-        { id: 'andres', firstName: 'Andres', lastName: 'Henarnandez', grade: 'Responsable Coiffeur', phone: '212-0212', imageId: 'andres' },
-        { id: 'yoruhime', firstName: 'Yoruhime', lastName: 'Yoshikage', grade: 'Responsable Tatoueur', phone: '672-0651', imageId: 'yoruhime' }
-      ];
-      
       // Get deleted members
       const deletedMembers = JSON.parse(localStorage.getItem('deleted_team_members') || '[]');
       
-      // Si on a des membres dans le JSON, les utiliser directement
-      let allMembers = [];
-      if (teamMembers.length > 0) {
-        // Utiliser directement les membres du JSON (nouveau système)
-        allMembers = teamMembers.filter(m => !deletedMembers.includes(m.id));
-      } else {
-        // Fallback sur les membres par défaut (ancien système)
-        defaultMembers.forEach(defaultMember => {
-          if (!deletedMembers.includes(defaultMember.id)) {
-            allMembers.push(defaultMember);
-          }
-        });
-      }
+      // Filtrer les membres supprimés
+      const allMembers = teamMembers.filter(m => !deletedMembers.includes(m.id));
       
       teamGrid.innerHTML = '';
       allMembers.forEach(member => {
