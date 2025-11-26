@@ -12,15 +12,42 @@
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="firebase-config.js"></script>
   <script src="firebase-db.js"></script>
   <script>
-    // Vérifier l'authentification avant d'afficher la page
-    if (sessionStorage.getItem('adminAuthenticated') !== 'true') {
-      // Utiliser un chemin absolu depuis la racine
-      const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
-      window.location.href = rootPath + '/admin-login.html';
-    }
+    // Vérifier l'authentification Firebase avant d'afficher la page
+    document.addEventListener('DOMContentLoaded', () => {
+      if (initFirebaseDB && typeof initFirebaseDB === 'function') {
+        initFirebaseDB();
+        
+        if (typeof firebaseAuth !== 'undefined') {
+          firebaseAuth.onAuthStateChanged((user) => {
+            if (!user) {
+              // L'utilisateur n'est pas authentifié, rediriger vers la page de connexion
+              const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+              window.location.href = rootPath + '/admin-login.html';
+            } else {
+              // L'utilisateur est authentifié, mettre à jour sessionStorage pour compatibilité
+              sessionStorage.setItem('adminAuthenticated', 'true');
+              sessionStorage.setItem('adminEmail', user.email);
+            }
+          });
+        } else {
+          // Fallback: vérifier sessionStorage si Firebase Auth n'est pas disponible
+          if (sessionStorage.getItem('adminAuthenticated') !== 'true') {
+            const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+            window.location.href = rootPath + '/admin-login.html';
+          }
+        }
+      } else {
+        // Fallback: vérifier sessionStorage
+        if (sessionStorage.getItem('adminAuthenticated') !== 'true') {
+          const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+          window.location.href = rootPath + '/admin-login.html';
+        }
+      }
+    });
     
     // Force scroll to top immediately on page load
     if ('scrollRestoration' in history) {
@@ -1224,8 +1251,8 @@
         return numA - numB;
       });
       femmesImages.forEach((item, index) => {
-        // Utiliser index + 1 pour que les coupes commencent à 1 (index commence à 0)
-        const number = index + 1;
+        // Utiliser index pour que les coupes commencent à 0
+        const number = index;
         
         const config = {
           id: item.id,
@@ -1258,8 +1285,8 @@
         return numA - numB;
       });
       hommesImages.forEach((item, index) => {
-        // Utiliser index + 1 pour que les coupes commencent à 1 (index commence à 0)
-        const number = index + 1;
+        // Utiliser index pour que les coupes commencent à 0
+        const number = index;
         
         const config = {
           id: item.id,
@@ -1401,13 +1428,31 @@
       }, 1000);
     }
     
-    // Déconnexion (optionnel - vous pouvez ajouter un bouton de déconnexion)
+    // Déconnexion
     function logout() {
       if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
-        sessionStorage.removeItem('adminAuthenticated');
-        // Utiliser un chemin absolu depuis la racine
-        const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
-        window.location.href = rootPath + '/admin-login.html';
+        // Déconnecter de Firebase Auth
+        if (typeof firebaseAuth !== 'undefined') {
+          firebaseAuth.signOut().then(() => {
+            sessionStorage.removeItem('adminAuthenticated');
+            sessionStorage.removeItem('adminEmail');
+            const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+            window.location.href = rootPath + '/admin-login.html';
+          }).catch((error) => {
+            console.error('Erreur déconnexion:', error);
+            // Déconnexion de sessionStorage même en cas d'erreur
+            sessionStorage.removeItem('adminAuthenticated');
+            sessionStorage.removeItem('adminEmail');
+            const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+            window.location.href = rootPath + '/admin-login.html';
+          });
+        } else {
+          // Fallback
+          sessionStorage.removeItem('adminAuthenticated');
+          sessionStorage.removeItem('adminEmail');
+          const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+          window.location.href = rootPath + '/admin-login.html';
+        }
       }
     }
 

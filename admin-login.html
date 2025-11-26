@@ -12,6 +12,7 @@
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="firebase-config.js"></script>
   <script src="firebase-db.js"></script>
   <style>
@@ -150,46 +151,30 @@
     // Note: db est déclaré dans firebase-db.js
     let firebaseInitialized = false;
     
-    // Fonction pour hasher le mot de passe (SHA-256)
-    async function hashPassword(password) {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(password);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-    
     // Initialiser Firebase
     document.addEventListener('DOMContentLoaded', async () => {
       if (initFirebaseDB && typeof initFirebaseDB === 'function') {
         firebaseInitialized = initFirebaseDB();
-        if (firebaseInitialized && typeof firebaseFirestore !== 'undefined') {
-          // Vérifier si le mot de passe existe dans Firestore, sinon créer le défaut
-          try {
-            const passwordDoc = await firebaseFirestore.collection('admin').doc('password').get();
-            if (!passwordDoc.exists) {
-              // Créer le mot de passe par défaut (admin123)
-              const defaultPassword = 'admin123';
-              const defaultHash = await hashPassword(defaultPassword);
-              await firebaseFirestore.collection('admin').doc('password').set({
-                hash: defaultHash,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-              });
-              console.log('Mot de passe par défaut créé: admin123');
+        if (firebaseInitialized && typeof firebaseAuth !== 'undefined') {
+          // Vérifier si l'utilisateur est déjà connecté
+          firebaseAuth.onAuthStateChanged((user) => {
+            if (user) {
+              // L'utilisateur est connecté, rediriger vers admin.html
+              const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+              window.location.href = rootPath + '/admin.html';
             }
+          });
+          
+          // Vérifier si un compte admin existe, sinon le créer
+          try {
+            // Essayer de se connecter avec un email admin par défaut pour vérifier s'il existe
+            // Si ça échoue, on créera le compte (cette logique sera dans handleLogin)
           } catch (error) {
-            console.error('Erreur initialisation mot de passe:', error);
+            console.error('Erreur initialisation:', error);
           }
         }
       }
     });
-    
-    // Vérifier si l'utilisateur est déjà connecté
-    if (sessionStorage.getItem('adminAuthenticated') === 'true') {
-      // Utiliser un chemin absolu depuis la racine
-      const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
-      window.location.href = rootPath + '/admin.html';
-    }
     
     async function handleLogin(event) {
       if (event) {
@@ -201,7 +186,7 @@
       const password = passwordInput.value;
       const errorMessage = document.getElementById('errorMessage');
       
-      if (!firebaseInitialized || !firebaseFirestore) {
+      if (!firebaseInitialized || !firebaseAuth) {
         errorMessage.textContent = 'Erreur de connexion. Veuillez réessayer.';
         errorMessage.classList.add('show');
         setTimeout(() => {
@@ -210,54 +195,75 @@
         return false;
       }
       
+      // Email admin par défaut
+      const adminEmail = 'admin@vespucci.com';
+      
       try {
-        // Récupérer le hash du mot de passe depuis Firestore
-        const passwordDoc = await firebaseFirestore.collection('admin').doc('password').get();
+        // Essayer de se connecter avec Firebase Auth
+        await firebaseAuth.signInWithEmailAndPassword(adminEmail, password);
         
-        if (!passwordDoc.exists) {
-          errorMessage.textContent = 'Configuration manquante. Contactez l\'administrateur.';
-          errorMessage.classList.add('show');
-          setTimeout(() => {
-            errorMessage.classList.remove('show');
-          }, 3000);
-          return false;
-        }
+        // Si la connexion réussit, rediriger vers admin.html
+        const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+        window.location.replace(rootPath + '/admin.html');
+        return false;
+      } catch (error) {
+        console.error('Erreur authentification:', error);
         
-        const storedHash = passwordDoc.data().hash;
-        
-        // Hasher le mot de passe saisi
-        const inputHash = await hashPassword(password);
-        
-        // Comparer les hash
-        if (inputHash === storedHash) {
-          // Stocker l'authentification dans sessionStorage
-          sessionStorage.setItem('adminAuthenticated', 'true');
-          
-          // Rediriger vers admin.html (utiliser replace pour éviter le retour en arrière)
-          const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
-          window.location.replace(rootPath + '/admin.html');
-          return false;
-        } else {
-          // Afficher l'erreur
+        // Si l'erreur est "user-not-found", créer le compte admin par défaut
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+          try {
+            // Créer le compte admin avec le mot de passe fourni
+            // Note: Le mot de passe par défaut est "admin123"
+            if (password === 'admin123') {
+              await firebaseAuth.createUserWithEmailAndPassword(adminEmail, password);
+              // Après création, se connecter automatiquement
+              await firebaseAuth.signInWithEmailAndPassword(adminEmail, password);
+              const rootPath = window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+              window.location.replace(rootPath + '/admin.html');
+              return false;
+            } else {
+              errorMessage.textContent = 'Mot de passe incorrect. Le mot de passe par défaut est "admin123".';
+              errorMessage.classList.add('show');
+              passwordInput.value = '';
+              passwordInput.focus();
+              setTimeout(() => {
+                errorMessage.classList.remove('show');
+              }, 5000);
+              return false;
+            }
+          } catch (createError) {
+            console.error('Erreur création compte:', createError);
+            if (createError.code === 'auth/email-already-in-use') {
+              // Le compte existe déjà, mais le mot de passe est incorrect
+              errorMessage.textContent = 'Mot de passe incorrect. Veuillez réessayer.';
+            } else {
+              errorMessage.textContent = 'Erreur de connexion. Veuillez réessayer.';
+            }
+            errorMessage.classList.add('show');
+            passwordInput.value = '';
+            passwordInput.focus();
+            setTimeout(() => {
+              errorMessage.classList.remove('show');
+            }, 3000);
+            return false;
+          }
+        } else if (error.code === 'auth/wrong-password') {
           errorMessage.textContent = 'Mot de passe incorrect. Veuillez réessayer.';
           errorMessage.classList.add('show');
           passwordInput.value = '';
           passwordInput.focus();
-          
-          // Masquer l'erreur après 3 secondes
+          setTimeout(() => {
+            errorMessage.classList.remove('show');
+          }, 3000);
+          return false;
+        } else {
+          errorMessage.textContent = 'Erreur de connexion. Veuillez réessayer.';
+          errorMessage.classList.add('show');
           setTimeout(() => {
             errorMessage.classList.remove('show');
           }, 3000);
           return false;
         }
-      } catch (error) {
-        console.error('Erreur authentification:', error);
-        errorMessage.textContent = 'Erreur de connexion. Veuillez réessayer.';
-        errorMessage.classList.add('show');
-        setTimeout(() => {
-          errorMessage.classList.remove('show');
-        }, 3000);
-        return false;
       }
     }
     

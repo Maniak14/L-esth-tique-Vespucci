@@ -180,8 +180,8 @@
         return numA - numB;
       });
       femmesImages.forEach((item, index) => {
-        // Utiliser index + 1 pour que les coupes commencent à 1 (index commence à 0)
-        const number = index + 1;
+        // Utiliser index pour que les coupes commencent à 0
+        const number = index;
         
         const card = document.createElement('div');
         card.className = 'service-card';
