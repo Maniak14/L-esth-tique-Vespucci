@@ -586,6 +586,7 @@
           <p style="color: var(--text-secondary);">Gérez les images de votre site</p>
         </div>
         <div style="display: flex; gap: 1rem; align-items: center;">
+          <button onclick="exportAllCatalogData()" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: all 0.3s ease; white-space: nowrap;" onmouseover="this.style.background='rgba(34, 197, 94, 0.2)'" onmouseout="this.style.background='rgba(34, 197, 94, 0.1)'" title="Télécharger catalog-images.json avec toutes les données">📥 Exporter tout (JSON)</button>
           <button onclick="logout()" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: all 0.3s ease; white-space: nowrap;" onmouseover="this.style.background='rgba(239, 68, 68, 0.2)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'">Déconnexion</button>
         </div>
       </div>
@@ -647,6 +648,14 @@
           <div>+</div>
           <span>Ajouter une image</span>
         </div>
+        <button class="btn-small" onclick="exportFemmesData()" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e;">📥 Exporter les données</button>
+      </div>
+      <div id="femmesExportResult" style="display: none; margin-top: 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h3 style="color: var(--text-primary); font-size: 1.1rem; margin: 0;">📋 Données exportées (copiez ceci) :</h3>
+          <button onclick="copyFemmesExport()" class="btn-small" style="background: var(--primary); color: white;">📋 Copier</button>
+        </div>
+        <textarea id="femmesExportData" readonly style="width: 100%; min-height: 200px; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-family: monospace; font-size: 0.85rem; resize: vertical;"></textarea>
       </div>
     </div>
 
@@ -682,6 +691,14 @@
           <div>+</div>
           <span>Ajouter une image</span>
         </div>
+        <button class="btn-small" onclick="exportHommesData()" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e;">📥 Exporter les données</button>
+      </div>
+      <div id="hommesExportResult" style="display: none; margin-top: 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h3 style="color: var(--text-primary); font-size: 1.1rem; margin: 0;">📋 Données exportées (copiez ceci) :</h3>
+          <button onclick="copyHommesExport()" class="btn-small" style="background: var(--primary); color: white;">📋 Copier</button>
+        </div>
+        <textarea id="hommesExportData" readonly style="width: 100%; min-height: 200px; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-family: monospace; font-size: 0.85rem; resize: vertical;"></textarea>
       </div>
     </div>
 
@@ -1513,6 +1530,86 @@
       setTimeout(() => {
         resultDiv.style.display = 'none';
       }, 5000);
+    };
+    
+    // Export femmes data (global function)
+    window.exportFemmesData = function() {
+      const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
+      const exportData = {
+        femmes: femmesImages,
+        hommes: []
+      };
+      const jsonString = JSON.stringify(exportData, null, 2);
+      
+      const resultDiv = document.getElementById('femmesExportResult');
+      const textarea = document.getElementById('femmesExportData');
+      if (resultDiv && textarea) {
+        textarea.value = jsonString;
+        resultDiv.style.display = 'block';
+        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    };
+    
+    // Copy femmes export (global function)
+    window.copyFemmesExport = function() {
+      const textarea = document.getElementById('femmesExportData');
+      if (textarea) {
+        textarea.select();
+        document.execCommand('copy');
+        alert('✅ Données copiées ! Collez-les dans catalog-images.json');
+      }
+    };
+    
+    // Export hommes data (global function)
+    window.exportHommesData = function() {
+      const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
+      const exportData = {
+        femmes: [],
+        hommes: hommesImages
+      };
+      const jsonString = JSON.stringify(exportData, null, 2);
+      
+      const resultDiv = document.getElementById('hommesExportResult');
+      const textarea = document.getElementById('hommesExportData');
+      if (resultDiv && textarea) {
+        textarea.value = jsonString;
+        resultDiv.style.display = 'block';
+        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    };
+    
+    // Copy hommes export (global function)
+    window.copyHommesExport = function() {
+      const textarea = document.getElementById('hommesExportData');
+      if (textarea) {
+        textarea.select();
+        document.execCommand('copy');
+        alert('✅ Données copiées ! Collez-les dans catalog-images.json');
+      }
+    };
+    
+    // Export all data (global function) - Export complet pour catalog-images.json
+    window.exportAllCatalogData = function() {
+      const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
+      const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
+      const exportData = {
+        femmes: femmesImages,
+        hommes: hommesImages
+      };
+      const jsonString = JSON.stringify(exportData, null, 2);
+      
+      // Créer un lien de téléchargement
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'catalog-images.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      alert('✅ Fichier catalog-images.json téléchargé ! Remplacez le fichier existant avec celui-ci.');
     };
     
     // Add new hommes image (global function)
