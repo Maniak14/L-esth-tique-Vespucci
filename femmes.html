@@ -123,11 +123,31 @@
   <style>
     .catalog-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      grid-template-columns: repeat(5, 1fr);
       gap: 1.5rem;
       max-width: 1400px;
       margin: 0 auto;
       padding: 0 2rem;
+    }
+    
+    @media (max-width: 1200px) {
+      .catalog-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+    
+    @media (max-width: 900px) {
+      .catalog-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .catalog-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        padding: 0 1rem;
+      }
     }
     
     .catalog-item {
@@ -182,6 +202,7 @@
       z-index: 1;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
       transition: transform 0.3s ease;
+      will-change: transform;
     }
     
     .catalog-item:hover img {
@@ -285,38 +306,45 @@
       return femmesImages;
     }
     
-    // Afficher le catalogue
+    // Afficher le catalogue (optimisé pour performance)
     function displayFemmesCatalog(femmesImages) {
       const container = document.getElementById('femmesCatalog');
       if (!container) return;
       
-      container.innerHTML = '';
-      
-      // Trier les images par numéro d'ID pour garantir l'ordre
-      femmesImages.sort((a, b) => {
-        const matchA = a.id.match(/femme_(\d+)/);
-        const matchB = b.id.match(/femme_(\d+)/);
-        const numA = matchA ? parseInt(matchA[1]) : 0;
-        const numB = matchB ? parseInt(matchB[1]) : 0;
-        return numA - numB;
-      });
-      
-      femmesImages.forEach((item, index) => {
-        // Extraire le numéro de l'ID et soustraire 1 (femme_1 → Coupe 0, femme_2 → Coupe 1, etc.)
-        const match = item.id.match(/femme_(\d+)/);
-        const number = match ? parseInt(match[1]) - 1 : index;
+      // Utiliser requestAnimationFrame pour un rendu fluide
+      requestAnimationFrame(() => {
+        // Utiliser DocumentFragment pour optimiser le DOM
+        const fragment = document.createDocumentFragment();
         
-        const card = document.createElement('div');
-        card.className = 'catalog-item';
-        card.innerHTML = `
-          <img src="${item.url}" alt="Coupe Femme ${number}">
-          <div class="catalog-label">Coupe ${number}</div>
-        `;
-        container.appendChild(card);
+        // Trier les images par numéro d'ID pour garantir l'ordre
+        femmesImages.sort((a, b) => {
+          const matchA = a.id.match(/femme_(\d+)/);
+          const matchB = b.id.match(/femme_(\d+)/);
+          const numA = matchA ? parseInt(matchA[1]) : 0;
+          const numB = matchB ? parseInt(matchB[1]) : 0;
+          return numA - numB;
+        });
+        
+        femmesImages.forEach((item, index) => {
+          // Extraire le numéro de l'ID et soustraire 1 (femme_1 → Coupe 0, femme_2 → Coupe 1, etc.)
+          const match = item.id.match(/femme_(\d+)/);
+          const number = match ? parseInt(match[1]) - 1 : index;
+          
+          const card = document.createElement('div');
+          card.className = 'catalog-item';
+          card.innerHTML = `
+            <img src="${item.url}" alt="Coupe Femme ${number}" loading="lazy">
+            <div class="catalog-label">Coupe ${number}</div>
+          `;
+          fragment.appendChild(card);
+        });
+        
+        container.innerHTML = '';
+        container.appendChild(fragment);
+        
+        // Re-attach lightbox events après un court délai pour éviter le blocage
+        setTimeout(() => attachCatalogEvents(), 0);
       });
-      
-      // Re-attach lightbox and tilt events
-      attachCatalogEvents();
     }
     
     // Attach events to catalog items
