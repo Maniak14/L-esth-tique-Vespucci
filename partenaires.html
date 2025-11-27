@@ -269,6 +269,23 @@
 
     window.addEventListener('scroll', handleFixedCTA);
     handleFixedCTA();
+
+    // Empêcher les clics sur les cartes de partenaires
+    document.addEventListener('DOMContentLoaded', () => {
+      const partnerCards = document.querySelectorAll('.partner-card');
+      partnerCards.forEach(card => {
+        card.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        });
+        card.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        });
+      });
+    });
   </script>
 
   <style>
@@ -476,6 +493,8 @@
       min-height: 400px;
       position: relative;
       overflow: hidden;
+      cursor: default;
+      user-select: none;
     }
 
     .partner-card::before {
