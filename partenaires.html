@@ -58,45 +58,57 @@
   </nav>
 
   <!-- Partners Section -->
-  <section class="gallery-section" style="padding-top: 8rem;">
-    <div class="section-header">
-      <span class="section-tag">Partenaires Premium</span>
-      <h2 class="section-title">Nos Partenaires d'Excellence</h2>
+  <section class="gallery-section" style="padding-top: 8rem; position: relative;">
+    <div class="partners-hero">
+      <div class="section-header">
+        <span class="section-tag premium-badge">⭐ Partenaires Premium</span>
+        <h2 class="section-title partners-title">Nos Partenaires d'Excellence</h2>
+      </div>
+      <p class="partners-intro">
+        Nous sommes fiers de collaborer avec des partenaires de renom qui partagent nos valeurs d'excellence, d'innovation et de qualité. Ces alliances stratégiques renforcent notre engagement envers vous.
+      </p>
     </div>
-    <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto 5rem; font-size: 1.2rem; line-height: 1.8;">
-      Nous sommes fiers de collaborer avec des partenaires de renom qui partagent nos valeurs d'excellence, d'innovation et de qualité. Ces alliances stratégiques renforcent notre engagement envers vous.
-    </p>
 
     <div class="partners-grid-premium">
-      <div class="partner-card">
+      <div class="partner-card premium-partner">
+        <div class="partner-badge">Partenaire Officiel</div>
+        <div class="partner-glow"></div>
         <div class="partner-image-wrapper">
           <img src="img/auto_exo.webp" alt="Auto Exótic" class="partner-image">
         </div>
         <h3 class="partner-name">Auto Exótic</h3>
       </div>
 
-      <div class="partner-card">
+      <div class="partner-card premium-partner">
+        <div class="partner-badge">Partenaire Officiel</div>
+        <div class="partner-glow"></div>
         <div class="partner-image-wrapper">
           <img src="img/ltd.webp" alt="LTD SandyShore" class="partner-image">
         </div>
         <h3 class="partner-name">LTD SandyShore</h3>
       </div>
 
-      <div class="partner-card">
+      <div class="partner-card premium-partner">
+        <div class="partner-badge">Partenaire Officiel</div>
+        <div class="partner-glow"></div>
         <div class="partner-image-wrapper">
           <img src="img/hen.png" alt="Hen House" class="partner-image">
         </div>
         <h3 class="partner-name">Hen House</h3>
       </div>
 
-      <div class="partner-card">
+      <div class="partner-card premium-partner">
+        <div class="partner-badge">Partenaire Officiel</div>
+        <div class="partner-glow"></div>
         <div class="partner-image-wrapper">
           <img src="img/delight.png" alt="Delight" class="partner-image">
         </div>
         <h3 class="partner-name">Delight</h3>
       </div>
 
-      <div class="partner-card">
+      <div class="partner-card premium-partner">
+        <div class="partner-badge">Partenaire Officiel</div>
+        <div class="partner-glow"></div>
         <div class="partner-image-wrapper">
           <img src="img/life.png" alt="Life Invader" class="partner-image">
         </div>
@@ -472,6 +484,64 @@
       }
     }
 
+    .partners-hero {
+      text-align: center;
+      margin-bottom: 6rem;
+      position: relative;
+    }
+
+    .premium-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, rgba(32, 178, 170, 0.2) 0%, rgba(32, 178, 170, 0.05) 100%);
+      border: 1px solid var(--primary);
+      padding: 0.5rem 1.5rem;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin-bottom: 1.5rem;
+      animation: pulse-glow 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% {
+        box-shadow: 0 0 20px rgba(32, 178, 170, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 40px rgba(32, 178, 170, 0.6);
+      }
+    }
+
+    .partners-title {
+      font-size: 3.5rem;
+      background: linear-gradient(135deg, #ffffff 0%, var(--primary) 50%, #ffffff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-size: 200% auto;
+      animation: shimmer 3s linear infinite;
+      margin-bottom: 2rem;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: 0% center;
+      }
+      100% {
+        background-position: 200% center;
+      }
+    }
+
+    .partners-intro {
+      text-align: center;
+      color: var(--text-secondary);
+      max-width: 800px;
+      margin: 0 auto;
+      font-size: 1.3rem;
+      line-height: 1.9;
+      font-weight: 300;
+    }
+
     .partners-grid-premium {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -484,18 +554,73 @@
     .partner-card {
       background: var(--surface);
       border: 2px solid var(--border);
-      border-radius: 25px;
-      padding: 3.5rem 2.5rem;
+      border-radius: 30px;
+      padding: 4rem 2.5rem;
       text-align: center;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       backdrop-filter: blur(20px);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 400px;
+      min-height: 450px;
       position: relative;
       overflow: hidden;
+      animation: fadeInUp 0.6s ease-out backwards;
+    }
+
+    .partner-card:nth-child(1) { animation-delay: 0.1s; }
+    .partner-card:nth-child(2) { animation-delay: 0.2s; }
+    .partner-card:nth-child(3) { animation-delay: 0.3s; }
+    .partner-card:nth-child(4) { animation-delay: 0.4s; }
+    .partner-card:nth-child(5) { animation-delay: 0.5s; }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .partner-badge {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: linear-gradient(135deg, var(--primary) 0%, #1fa89a 100%);
+      color: white;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      z-index: 10;
+      box-shadow: 0 4px 15px rgba(32, 178, 170, 0.4);
+      animation: badge-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes badge-pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    .partner-glow {
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(32, 178, 170, 0.15) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      z-index: 0;
     }
 
     .partner-card::before {
@@ -505,103 +630,167 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, rgba(32, 178, 170, 0.05) 0%, transparent 70%);
+      background: linear-gradient(135deg, rgba(32, 178, 170, 0.1) 0%, transparent 70%);
       opacity: 0;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.5s ease;
       z-index: 0;
+    }
+
+    .partner-card::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(135deg, var(--primary), #1fa89a, var(--primary));
+      border-radius: 30px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      z-index: -1;
+      filter: blur(10px);
     }
 
     .partner-card:hover::before {
       opacity: 1;
     }
 
+    .partner-card:hover::after {
+      opacity: 0.6;
+    }
+
+    .partner-card:hover .partner-glow {
+      opacity: 1;
+    }
+
     .partner-card:hover {
-      transform: translateY(-15px) scale(1.02);
+      transform: translateY(-20px) scale(1.03);
       border-color: var(--primary);
-      box-shadow: 0 30px 80px rgba(32, 178, 170, 0.3);
+      box-shadow: 0 40px 100px rgba(32, 178, 170, 0.4), 0 0 60px rgba(32, 178, 170, 0.2);
       border-width: 2px;
     }
 
     .partner-image-wrapper {
       width: 100%;
-      max-width: 280px;
-      height: 200px;
+      max-width: 300px;
+      height: 220px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 2rem;
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 20px;
-      padding: 2rem;
+      margin-bottom: 2.5rem;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 25px;
+      padding: 2.5rem;
       position: relative;
       z-index: 1;
-      transition: all 0.4s ease;
+      transition: all 0.5s ease;
+      border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .partner-card:hover .partner-image-wrapper {
-      background: rgba(255, 255, 255, 0.05);
-      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.08);
+      transform: scale(1.08);
+      border-color: rgba(32, 178, 170, 0.3);
+      box-shadow: 0 10px 40px rgba(32, 178, 170, 0.2);
     }
 
     .partner-image {
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
-      filter: brightness(0.9);
-      transition: all 0.4s ease;
+      filter: brightness(0.95) drop-shadow(0 0 10px rgba(32, 178, 170, 0.1));
+      transition: all 0.5s ease;
     }
 
     .partner-card:hover .partner-image {
-      filter: brightness(1.15);
-      transform: scale(1.1);
+      filter: brightness(1.2) drop-shadow(0 0 20px rgba(32, 178, 170, 0.3));
+      transform: scale(1.12);
     }
 
     .partner-name {
-      font-size: 1.6rem;
-      font-weight: 800;
+      font-size: 1.8rem;
+      font-weight: 900;
       color: var(--text-primary);
       margin: 0;
       position: relative;
       z-index: 1;
-      background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary) 100%);
+      background: linear-gradient(135deg, #ffffff 0%, var(--primary) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      letter-spacing: 0.5px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: all 0.5s ease;
+    }
+
+    .partner-card:hover .partner-name {
+      background: linear-gradient(135deg, var(--primary) 0%, #ffffff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      transform: scale(1.05);
     }
 
     @media (max-width: 1024px) {
+      .partners-title {
+        font-size: 2.8rem;
+      }
+
+      .partners-intro {
+        font-size: 1.1rem;
+      }
+
       .partners-grid-premium {
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 2.5rem;
       }
 
       .partner-card {
-        min-height: 350px;
-        padding: 3rem 2rem;
+        min-height: 400px;
+        padding: 3.5rem 2rem;
       }
 
       .partner-image-wrapper {
-        max-width: 240px;
-        height: 180px;
+        max-width: 260px;
+        height: 200px;
+      }
+
+      .partner-name {
+        font-size: 1.6rem;
       }
     }
 
     @media (max-width: 768px) {
+      .partners-title {
+        font-size: 2.2rem;
+      }
+
+      .partners-intro {
+        font-size: 1rem;
+        padding: 0 1rem;
+      }
+
       .partners-grid-premium {
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 2rem;
       }
 
       .partner-card {
-        min-height: 320px;
-        padding: 2.5rem 1.5rem;
+        min-height: 380px;
+        padding: 3rem 1.5rem;
+      }
+
+      .partner-badge {
+        top: 1rem;
+        right: 1rem;
+        font-size: 0.7rem;
+        padding: 0.3rem 0.8rem;
       }
 
       .partner-image-wrapper {
-        max-width: 200px;
-        height: 150px;
-        padding: 1.5rem;
+        max-width: 220px;
+        height: 180px;
+        padding: 2rem;
       }
 
       .partner-name {
