@@ -60,14 +60,14 @@
   <!-- Partners Section -->
   <section class="gallery-section" style="padding-top: 8rem;">
     <div class="section-header">
-      <span class="section-tag">Partenaires</span>
-      <h2 class="section-title">Nos partenaires</h2>
+      <span class="section-tag">Partenaires Premium</span>
+      <h2 class="section-title">Nos Partenaires d'Excellence</h2>
     </div>
-    <p style="text-align: center; color: var(--text-secondary); max-width: 600px; margin: 0 auto 4rem; font-size: 1.1rem; line-height: 1.8;">
-      Découvrez nos partenaires de confiance qui partagent nos valeurs d'excellence et de qualité.
+    <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto 5rem; font-size: 1.2rem; line-height: 1.8;">
+      Nous sommes fiers de collaborer avec des partenaires de renom qui partagent nos valeurs d'excellence, d'innovation et de qualité. Ces alliances stratégiques renforcent notre engagement envers vous.
     </p>
 
-    <div class="partners-grid">
+    <div class="partners-grid-premium">
       <div class="partner-card">
         <div class="partner-image-wrapper">
           <img src="img/auto_exo.webp" alt="Auto Exótic" class="partner-image">
@@ -452,87 +452,140 @@
       }
     }
 
-    .partners-grid {
+    .partners-grid-premium {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-      max-width: 1200px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 3rem;
+      max-width: 1400px;
       margin: 0 auto;
       padding: 0 2rem;
     }
 
     .partner-card {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 2rem;
+      border: 2px solid var(--border);
+      border-radius: 25px;
+      padding: 3.5rem 2.5rem;
       text-align: center;
-      transition: all 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       backdrop-filter: blur(20px);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 300px;
+      min-height: 400px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .partner-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(32, 178, 170, 0.05) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 0;
+    }
+
+    .partner-card:hover::before {
+      opacity: 1;
     }
 
     .partner-card:hover {
-      transform: translateY(-10px);
+      transform: translateY(-15px) scale(1.02);
       border-color: var(--primary);
-      box-shadow: 0 20px 60px rgba(32, 178, 170, 0.2);
+      box-shadow: 0 30px 80px rgba(32, 178, 170, 0.3);
+      border-width: 2px;
     }
 
     .partner-image-wrapper {
       width: 100%;
-      max-width: 200px;
-      height: 150px;
+      max-width: 280px;
+      height: 200px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 1.5rem;
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: 15px;
-      padding: 1rem;
+      margin-bottom: 2rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 20px;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+      transition: all 0.4s ease;
+    }
+
+    .partner-card:hover .partner-image-wrapper {
+      background: rgba(255, 255, 255, 0.05);
+      transform: scale(1.05);
     }
 
     .partner-image {
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
-      filter: brightness(0.95);
-      transition: all 0.3s ease;
+      filter: brightness(0.9);
+      transition: all 0.4s ease;
     }
 
     .partner-card:hover .partner-image {
-      filter: brightness(1.1);
-      transform: scale(1.05);
+      filter: brightness(1.15);
+      transform: scale(1.1);
     }
 
     .partner-name {
-      font-size: 1.3rem;
-      font-weight: 700;
+      font-size: 1.6rem;
+      font-weight: 800;
       color: var(--text-primary);
       margin: 0;
+      position: relative;
+      z-index: 1;
       background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      letter-spacing: 0.5px;
     }
 
-    @media (max-width: 768px) {
-      .partners-grid {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
+    @media (max-width: 1024px) {
+      .partners-grid-premium {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2.5rem;
       }
 
       .partner-card {
-        min-height: 250px;
-        padding: 1.5rem;
+        min-height: 350px;
+        padding: 3rem 2rem;
       }
 
       .partner-image-wrapper {
-        max-width: 150px;
-        height: 120px;
+        max-width: 240px;
+        height: 180px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .partners-grid-premium {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+      }
+
+      .partner-card {
+        min-height: 320px;
+        padding: 2.5rem 1.5rem;
+      }
+
+      .partner-image-wrapper {
+        max-width: 200px;
+        height: 150px;
+        padding: 1.5rem;
+      }
+
+      .partner-name {
+        font-size: 1.4rem;
       }
     }
   </style>
