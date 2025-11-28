@@ -1792,17 +1792,17 @@ section {
 
   .hero-visual {
     max-width: 100%;
-    transform: translateY(0);
+    transform: translateY(-40px);
   }
 
   .hero-visual-container {
-    flex-direction: row;
-    gap: 0.5rem;
+    flex-direction: column;
+    gap: 1rem;
   }
 
   .hero-image-wrapper {
     min-height: 300px;
-    flex: 1;
+    width: 100%;
   }
 
   .hero-image {
@@ -1922,6 +1922,22 @@ section {
 
   .section-title {
     font-size: 2rem;
+  }
+
+  .hero-visual {
+    transform: translateY(-30px);
+  }
+
+  .hero-visual-container {
+    gap: 0.8rem;
+  }
+
+  .hero-image-wrapper {
+    min-height: 250px;
+  }
+
+  .hero-image {
+    min-height: 250px;
   }
 
   .service-card {
