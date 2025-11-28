@@ -183,7 +183,12 @@
     </div>
   </footer>
 
-  <!-- Fixed CTA Button -->
+  <!-- Fixed CTA Buttons -->
+  <button class="scroll-to-top" id="scrollToTop" aria-label="Retour en haut">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 15l-6-6-6 6"/>
+    </svg>
+  </button>
   <a href="#" class="fixed-cta" id="openFixedBookingModal">
     <span class="cta-text">Réserver</span>
   </a>
@@ -335,6 +340,7 @@
     // Hide fixed CTA button near footer
     function handleFixedCTA() {
       const fixedCTA = document.querySelector('.fixed-cta');
+      const scrollToTopBtn = document.querySelector('.scroll-to-top');
       const footer = document.querySelector('.main-footer');
       if (fixedCTA && footer) {
         const footerTop = footer.offsetTop;
@@ -344,15 +350,45 @@
         if (distanceToFooter < 150) {
           fixedCTA.style.opacity = '0';
           fixedCTA.style.pointerEvents = 'none';
+          if (scrollToTopBtn) {
+            scrollToTopBtn.style.opacity = '0';
+            scrollToTopBtn.style.pointerEvents = 'none';
+          }
         } else {
           fixedCTA.style.opacity = '1';
           fixedCTA.style.pointerEvents = 'auto';
+          if (scrollToTopBtn && scrollToTopBtn.classList.contains('visible')) {
+            scrollToTopBtn.style.opacity = '1';
+            scrollToTopBtn.style.pointerEvents = 'auto';
+          }
         }
       }
     }
     
     window.addEventListener('scroll', handleFixedCTA, { passive: true });
     handleFixedCTA();
+
+    // Scroll to Top Button
+    const scrollToTopBtn = document.getElementById('scrollToTop');
+    if (scrollToTopBtn) {
+      function handleScrollToTop() {
+        if (window.pageYOffset > 300) {
+          scrollToTopBtn.classList.add('visible');
+        } else {
+          scrollToTopBtn.classList.remove('visible');
+        }
+      }
+
+      scrollToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+
+      window.addEventListener('scroll', handleScrollToTop, { passive: true });
+      handleScrollToTop();
+    }
 
     // 3D Tilt Effect
     document.querySelectorAll('[data-tilt]').forEach(card => {
