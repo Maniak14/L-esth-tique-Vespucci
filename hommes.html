@@ -182,10 +182,11 @@
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      gap: 8px;
+      gap: 0;
     }
 
     .mobile-close-btn span {
+      position: absolute;
       width: 25px;
       height: 2px;
       background: var(--text-primary);
@@ -193,11 +194,11 @@
     }
 
     .mobile-close-btn span:first-child {
-      transform: rotate(45deg) translate(5px, 5px);
+      transform: rotate(45deg);
     }
 
     .mobile-close-btn span:last-child {
-      transform: rotate(-45deg) translate(5px, -5px);
+      transform: rotate(-45deg);
     }
 
     .burger {
