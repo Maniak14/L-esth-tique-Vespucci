@@ -335,6 +335,17 @@
       const filterButtons = document.querySelectorAll('.category-filter-btn');
       if (filterButtons.length === 0) return; // Attendre que les boutons soient dans le DOM
       
+      // Ne pas réinitialiser si déjà initialisé
+      if (filterButtons[0].hasAttribute('data-initialized')) {
+        // Si déjà initialisé, mettre à jour currentCategory depuis le bouton actif
+        const activeBtn = document.querySelector('.category-filter-btn.active');
+        if (activeBtn) {
+          currentCategory = activeBtn.getAttribute('data-category');
+        }
+        return;
+      }
+      filterButtons.forEach(btn => btn.setAttribute('data-initialized', 'true'));
+      
       filterButtons.forEach(btn => {
         btn.addEventListener('click', function() {
           // Retirer la classe active de tous les boutons
@@ -346,6 +357,12 @@
           filterByCategory(currentCategory);
         });
       });
+      
+      // Mettre à jour currentCategory depuis le bouton actif au chargement
+      const activeBtn = document.querySelector('.category-filter-btn.active');
+      if (activeBtn) {
+        currentCategory = activeBtn.getAttribute('data-category');
+      }
     }
     
     // Filtrer les images par catégorie

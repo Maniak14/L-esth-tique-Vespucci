@@ -329,6 +329,17 @@
       const filterButtons = document.querySelectorAll('.category-filter-btn');
       if (filterButtons.length === 0) return; // Attendre que les boutons soient dans le DOM
       
+      // Ne pas réinitialiser si déjà initialisé
+      if (filterButtons[0].hasAttribute('data-initialized')) {
+        // Si déjà initialisé, mettre à jour currentCategory depuis le bouton actif
+        const activeBtn = document.querySelector('.category-filter-btn.active');
+        if (activeBtn) {
+          currentCategory = activeBtn.getAttribute('data-category');
+        }
+        return;
+      }
+      filterButtons.forEach(btn => btn.setAttribute('data-initialized', 'true'));
+      
       filterButtons.forEach(btn => {
         btn.addEventListener('click', function() {
           // Retirer la classe active de tous les boutons
@@ -340,6 +351,12 @@
           filterByCategory(currentCategory);
         });
       });
+      
+      // Mettre à jour currentCategory depuis le bouton actif au chargement
+      const activeBtn = document.querySelector('.category-filter-btn.active');
+      if (activeBtn) {
+        currentCategory = activeBtn.getAttribute('data-category');
+      }
     }
     
     // Filtrer les images par catégorie
@@ -379,12 +396,14 @@
       if (initFirebaseDB && typeof initFirebaseDB === 'function') {
         const initialized = initFirebaseDB();
         if (initialized && typeof firebaseFirestore !== 'undefined') {
-          firebaseFirestore.collection('data').doc('hommes_images').onSnapshot((doc) => {
-            if (doc.exists) {
-              const data = doc.data();
+            firebaseFirestore.collection('data').doc('hommes_images').onSnapshot((doc) => {
+              if (doc.exists) {
+                const data = doc.data();
               if (data.images && Array.isArray(data.images) && data.images.length > 0) {
-                localStorage.setItem('hommes_images', JSON.stringify(data.images));
-                displayHommesCatalog(data.images);
+                  localStorage.setItem('hommes_images', JSON.stringify(data.images));
+                // Mettre à jour allHommesImages et réappliquer le filtre actif
+                allHommesImages = data.images;
+                filterByCategory(currentCategory);
               }
             }
           });
@@ -405,9 +424,9 @@
     // Charger les images par défaut
     function loadDefaultHommesImages() {
       const hommesImages = [];
-      for (let i = 1; i <= 6; i++) {
-        hommesImages.push({ id: `homme_${i}`, url: `img/hommes/${i}.png` });
-      }
+        for (let i = 1; i <= 6; i++) {
+          hommesImages.push({ id: `homme_${i}`, url: `img/hommes/${i}.png` });
+        }
       return hommesImages;
     }
     
@@ -435,10 +454,10 @@
           // Fichier 43.png correspond à homme_44 dans le JSON, donc on affiche "Coupe 43"
           const match = item.id.match(/homme_(\d+)/);
           const displayNumber = match ? parseInt(match[1]) - 1 : index; // homme_44 → 43 (numéro du fichier)
-          
-          const card = document.createElement('div');
+        
+        const card = document.createElement('div');
           card.className = 'catalog-item';
-          card.innerHTML = `
+        card.innerHTML = `
             <img src="${item.url}" alt="Coupe Homme ${displayNumber}" loading="lazy">
             <div class="catalog-label">Coupe ${displayNumber}</div>
           `;
@@ -561,7 +580,7 @@
         console.log('Erreur chargement contacts');
       }
     }
-    
+
     function openModal(modal) {
       if (modal) {
         modal.classList.add('active');
