@@ -504,10 +504,10 @@
           return numA - numB;
         });
         
-      hommesImages.forEach((item, index) => {
+        hommesImages.forEach((item, index) => {
           // Extraire le numéro de l'ID (homme_44 → 44) puis soustraire 1 pour obtenir le numéro du fichier (43.png → 43)
           // Fichier 43.png correspond à homme_44 dans le JSON, donc on affiche "Coupe 43"
-        const match = item.id.match(/homme_(\d+)/);
+          const match = item.id.match(/homme_(\d+)/);
           const displayNumber = match ? parseInt(match[1]) - 1 : index; // homme_44 → 43 (numéro du fichier)
         
         const card = document.createElement('div');
@@ -668,23 +668,11 @@
       const fixedCTA = document.querySelector('.fixed-cta');
       const scrollToTopBtn = document.querySelector('.scroll-to-top');
       const footer = document.querySelector('.main-footer');
-      
-      if (fixedCTA) {
-        // Par défaut, le bouton est visible
-        let shouldHide = false;
-        
-        if (footer) {
-        const footerTop = footer.offsetTop;
-        const windowBottom = window.pageYOffset + window.innerHeight;
-        const distanceToFooter = footerTop - windowBottom;
-        
-          // Cacher seulement si on est très près du footer
-        if (distanceToFooter < 150) {
-            shouldHide = true;
-          }
-        }
-        
-        if (shouldHide) {
+      if (fixedCTA && footer) {
+        const footerTop = footer.getBoundingClientRect().top;
+        const windowHeight = window.innerHeight;
+        // Cacher seulement si le footer est visible dans la fenêtre (à moins de 150px du bas)
+        if (footerTop < windowHeight - 150) {
           fixedCTA.style.opacity = '0';
           fixedCTA.style.pointerEvents = 'none';
           if (scrollToTopBtn) {
@@ -699,12 +687,15 @@
             scrollToTopBtn.style.pointerEvents = 'auto';
           }
         }
+      } else if (fixedCTA) {
+        // Si le footer n'est pas encore chargé, afficher le bouton par défaut
+        fixedCTA.style.opacity = '1';
+        fixedCTA.style.pointerEvents = 'auto';
       }
     }
     
     window.addEventListener('scroll', handleFixedCTA, { passive: true });
-    
-    // Appeler handleFixedCTA après le chargement complet de la page
+    // Attendre que le DOM soit complètement chargé avant de vérifier
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
         setTimeout(handleFixedCTA, 100);
