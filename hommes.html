@@ -431,8 +431,10 @@
         });
         
         hommesImages.forEach((item, index) => {
-          // Utiliser l'index pour la numérotation séquentielle (0, 1, 2, 3, ...)
-          const displayNumber = index;
+          // Extraire le numéro de l'ID (homme_44 → 44) puis soustraire 1 pour obtenir le numéro du fichier (43.png → 43)
+          // Fichier 43.png correspond à homme_44 dans le JSON, donc on affiche "Coupe 43"
+          const match = item.id.match(/homme_(\d+)/);
+          const displayNumber = match ? parseInt(match[1]) - 1 : index; // homme_44 → 43 (numéro du fichier)
           
           const card = document.createElement('div');
           card.className = 'catalog-item';

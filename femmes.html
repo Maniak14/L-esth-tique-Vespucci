@@ -392,11 +392,11 @@
                   localStorage.setItem('femmes_images', JSON.stringify(data.images));
                 allFemmesImages = data.images;
                 filterByCategory(currentCategory);
-              }
+                }
               }
             });
+          }
         }
-      }
     });
 
     // Afficher immédiatement depuis le cache si disponible
@@ -438,12 +438,14 @@
         });
         
         femmesImages.forEach((item, index) => {
-          // Utiliser l'index pour la numérotation séquentielle (0, 1, 2, 3, ...)
-          const displayNumber = index;
-          
-          const card = document.createElement('div');
+          // Extraire le numéro de l'ID (femme_44 → 44) puis soustraire 1 pour obtenir le numéro du fichier (43.png → 43)
+          // Fichier 43.png correspond à femme_44 dans le JSON, donc on affiche "Coupe 43"
+          const match = item.id.match(/femme_(\d+)/);
+          const displayNumber = match ? parseInt(match[1]) - 1 : index; // femme_44 → 43 (numéro du fichier)
+        
+        const card = document.createElement('div');
           card.className = 'catalog-item';
-          card.innerHTML = `
+        card.innerHTML = `
             <img src="${item.url}" alt="Coupe Femme ${displayNumber}" loading="lazy">
             <div class="catalog-label">Coupe ${displayNumber}</div>
           `;
