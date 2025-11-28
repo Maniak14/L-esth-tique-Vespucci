@@ -149,6 +149,20 @@
         display: none;
       }
     }
+
+    /* Services supplémentaires grid */
+    .supplementary-services-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    @media (max-width: 768px) {
+      .supplementary-services-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
@@ -288,7 +302,7 @@
         <span class="section-tag">Services</span>
         <h2 class="section-title">Services supplémentaires</h2>
       </div>
-      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-top: 3rem;">
+      <div class="supplementary-services-grid">
         <div class="service-card supplementary">
           <div class="service-content">
             <h3>Rouge à lèvres</h3>
