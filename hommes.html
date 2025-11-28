@@ -72,6 +72,15 @@
       Découvrez notre sélection de coupes masculines modernes et classiques, réalisées par nos experts coiffeurs.
     </p>
 
+    <!-- Category Filters -->
+    <div class="category-filters" style="display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 3rem; padding: 0 2rem;">
+      <button class="category-filter-btn active" data-category="all">Tout</button>
+      <button class="category-filter-btn" data-category="attache">Coupe Attaché</button>
+      <button class="category-filter-btn" data-category="court">Coupe Court</button>
+      <button class="category-filter-btn" data-category="degrade">Coupe Dégradé</button>
+      <button class="category-filter-btn" data-category="long">Coupe Long</button>
+    </div>
+
     <div id="hommesCatalog" class="catalog-grid">
       <!-- Images will be loaded IMMEDIATELY from cache -->
     </div>
@@ -261,6 +270,18 @@
     // Images directement dans le code pour chargement instantané
     const HOMMES_IMAGES_DATA = [];
     
+    // Définir les catégories avec leurs numéros de coupe
+    const CATEGORIES = {
+      'attache': [43, 76, 101, 111, 149, 150, 151, 152, 154, 170, 193, 196, 197, 201, 208, 209, 243, 256, 257, 268, 294, 353, 361, 405, 434, 435, 439, 474],
+      'court': [33, 34, 38, 40, 41, 46, 48, 67, 68, 69, 72, 102, 103, 124, 125, 126, 128, 144, 162, 227, 231, 232, 244, 245, 246, 252, 263, 272, 273, 297, 298, 311, 322, 335, 336, 383, 394, 425, 428, 430, 432, 437, 440, 445, 449, 451, 452, 453, 457, 466, 468, 470, 471, 473, 475],
+      'degrade': [37, 39, 73, 86, 91, 104, 187, 213, 226, 228, 303, 323, 354, 427, 455, 458, 459, 460, 461, 467],
+      'long': [123, 184, 207, 223, 260, 401, 418, 441, 443, 462]
+    };
+    
+    // Variable pour stocker toutes les images
+    let allHommesImages = [];
+    let currentCategory = 'all';
+    
     // Charger depuis JSON statique (INSTANTANÉ)
     async function loadHommesCatalog() {
       const container = document.getElementById('hommesCatalog');
@@ -288,7 +309,56 @@
         hommesImages = loadDefaultHommesImages();
       }
       
-      displayHommesCatalog(hommesImages);
+      // Stocker toutes les images
+      allHommesImages = hommesImages;
+      
+      // Initialiser les filtres de catégorie
+      initCategoryFilters();
+      
+      // Afficher le catalogue avec le filtre actif
+      filterByCategory(currentCategory);
+    }
+    
+    // Initialiser les filtres de catégorie
+    function initCategoryFilters() {
+      const filterButtons = document.querySelectorAll('.category-filter-btn');
+      if (filterButtons.length === 0) return; // Attendre que les boutons soient dans le DOM
+      
+      filterButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+          // Retirer la classe active de tous les boutons
+          filterButtons.forEach(b => b.classList.remove('active'));
+          // Ajouter la classe active au bouton cliqué
+          this.classList.add('active');
+          // Filtrer par catégorie
+          currentCategory = this.getAttribute('data-category');
+          filterByCategory(currentCategory);
+        });
+      });
+    }
+    
+    // Filtrer les images par catégorie
+    function filterByCategory(category) {
+      let filteredImages = [];
+      
+      if (category === 'all') {
+        // Afficher toutes les images
+        filteredImages = allHommesImages;
+      } else {
+        // Filtrer par catégorie
+        const categoryNumbers = CATEGORIES[category] || [];
+        filteredImages = allHommesImages.filter(item => {
+          // Extraire le numéro de l'ID (homme_43 → 43)
+          const match = item.id.match(/homme_(\d+)/);
+          if (match) {
+            const number = parseInt(match[1]);
+            return categoryNumbers.includes(number);
+          }
+          return false;
+        });
+      }
+      
+      displayHommesCatalog(filteredImages);
     }
     
     // Charger IMMÉDIATEMENT au chargement de la page
@@ -316,10 +386,9 @@
     (function() {
       const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
       if (hommesImages.length > 0 && document.readyState !== 'loading') {
-        const container = document.getElementById('hommesCatalog');
-        if (container) {
-          displayHommesCatalog(hommesImages);
-        }
+        allHommesImages = hommesImages;
+        initCategoryFilters();
+        filterByCategory(currentCategory);
       }
     })();
     
@@ -342,7 +411,7 @@
         // Utiliser DocumentFragment pour optimiser le DOM
         const fragment = document.createDocumentFragment();
         
-        // Trier les images par numéro d'ID pour garantir l'ordre
+        // Trier les images par numéro d'ID pour garantir l'ordre (numérique)
         hommesImages.sort((a, b) => {
           const matchA = a.id.match(/homme_(\d+)/);
           const matchB = b.id.match(/homme_(\d+)/);
@@ -534,6 +603,60 @@
   </script>
 
   <style>
+    .category-filters {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 3rem;
+      padding: 0 2rem;
+    }
+
+    .category-filter-btn {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      color: var(--text-secondary);
+      padding: 0.75rem 2rem;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      white-space: nowrap;
+    }
+
+    .category-filter-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(32, 178, 170, 0.2);
+    }
+
+    .category-filter-btn.active {
+      background: linear-gradient(135deg, var(--primary) 0%, #1fa89a 100%);
+      border-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 20px rgba(32, 178, 170, 0.4);
+    }
+
+    .category-filter-btn.active:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(32, 178, 170, 0.5);
+    }
+
+    @media (max-width: 768px) {
+      .category-filters {
+        gap: 0.75rem;
+        padding: 0 1rem;
+      }
+
+      .category-filter-btn {
+        padding: 0.6rem 1.5rem;
+        font-size: 0.9rem;
+      }
+    }
+
     .booking-modal-content {
       max-width: 600px;
       max-height: 90vh;
