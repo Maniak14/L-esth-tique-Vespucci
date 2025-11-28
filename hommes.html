@@ -348,11 +348,16 @@
         // Filtrer par catégorie
         const categoryNumbers = CATEGORIES[category] || [];
         filteredImages = allHommesImages.filter(item => {
-          // Extraire le numéro de l'ID (homme_43 → 43)
+          // Extraire le numéro de l'ID (homme_44 → 44)
+          // Les numéros de catégorie sont les numéros des fichiers (43.png)
+          // Mais dans la base, c'est homme_44 (fichier 43.png = homme_44)
+          // Donc on doit comparer : numéro du fichier + 1 = ID dans la base
           const match = item.id.match(/homme_(\d+)/);
           if (match) {
-            const number = parseInt(match[1]);
-            return categoryNumbers.includes(number);
+            const dbId = parseInt(match[1]); // homme_44 → 44
+            // Vérifier si le numéro du fichier (dbId - 1) est dans la catégorie
+            const fileNumber = dbId - 1; // 44 - 1 = 43 (numéro du fichier)
+            return categoryNumbers.includes(fileNumber);
           }
           return false;
         });
@@ -421,15 +426,17 @@
         });
         
         hommesImages.forEach((item, index) => {
-          // Extraire le numéro de l'ID et soustraire 1 (homme_1 → Coupe 0, homme_2 → Coupe 1, etc.)
+          // Extraire le numéro de l'ID (homme_44 → 44) puis soustraire 1 pour obtenir le numéro du fichier (43.png → 43)
+          // Puis soustraire encore 1 pour l'affichage (43 → Coupe 42)
           const match = item.id.match(/homme_(\d+)/);
-          const number = match ? parseInt(match[1]) - 1 : index;
+          const fileNumber = match ? parseInt(match[1]) - 1 : index; // homme_44 → 43 (numéro du fichier)
+          const displayNumber = fileNumber - 1; // 43 → 42 (pour l'affichage "Coupe 42")
           
           const card = document.createElement('div');
           card.className = 'catalog-item';
           card.innerHTML = `
-            <img src="${item.url}" alt="Coupe Homme ${number}" loading="lazy">
-            <div class="catalog-label">Coupe ${number}</div>
+            <img src="${item.url}" alt="Coupe Homme ${displayNumber}" loading="lazy">
+            <div class="catalog-label">Coupe ${displayNumber}</div>
           `;
           fragment.appendChild(card);
         });
