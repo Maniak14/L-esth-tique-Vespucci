@@ -1006,10 +1006,17 @@
     const scrollToTopBtn = document.getElementById('scrollToTop');
     if (scrollToTopBtn) {
       function handleScrollToTop() {
+        // Cacher le bouton si on est en haut de la page (scrollY <= 300)
         if (window.pageYOffset > 300) {
           scrollToTopBtn.classList.add('visible');
+          // Retirer les styles inline pour permettre au CSS de fonctionner
+          scrollToTopBtn.style.opacity = '';
+          scrollToTopBtn.style.pointerEvents = '';
         } else {
           scrollToTopBtn.classList.remove('visible');
+          // S'assurer que le bouton est bien caché
+          scrollToTopBtn.style.opacity = '0';
+          scrollToTopBtn.style.pointerEvents = 'none';
         }
       }
 
@@ -1021,6 +1028,7 @@
       });
 
       window.addEventListener('scroll', handleScrollToTop, { passive: true });
+      // Vérifier l'état initial au chargement
       handleScrollToTop();
     }
 
