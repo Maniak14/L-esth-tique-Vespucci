@@ -1792,6 +1792,21 @@ section {
 
   .hero-visual {
     max-width: 100%;
+    transform: translateY(0);
+  }
+
+  .hero-visual-container {
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+
+  .hero-image-wrapper {
+    min-height: 300px;
+    flex: 1;
+  }
+
+  .hero-image {
+    min-height: 300px;
   }
 
   .floating-card {
@@ -1903,6 +1918,18 @@ section {
 
   .section-title {
     font-size: 2rem;
+  }
+
+  .hero-visual-container {
+    gap: 0.3rem;
+  }
+
+  .hero-image-wrapper {
+    min-height: 250px;
+  }
+
+  .hero-image {
+    min-height: 250px;
   }
 
   .service-card {
