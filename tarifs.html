@@ -384,7 +384,62 @@
     </div>
   </div>
 
-  <script src="assets/burger-menu.js" defer></script>
+  <script>
+    // Mobile Navigation Toggle - S'exécute immédiatement
+    (function() {
+      const burger = document.getElementById('burger');
+      const navbar = document.querySelector('.navbar');
+      const mobileCloseBtn = document.querySelector('.mobile-close-btn');
+      
+      if (!burger || !navbar) return;
+      
+      // Fonction pour ouvrir/fermer le menu
+      function toggleMenu() {
+        burger.classList.toggle('active');
+        navbar.classList.toggle('active');
+        document.body.style.overflow = navbar.classList.contains('active') ? 'hidden' : '';
+      }
+      
+      // Event listener pour le burger
+      burger.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleMenu();
+      });
+      
+      // Event listener pour le bouton de fermeture
+      if (mobileCloseBtn) {
+        mobileCloseBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          burger.classList.remove('active');
+          navbar.classList.remove('active');
+          document.body.style.overflow = '';
+        });
+      }
+      
+      // Fermer le menu quand on clique sur un lien
+      const navLinks = document.querySelectorAll('.nav-link');
+      navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          burger.classList.remove('active');
+          navbar.classList.remove('active');
+          document.body.style.overflow = '';
+        });
+      });
+      
+      // Fermer le menu quand on clique en dehors
+      document.addEventListener('click', function(e) {
+        if (navbar.classList.contains('active') && 
+            !navbar.contains(e.target) && 
+            !burger.contains(e.target)) {
+          burger.classList.remove('active');
+          navbar.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+    })();
+  </script>
   <script>
     // Navigation Toggle
     const navToggle = document.getElementById('navToggle');

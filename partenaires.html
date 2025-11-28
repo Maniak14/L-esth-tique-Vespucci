@@ -15,6 +15,140 @@
     }
     window.scrollTo(0, 0);
   </script>
+  <style>
+    /* Mobile Navigation Styles */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: rgba(10, 10, 15, 0.98);
+      backdrop-filter: blur(20px);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      padding: 2rem;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      overflow-y: auto;
+    }
+
+    .navbar.active {
+      transform: translateX(0);
+    }
+
+    .mobile-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 2rem;
+    }
+
+    .nav-links-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      flex: 1;
+    }
+
+    .nav-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      padding: 0.75rem 0;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--primary-light);
+    }
+
+    .mobile-close-btn {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      gap: 8px;
+    }
+
+    .mobile-close-btn span {
+      width: 25px;
+      height: 2px;
+      background: var(--text-primary);
+      transition: all 0.3s ease;
+    }
+
+    .mobile-close-btn span:first-child {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .mobile-close-btn span:last-child {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
+    .burger {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 40px;
+      height: 40px;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      z-index: 10000;
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 8px;
+      border: 1px solid var(--border);
+      pointer-events: auto;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .burger span {
+      width: 24px;
+      height: 2px;
+      background: var(--text-primary);
+      transition: all 0.3s ease;
+    }
+
+    .burger.active span:first-child {
+      transform: rotate(45deg) translate(6px, 6px);
+    }
+
+    .burger.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .burger.active span:last-child {
+      transform: rotate(-45deg) translate(6px, -6px);
+    }
+
+    @media (max-width: 768px) {
+      .burger {
+        display: flex;
+      }
+
+      .nav-toggle {
+        display: none;
+      }
+
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
 </head>
 <body>
   <!-- Animated Background -->
@@ -56,6 +190,29 @@
       </button>
     </div>
   </nav>
+
+  <!-- Mobile Navigation -->
+  <nav class="navbar">
+    <div class="mobile-title"></div>
+    <div class="nav-links-container">
+      <a href="index.html" class="nav-link">Accueil</a>
+      <a href="tarifs.html" class="nav-link">Tarifs</a>
+      <a href="femmes.html" class="nav-link">Femmes</a>
+      <a href="hommes.html" class="nav-link">Hommes</a>
+      <a href="partenaires.html" class="nav-link active">Partenaires</a>
+      <a href="index.html#faq" class="nav-link">F.A.Q</a>
+    </div>
+    <div class="mobile-close-btn">
+      <span></span>
+      <span></span>
+    </div>
+  </nav>
+
+  <div class="burger" id="burger">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
 
   <!-- Partners Section -->
   <section class="gallery-section" style="padding-top: 8rem; position: relative;">
@@ -184,7 +341,62 @@
     </div>
   </div>
 
-  <script src="assets/burger-menu.js" defer></script>
+  <script>
+    // Mobile Navigation Toggle - S'exécute immédiatement
+    (function() {
+      const burger = document.getElementById('burger');
+      const navbar = document.querySelector('.navbar');
+      const mobileCloseBtn = document.querySelector('.mobile-close-btn');
+      
+      if (!burger || !navbar) return;
+      
+      // Fonction pour ouvrir/fermer le menu
+      function toggleMenu() {
+        burger.classList.toggle('active');
+        navbar.classList.toggle('active');
+        document.body.style.overflow = navbar.classList.contains('active') ? 'hidden' : '';
+      }
+      
+      // Event listener pour le burger
+      burger.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleMenu();
+      });
+      
+      // Event listener pour le bouton de fermeture
+      if (mobileCloseBtn) {
+        mobileCloseBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          burger.classList.remove('active');
+          navbar.classList.remove('active');
+          document.body.style.overflow = '';
+        });
+      }
+      
+      // Fermer le menu quand on clique sur un lien
+      const navLinks = document.querySelectorAll('.nav-link');
+      navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          burger.classList.remove('active');
+          navbar.classList.remove('active');
+          document.body.style.overflow = '';
+        });
+      });
+      
+      // Fermer le menu quand on clique en dehors
+      document.addEventListener('click', function(e) {
+        if (navbar.classList.contains('active') && 
+            !navbar.contains(e.target) && 
+            !burger.contains(e.target)) {
+          burger.classList.remove('active');
+          navbar.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+    })();
+  </script>
   <script>
     // Navigation Toggle
     const navToggle = document.getElementById('navToggle');
