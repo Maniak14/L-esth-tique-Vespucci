@@ -673,12 +673,23 @@
       const fixedCTA = document.querySelector('.fixed-cta');
       const scrollToTopBtn = document.querySelector('.scroll-to-top');
       const footer = document.querySelector('.main-footer');
-      if (fixedCTA && footer) {
+      
+      if (fixedCTA) {
+        // Par défaut, le bouton est visible
+        let shouldHide = false;
+        
+        if (footer) {
         const footerTop = footer.offsetTop;
         const windowBottom = window.pageYOffset + window.innerHeight;
         const distanceToFooter = footerTop - windowBottom;
         
+          // Cacher seulement si on est très près du footer
         if (distanceToFooter < 150) {
+            shouldHide = true;
+          }
+        }
+        
+        if (shouldHide) {
           fixedCTA.style.opacity = '0';
           fixedCTA.style.pointerEvents = 'none';
           if (scrollToTopBtn) {
