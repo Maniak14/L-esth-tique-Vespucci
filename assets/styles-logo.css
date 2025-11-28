@@ -1801,12 +1801,12 @@ section {
   }
 
   .hero-image-wrapper {
-    min-height: 300px;
+    min-height: 200px;
     width: 100%;
   }
 
   .hero-image {
-    min-height: 300px;
+    min-height: 200px;
   }
 
   .floating-card {
@@ -1859,11 +1859,11 @@ section {
   }
 
   .hero {
-    padding: 8rem 1.5rem 3rem;
+    padding: 6rem 1.5rem 3rem;
   }
 
   .hero-badge {
-    margin-top: 1rem;
+    margin-top: 0.5rem;
   }
 
   .hero-cta {
@@ -1933,11 +1933,11 @@ section {
   }
 
   .hero-image-wrapper {
-    min-height: 250px;
+    min-height: 180px;
   }
 
   .hero-image {
-    min-height: 250px;
+    min-height: 180px;
   }
 
   .service-card {
