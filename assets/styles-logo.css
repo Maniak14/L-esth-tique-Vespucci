@@ -1792,7 +1792,13 @@ section {
 
   .hero-visual {
     max-width: 100%;
-    transform: translateY(-60px);
+    transform: translateY(0);
+    margin-top: 2rem;
+    order: 2;
+  }
+
+  .hero-content {
+    order: 1;
   }
 
   .hero-visual-container {
@@ -1928,7 +1934,8 @@ section {
   }
 
   .hero-visual {
-    transform: translateY(-50px);
+    transform: translateY(0);
+    margin-top: 1.5rem;
   }
 
   .hero-visual-container {
