@@ -196,7 +196,7 @@ body::-webkit-scrollbar {
   width: 100%;
   z-index: 1000;
   padding: 1.5rem 0;
-  background: rgba(10, 10, 15, 0.95);
+  background: rgba(10, 10, 15, 0.5);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
 }
@@ -325,7 +325,6 @@ body::-webkit-scrollbar {
   margin: 0 auto;
   z-index: 1;
   gap: 4rem;
-  background: var(--bg-dark);
 }
 
 .hero-content {
