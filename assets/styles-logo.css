@@ -493,6 +493,7 @@ body::-webkit-scrollbar {
 
 .hero-visual-container {
   display: flex;
+  flex-direction: row;
   gap: 3rem;
   width: 100%;
   position: relative;
