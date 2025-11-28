@@ -320,8 +320,18 @@
     const scrollToTopBtn = document.getElementById('scrollToTop');
     if (scrollToTopBtn) {
       function handleScrollToTop() {
-        // Cacher le bouton si on est en haut de la page (scrollY <= 300)
-        if (window.pageYOffset > 300) {
+        const footer = document.querySelector('.main-footer');
+        let nearFooter = false;
+        
+        // Vérifier si on est près du footer (même logique que handleFixedCTA)
+        if (footer) {
+          const footerTop = footer.getBoundingClientRect().top;
+          const windowHeight = window.innerHeight;
+          nearFooter = footerTop < windowHeight;
+        }
+        
+        // Cacher le bouton si on est en haut de la page OU près du footer
+        if (window.pageYOffset > 300 && !nearFooter) {
           scrollToTopBtn.classList.add('visible');
           // Retirer les styles inline pour permettre au CSS de fonctionner
           scrollToTopBtn.style.opacity = '';
