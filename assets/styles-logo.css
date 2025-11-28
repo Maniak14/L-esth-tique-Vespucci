@@ -1830,12 +1830,12 @@ section {
   .hero-image-wrapper {
     width: 342px;
     max-width: 100%;
-    min-height: 350px;
+    min-height: 200px;
     flex: none;
   }
 
   .hero-image {
-    min-height: 350px;
+    min-height: 200px;
     object-position: center 15%;
   }
 
