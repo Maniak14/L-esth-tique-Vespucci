@@ -1859,11 +1859,11 @@ section {
   }
 
   .hero {
-    padding: 10rem 1.5rem 3rem;
+    padding: 8rem 1.5rem 3rem;
   }
 
   .hero-badge {
-    margin-top: 2rem;
+    margin-top: 1rem;
   }
 
   .hero-cta {
