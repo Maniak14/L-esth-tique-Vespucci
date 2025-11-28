@@ -1617,7 +1617,7 @@ section {
     width: 45px;
     height: 45px;
     bottom: 1rem;
-    right: calc(1rem + 110px + 1rem);
+    right: calc(1rem + 90px);
   }
 
   .scroll-to-top svg {
