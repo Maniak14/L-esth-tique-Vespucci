@@ -553,11 +553,11 @@ body::-webkit-scrollbar {
 }
 
 .hero-image-wrapper-left .hero-image {
-  object-position: 10% center;
+  object-position: center 15%;
 }
 
 .hero-image-wrapper-right .hero-image {
-  object-position: center 20%;
+  object-position: center 15%;
   transform: scale(1.05);
 }
 
@@ -1823,16 +1823,20 @@ section {
 
   .hero-visual-container {
     flex-direction: column;
-    gap: 1rem;
+    align-items: center;
+    gap: 2rem;
   }
 
   .hero-image-wrapper {
-    min-height: 200px;
-    width: 100%;
+    width: 342px;
+    max-width: 100%;
+    min-height: 450px;
+    flex: none;
   }
 
   .hero-image {
-    min-height: 200px;
+    min-height: 450px;
+    object-position: center 15%;
   }
 
   .floating-card {
