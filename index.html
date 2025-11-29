@@ -25,26 +25,9 @@
     let firebaseInitialized = false;
     
     // Load images from localStorage (admin changes)
+    // Les images sont maintenant chargées uniquement depuis Firebase/localStorage
     function loadSavedImages() {
-      // Team images
-      const teamImages = {
-        'julio': 'https://i.goopics.net/pjtgz1.png',
-        'soren': 'https://i.goopics.net/8y3mgo.png',
-        'sun': 'https://i.goopics.net/t7adhn.png',
-        'inaya': 'https://i.goopics.net/zyg7y5.png',
-        'andres': 'https://i.goopics.net/xloucg.png',
-        'yoruhime': 'https://i.goopics.net/15utm9.png'
-      };
-      
-      // Gallery images
-      const galleryImages = {
-        'gallery1': 'https://i.goopics.net/x6ndav.png',
-        'gallery2': 'https://i.goopics.net/36r8hs.png',
-        'gallery3': 'https://i.goopics.net/tu7axw.png',
-        'gallery4': 'https://i.goopics.net/84cvti.png',
-        'gallery5': 'https://i.goopics.net/uh4ppc.png',
-        'gallery6': 'https://i.goopics.net/gu631x.png'
-      };
+      // Cette fonction est conservée pour compatibilité mais ne force plus d'images par défaut
       
       // Fonction pour appliquer les positions d'images
       function applyImagePositions() {
@@ -328,48 +311,26 @@
         const imageId = member.imageId || member.id;
         const savedImage = localStorage.getItem(`image_${imageId}`);
         
-        // Mapping des anciens IDs vers les images par défaut (pour compatibilité)
-        const defaultImages = {
-          'julio': 'https://i.goopics.net/pjtgz1.png',
-          'soren': 'https://i.goopics.net/8y3mgo.png',
-          'sun': 'https://i.goopics.net/t7adhn.png',
-          'inaya': 'https://i.goopics.net/zyg7y5.png',
-          'andres': 'https://i.goopics.net/xloucg.png',
-          'yoruhime': 'https://i.goopics.net/15utm9.png',
-          // Mapping par prénom pour les nouveaux IDs
-          'Julio': 'https://i.goopics.net/pjtgz1.png',
-          'Soren': 'https://i.goopics.net/8y3mgo.png',
-          'Sun': 'https://i.goopics.net/t7adhn.png',
-          'Inaya': 'https://i.goopics.net/zyg7y5.png',
-          'Andres': 'https://i.goopics.net/xloucg.png',
-          'Yoruhime': 'https://i.goopics.net/15utm9.png'
-        };
+        // Charger UNIQUEMENT depuis localStorage/Firebase (pas de valeurs par défaut hardcodées)
+        if (!savedImage) {
+          // Si pas d'image sauvegardée, ne pas afficher ce membre
+          console.log(`Image manquante pour ${imageId}, membre ignoré`);
+          return;
+        }
         
-        // Essayer d'abord l'image sauvegardée, puis par imageId, puis par prénom, puis défaut
-        const imageUrl = savedImage || 
-                        defaultImages[imageId] || 
-                        defaultImages[member.firstName] || 
-                        'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage%3C/text%3E%3C/svg%3E';
+        const imageUrl = savedImage;
         const fullName = `${member.firstName || ''} ${member.lastName || ''}`.trim() || 'Nouvel employé';
         
         const card = document.createElement('div');
         card.className = 'team-card';
         
-        // Get saved image position
+        // Get saved image position depuis localStorage/Firebase uniquement
         const savedPosition = localStorage.getItem(`image_position_${imageId}`);
-        const defaultPositions = {
-          'julio': 'center 35%',
-          'soren': 'center 8%',
-          'sun': 'center 3%',
-          'inaya': 'center 3%',
-          'andres': 'center 0%',
-          'yoruhime': 'center 18%'
-        };
-        const imagePosition = savedPosition || defaultPositions[imageId] || 'center 35%';
+        const imagePosition = savedPosition || 'center center';
         
         card.innerHTML = `
           <div class="team-image-wrapper">
-            <img src="${imageUrl}" alt="${fullName}" style="object-position: ${imagePosition};">
+            <img src="${imageUrl}" alt="${fullName}" data-image-id="${imageId}" style="object-position: ${imagePosition};">
             <div class="team-overlay">
               <div class="team-social">
                 <a>${member.phone || ''}</a>

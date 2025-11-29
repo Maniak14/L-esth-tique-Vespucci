@@ -926,6 +926,17 @@
     
     // Get image position (object-position)
     function getImagePosition(imageId) {
+      // Check if it's a hero image (hero1 or hero2)
+      if (imageId === 'hero1' || imageId === 'hero2') {
+        const heroIndex = imageId === 'hero1' ? '1' : '2';
+        // Try both formats for compatibility
+        const saved = localStorage.getItem(`image_position_hero${heroIndex}`) || localStorage.getItem(`image_position_${imageId}`);
+        if (saved) {
+          return saved;
+        }
+        return 'center center';
+      }
+      
       const saved = localStorage.getItem(`image_position_${imageId}`);
       if (saved) {
         return saved;
@@ -944,10 +955,23 @@
     
     // Save image position
     function saveImagePosition(imageId, position) {
-      localStorage.setItem(`image_position_${imageId}`, position);
-      if (firebaseInitialized && typeof savePositionToFirebase === 'function') {
-        savePositionToFirebase(imageId, position);
+      // Check if it's a hero image (hero1 or hero2)
+      if (imageId === 'hero1' || imageId === 'hero2') {
+        const heroIndex = imageId === 'hero1' ? '1' : '2';
+        // Save with both formats for compatibility
+        localStorage.setItem(`image_position_hero${heroIndex}`, position); // For index.html
+        localStorage.setItem(`image_position_${imageId}`, position); // For admin
+        // Save to Firebase with the hero index format
+        if (firebaseInitialized && typeof savePositionToFirebase === 'function') {
+          savePositionToFirebase(`hero${heroIndex}`, position);
+        }
+      } else {
+        localStorage.setItem(`image_position_${imageId}`, position);
+        if (firebaseInitialized && typeof savePositionToFirebase === 'function') {
+          savePositionToFirebase(imageId, position);
+        }
       }
+      
       // Update preview
       const previewImg = document.querySelector(`#preview_${imageId}`);
       if (previewImg) {
