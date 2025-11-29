@@ -494,6 +494,7 @@ body::-webkit-scrollbar {
   pointer-events: none;
   margin-top: 2rem;
   margin-bottom: 2rem;
+  will-change: auto;
 }
 
 .hero-visual-container {
@@ -515,6 +516,7 @@ body::-webkit-scrollbar {
   transition: none;
   cursor: pointer;
   pointer-events: auto;
+  will-change: auto;
 }
 
 .hero-image-wrapper:hover {

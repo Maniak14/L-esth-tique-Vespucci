@@ -1159,19 +1159,19 @@
       });
     });
 
-    // Parallax Effect
-    function updateParallax() {
-      const scrolled = window.pageYOffset || window.scrollY || 0;
-      const heroVisual = document.querySelector('.hero-visual');
-      if (heroVisual) {
-        heroVisual.style.transform = `translateY(${-35 + scrolled * 0.3}px)`;
-      }
-    }
+    // Parallax Effect - Désactivé pour garder les images fixes
+    // function updateParallax() {
+    //   const scrolled = window.pageYOffset || window.scrollY || 0;
+    //   const heroVisual = document.querySelector('.hero-visual');
+    //   if (heroVisual) {
+    //     heroVisual.style.transform = `translateY(${-35 + scrolled * 0.3}px)`;
+    //   }
+    // }
     
     // Initialize parallax on load
-    updateParallax();
+    // updateParallax();
     
-    window.addEventListener('scroll', updateParallax, { passive: true });
+    // window.addEventListener('scroll', updateParallax, { passive: true });
 
     // Hide fixed CTA button near footer
     function handleFixedCTA() {
