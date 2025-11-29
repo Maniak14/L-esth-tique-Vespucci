@@ -9,6 +9,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="firebase-db.js"></script>
   <script>
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual';
@@ -216,51 +220,8 @@
       </p>
     </div>
 
-    <div class="partners-grid-premium">
-      <div class="partner-card premium-partner">
-        <div class="partner-badge">Partenaire Officiel</div>
-        <div class="partner-glow"></div>
-        <div class="partner-image-wrapper">
-          <img src="img/auto_exo.webp" alt="Auto Exótic" class="partner-image">
-        </div>
-        <h3 class="partner-name">Auto Exótic</h3>
-      </div>
-
-      <div class="partner-card premium-partner">
-        <div class="partner-badge">Partenaire Officiel</div>
-        <div class="partner-glow"></div>
-        <div class="partner-image-wrapper">
-          <img src="img/ltd.webp" alt="LTD SandyShore" class="partner-image">
-        </div>
-        <h3 class="partner-name">LTD SandyShore</h3>
-      </div>
-
-      <div class="partner-card premium-partner">
-        <div class="partner-badge">Partenaire Officiel</div>
-        <div class="partner-glow"></div>
-        <div class="partner-image-wrapper">
-          <img src="img/hen.png" alt="Hen House" class="partner-image">
-        </div>
-        <h3 class="partner-name">Hen House</h3>
-      </div>
-
-      <div class="partner-card premium-partner">
-        <div class="partner-badge">Partenaire Officiel</div>
-        <div class="partner-glow"></div>
-        <div class="partner-image-wrapper">
-          <img src="img/delight.png" alt="Delight" class="partner-image">
-        </div>
-        <h3 class="partner-name">Delight</h3>
-      </div>
-
-      <div class="partner-card premium-partner">
-        <div class="partner-badge">Partenaire Officiel</div>
-        <div class="partner-glow"></div>
-        <div class="partner-image-wrapper">
-          <img src="img/life.png" alt="Life Invader" class="partner-image">
-        </div>
-        <h3 class="partner-name">Life Invader</h3>
-      </div>
+    <div class="partners-grid-premium" id="partnersGrid">
+      <!-- Les partenaires seront chargés dynamiquement ici -->
     </div>
   </section>
 
@@ -1049,6 +1010,92 @@
       }
     }
   </style>
+  
+  <script>
+    // Partenaires par défaut
+    const DEFAULT_PARTENAIRES = [
+      { id: 'auto_exo', name: 'Auto Exótic', image: 'img/auto_exo.webp' },
+      { id: 'ltd', name: 'LTD SandyShore', image: 'img/ltd.webp' },
+      { id: 'hen', name: 'Hen House', image: 'img/hen.png' },
+      { id: 'delight', name: 'Delight', image: 'img/delight.png' },
+      { id: 'life', name: 'Life Invader', image: 'img/life.png' }
+    ];
+    
+    // Charger les partenaires (optimisé pour performance)
+    function loadPartenaires() {
+      const partnersGrid = document.getElementById('partnersGrid');
+      if (!partnersGrid) return;
+      
+      // Charger depuis le cache localStorage (INSTANTANÉ)
+      let partenaires = JSON.parse(localStorage.getItem('partenaires') || '[]');
+      
+      // Si cache vide, utiliser les partenaires par défaut
+      if (partenaires.length === 0) {
+        partenaires = DEFAULT_PARTENAIRES;
+        localStorage.setItem('partenaires', JSON.stringify(partenaires));
+      }
+      
+      // Utiliser requestAnimationFrame pour un rendu fluide
+      requestAnimationFrame(() => {
+        // Utiliser DocumentFragment pour optimiser le DOM
+        const fragment = document.createDocumentFragment();
+        
+        partenaires.forEach((partner, index) => {
+          const card = document.createElement('div');
+          card.className = 'partner-card premium-partner';
+          card.style.animationDelay = `${(index + 1) * 0.1}s`;
+          card.innerHTML = `
+            <div class="partner-badge">Partenaire Officiel</div>
+            <div class="partner-glow"></div>
+            <div class="partner-image-wrapper">
+              <img src="${partner.image}" alt="${partner.name}" class="partner-image" loading="lazy">
+            </div>
+            <h3 class="partner-name">${partner.name}</h3>
+          `;
+          fragment.appendChild(card);
+        });
+        
+        partnersGrid.innerHTML = '';
+        partnersGrid.appendChild(fragment);
+      });
+    }
+    
+    // Charger IMMÉDIATEMENT au chargement de la page
+    document.addEventListener('DOMContentLoaded', () => {
+      // Charger instantanément depuis le cache
+      loadPartenaires();
+      
+      // Initialiser Firebase en arrière-plan pour synchronisation
+      if (initFirebaseDB && typeof initFirebaseDB === 'function') {
+        const initialized = initFirebaseDB();
+        if (initialized && typeof firebaseFirestore !== 'undefined') {
+          // Charger toutes les données depuis Firebase en premier
+          if (typeof loadAllDataFromFirebase === 'function') {
+            loadAllDataFromFirebase().then(() => {
+              // Réafficher avec les données Firebase
+              loadPartenaires();
+            });
+          }
+          
+          // Écouter les changements de partenaires en temps réel
+          if (typeof watchPartenaires === 'function') {
+            watchPartenaires((partenaires) => {
+              console.log('Partenaires mis à jour depuis Firebase');
+              loadPartenaires();
+            });
+          }
+        }
+      }
+    });
+    
+    // Afficher immédiatement depuis le cache si disponible
+    (function() {
+      const partenaires = JSON.parse(localStorage.getItem('partenaires') || '[]');
+      if (partenaires.length > 0 && document.readyState !== 'loading') {
+        loadPartenaires();
+      }
+    })();
+  </script>
 </body>
 </html>
 

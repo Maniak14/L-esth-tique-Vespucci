@@ -451,8 +451,75 @@ async function loadAllDataFromFirebase() {
       }
     }
     
+    // Charger partenaires
+    const partenairesDoc = await db.collection('data').doc('partenaires').get();
+    if (partenairesDoc.exists) {
+      const data = partenairesDoc.data();
+      if (data.partenaires) {
+        localStorage.setItem('partenaires', JSON.stringify(data.partenaires));
+      }
+    }
+    
     console.log('Toutes les données ont été chargées depuis Firestore');
   } catch (error) {
     console.error('Erreur chargement données Firestore:', error);
+  }
+}
+
+// ========== PARTENAIRES ==========
+
+// Sauvegarder les partenaires dans Firestore
+function savePartenairesToFirebase(partenaires) {
+  if (!window.firebaseInitialized || !db) return;
+  
+  try {
+    db.collection('data').doc('partenaires').set({
+      partenaires: partenaires,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (error) {
+    console.error('Erreur sauvegarde partenaires:', error);
+  }
+}
+
+// Charger les partenaires depuis Firestore
+function loadPartenairesFromFirebase(callback) {
+  if (!window.firebaseInitialized || !db) {
+    if (callback) callback([]);
+    return;
+  }
+  
+  try {
+    db.collection('data').doc('partenaires').get().then((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        const partenaires = data.partenaires || [];
+        localStorage.setItem('partenaires', JSON.stringify(partenaires));
+        if (callback) callback(partenaires);
+      } else {
+        if (callback) callback([]);
+      }
+    });
+  } catch (error) {
+    console.error('Erreur chargement partenaires:', error);
+    if (callback) callback([]);
+  }
+}
+
+// Écouter les changements de partenaires en temps réel
+function watchPartenaires(callback) {
+  if (!window.firebaseInitialized || !db) return;
+  
+  try {
+    db.collection('data').doc('partenaires').onSnapshot((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        const partenaires = data.partenaires || [];
+        localStorage.setItem('partenaires', JSON.stringify(partenaires));
+        if (callback) callback(partenaires);
+      }
+    });
+  } catch (error) {
+    console.error('Erreur watch partenaires:', error);
   }
 }

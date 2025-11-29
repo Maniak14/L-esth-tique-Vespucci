@@ -689,6 +689,28 @@
       </div>
     </div>
 
+    <!-- Partenaires Section -->
+    <div class="admin-section">
+      <h2>Partenaires</h2>
+      <div class="image-grid" id="partenairesList">
+        <!-- Partenaires will be loaded here -->
+      </div>
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+        <div class="add-image-btn" onclick="addNewPartenaire()" title="Ajouter un nouveau partenaire">
+          <div>+</div>
+          <span>Ajouter un partenaire</span>
+        </div>
+        <button class="btn-small" onclick="exportPartenairesData()" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e;">📥 Exporter les données</button>
+      </div>
+      <div id="partenairesExportResult" style="display: none; margin-top: 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h3 style="color: var(--text-primary); font-size: 1.1rem; margin: 0;">📋 Données exportées (copiez ceci) :</h3>
+          <button onclick="copyPartenairesExport()" class="btn-small" style="background: var(--primary); color: white;">📋 Copier</button>
+        </div>
+        <textarea id="partenairesExportData" readonly style="width: 100%; min-height: 200px; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-family: monospace; font-size: 0.85rem; resize: vertical;"></textarea>
+      </div>
+    </div>
+
     <!-- Hommes Catalog Section -->
     <div class="admin-section">
       <h2>Catalogue Hommes</h2>
@@ -824,6 +846,9 @@
             if (typeof loadHommesCatalog === 'function') {
               loadHommesCatalog();
             }
+            if (typeof loadPartenaires === 'function') {
+              loadPartenaires();
+            }
           });
           watchPositions(() => {
             console.log('Positions mises à jour depuis Firebase');
@@ -846,6 +871,14 @@
               loadTeamMembers();
             }
           });
+          if (typeof watchPartenaires === 'function') {
+            watchPartenaires(() => {
+              console.log('Partenaires mis à jour depuis Firebase');
+              if (typeof loadPartenaires === 'function') {
+                loadPartenaires();
+              }
+            });
+          }
         }
       }
     });
@@ -1968,6 +2001,157 @@
       }, 1000);
     }
     
+    // ========== PARTENAIRES ==========
+    
+    // Charger les partenaires
+    function loadPartenaires() {
+      const container = document.getElementById('partenairesList');
+      if (!container) return;
+      
+      container.innerHTML = '';
+      
+      let partenaires = JSON.parse(localStorage.getItem('partenaires') || '[]');
+      
+      if (partenaires.length === 0) {
+        partenaires = [
+          { id: 'auto_exo', name: 'Auto Exótic', image: 'img/auto_exo.webp' },
+          { id: 'ltd', name: 'LTD SandyShore', image: 'img/ltd.webp' },
+          { id: 'hen', name: 'Hen House', image: 'img/hen.png' },
+          { id: 'delight', name: 'Delight', image: 'img/delight.png' },
+          { id: 'life', name: 'Life Invader', image: 'img/life.png' }
+        ];
+        localStorage.setItem('partenaires', JSON.stringify(partenaires));
+        if (firebaseInitialized && typeof savePartenairesToFirebase === 'function') {
+          savePartenairesToFirebase(partenaires);
+        }
+      }
+      
+      partenaires.forEach(partner => {
+        const item = document.createElement('div');
+        item.className = 'image-item';
+        item.dataset.partnerId = partner.id;
+        item.innerHTML = `
+          <button class="delete-image-btn" onclick="deletePartenaire('${partner.id}')" title="Supprimer">×</button>
+          <img src="${partner.image}" alt="${partner.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage%3C/text%3E%3C/svg%3E'">
+          <div class="image-label">${partner.name}</div>
+          <input type="text" class="input-url" placeholder="Nom du partenaire" value="${partner.name}" onchange="updatePartenaireName('${partner.id}', this.value)">
+          <input type="text" class="input-url" placeholder="URL de l'image" value="${partner.image}" onchange="updatePartenaireImage('${partner.id}', this.value)">
+          <button class="btn-small" onclick="updatePartenaire('${partner.id}')">Mettre à jour</button>
+        `;
+        container.appendChild(item);
+      });
+    }
+    
+    // Ajouter un nouveau partenaire
+    window.addNewPartenaire = function() {
+      const newId = 'partenaire_' + Date.now();
+      const newPartner = {
+        id: newId,
+        name: 'Nouveau Partenaire',
+        image: ''
+      };
+      
+      let partenaires = JSON.parse(localStorage.getItem('partenaires') || '[]');
+      partenaires.push(newPartner);
+      localStorage.setItem('partenaires', JSON.stringify(partenaires));
+      
+      if (firebaseInitialized && typeof savePartenairesToFirebase === 'function') {
+        savePartenairesToFirebase(partenaires);
+      }
+      
+      loadPartenaires();
+    };
+    
+    // Mettre à jour un partenaire
+    window.updatePartenaire = function(partnerId) {
+      const item = document.querySelector(`[data-partner-id="${partnerId}"]`);
+      if (!item) return;
+      
+      const nameInput = item.querySelector('input[placeholder="Nom du partenaire"]');
+      const imageInput = item.querySelector('input[placeholder="URL de l\'image"]');
+      
+      const name = nameInput.value.trim();
+      const image = imageInput.value.trim();
+      
+      if (!name || !image) {
+        alert('Veuillez remplir tous les champs');
+        return;
+      }
+      
+      let partenaires = JSON.parse(localStorage.getItem('partenaires') || '[]');
+      const index = partenaires.findIndex(p => p.id === partnerId);
+      
+      if (index !== -1) {
+        partenaires[index].name = name;
+        partenaires[index].image = image;
+        localStorage.setItem('partenaires', JSON.stringify(partenaires));
+        
+        if (firebaseInitialized && typeof savePartenairesToFirebase === 'function') {
+          savePartenairesToFirebase(partenaires);
+        }
+        
+        loadPartenaires();
+      }
+    };
+    
+    // Mettre à jour le nom d'un partenaire
+    window.updatePartenaireName = function(partnerId, name) {
+      let partenaires = JSON.parse(localStorage.getItem('partenaires') || '[]');
+      const index = partenaires.findIndex(p => p.id === partnerId);
+      if (index !== -1) {
+        partenaires[index].name = name;
+        localStorage.setItem('partenaires', JSON.stringify(partenaires));
+      }
+    };
+    
+    // Mettre à jour l'image d'un partenaire
+    window.updatePartenaireImage = function(partnerId, image) {
+      let partenaires = JSON.parse(localStorage.getItem('partenaires') || '[]');
+      const index = partenaires.findIndex(p => p.id === partnerId);
+      if (index !== -1) {
+        partenaires[index].image = image;
+        localStorage.setItem('partenaires', JSON.stringify(partenaires));
+      }
+    };
+    
+    // Supprimer un partenaire
+    window.deletePartenaire = function(partnerId) {
+      if (confirm('Êtes-vous sûr de vouloir supprimer ce partenaire ?')) {
+        let partenaires = JSON.parse(localStorage.getItem('partenaires') || '[]');
+        partenaires = partenaires.filter(p => p.id !== partnerId);
+        localStorage.setItem('partenaires', JSON.stringify(partenaires));
+        
+        if (firebaseInitialized && typeof savePartenairesToFirebase === 'function') {
+          savePartenairesToFirebase(partenaires);
+        }
+        
+        loadPartenaires();
+      }
+    };
+    
+    // Exporter les données des partenaires
+    window.exportPartenairesData = function() {
+      const partenaires = JSON.parse(localStorage.getItem('partenaires') || '[]');
+      const exportData = JSON.stringify(partenaires, null, 2);
+      const resultDiv = document.getElementById('partenairesExportResult');
+      const textarea = document.getElementById('partenairesExportData');
+      
+      if (resultDiv && textarea) {
+        textarea.value = exportData;
+        resultDiv.style.display = 'block';
+      }
+    };
+    
+    // Copier l'export des partenaires
+    window.copyPartenairesExport = function() {
+      const textarea = document.getElementById('partenairesExportData');
+      if (textarea) {
+        textarea.select();
+        document.execCommand('copy');
+        alert('Données copiées dans le presse-papiers !');
+      }
+    };
+    
     // Déconnexion (optionnel - vous pouvez ajouter un bouton de déconnexion)
     function logout() {
       if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
@@ -2050,6 +2234,9 @@
       
       // Load hommes catalog
       loadHommesCatalog();
+      
+      // Load partenaires
+      loadPartenaires();
     }
 
     // Initialize on load
