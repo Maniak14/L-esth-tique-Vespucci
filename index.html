@@ -143,6 +143,7 @@
               watchTeamMembers(() => {
                 console.log('Membres de l\'équipe mis à jour depuis Firebase');
                 loadTeamMembersFromJSON();
+                loadTeamContacts(); // Mettre à jour aussi les contacts dans le modal
                 applyImagePositions();
               });
             }
@@ -1085,63 +1086,79 @@
     const closeBookingModal = document.getElementById('closeBookingModal');
     const closeReviewModal = document.getElementById('closeReviewModal');
 
-    // Charger les contacts des employés dans le modal
+    // Charger les contacts des employés dans le modal depuis Firebase/localStorage
     async function loadTeamContacts() {
       const teamContactsDiv = document.getElementById('teamContacts');
       if (!teamContactsDiv) return;
       
-      try {
-        const response = await fetch('team-members.json');
-        if (response.ok) {
-          const data = await response.json();
-          if (data.team_members && Array.isArray(data.team_members)) {
-            teamContactsDiv.innerHTML = '';
-            data.team_members.forEach(member => {
-              if (member.phone) {
-                const fullName = `${member.firstName || ''} ${member.lastName || ''}`.trim();
-                const phone = member.phone.trim();
-                const contactCard = document.createElement('div');
-                contactCard.className = 'contact-card';
-                contactCard.innerHTML = `
-                  <div class="contact-info">
-                    <div class="contact-name">${fullName || 'Employé'}</div>
-                    <div class="contact-grade">${member.grade || ''}</div>
-                  </div>
-                  <a href="#" class="contact-phone-button" data-phone="${phone}">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 0.5rem;">
-                      <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-                    </svg>
-                    ${phone}
-                  </a>
-                `;
-                teamContactsDiv.appendChild(contactCard);
-                
-                // Ajouter le gestionnaire d'événement pour copier le numéro
-                const phoneButton = contactCard.querySelector('.contact-phone-button');
-                phoneButton.addEventListener('click', function(e) {
-                  e.preventDefault();
-                  const phoneNumber = this.getAttribute('data-phone');
-                  if (phoneNumber) {
-                    navigator.clipboard.writeText(phoneNumber).then(() => {
-                      const originalText = this.innerHTML;
-                      this.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 0.5rem;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Copié !';
-                      this.style.background = 'var(--primary)';
-                      setTimeout(() => {
-                        this.innerHTML = originalText;
-                        this.style.background = '';
-                      }, 2000);
-                    }).catch(() => {
-                      alert('Numéro: ' + phoneNumber);
-                    });
-                  }
-                });
-              }
-            });
+      // Charger D'ABORD depuis localStorage/Firebase (priorité à la base de données)
+      let teamMembers = JSON.parse(localStorage.getItem('team_members') || '[]');
+      
+      // Si pas de données dans localStorage, essayer le JSON statique en fallback
+      if (teamMembers.length === 0) {
+        try {
+          const response = await fetch('team-members.json');
+          if (response.ok) {
+            const data = await response.json();
+            if (data.team_members && Array.isArray(data.team_members)) {
+              teamMembers = data.team_members;
+              // Sauvegarder dans localStorage pour la prochaine fois
+              localStorage.setItem('team_members', JSON.stringify(teamMembers));
+            }
           }
+        } catch (error) {
+          console.log('team-members.json non disponible');
         }
-      } catch (error) {
-        console.log('Erreur chargement contacts');
       }
+      
+      // Get deleted members
+      const deletedMembers = JSON.parse(localStorage.getItem('deleted_team_members') || '[]');
+      
+      // Filtrer les membres supprimés
+      const allMembers = teamMembers.filter(m => !deletedMembers.includes(m.id));
+      
+      teamContactsDiv.innerHTML = '';
+      allMembers.forEach(member => {
+        if (member.phone) {
+          const fullName = `${member.firstName || ''} ${member.lastName || ''}`.trim();
+          const phone = member.phone.trim();
+          const contactCard = document.createElement('div');
+          contactCard.className = 'contact-card';
+          contactCard.innerHTML = `
+            <div class="contact-info">
+              <div class="contact-name">${fullName || 'Employé'}</div>
+              <div class="contact-grade">${member.grade || ''}</div>
+            </div>
+            <a href="#" class="contact-phone-button" data-phone="${phone}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 0.5rem;">
+                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+              </svg>
+              ${phone}
+            </a>
+          `;
+          teamContactsDiv.appendChild(contactCard);
+          
+          // Ajouter le gestionnaire d'événement pour copier le numéro
+          const phoneButton = contactCard.querySelector('.contact-phone-button');
+          phoneButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            const phoneNumber = this.getAttribute('data-phone');
+            if (phoneNumber) {
+              navigator.clipboard.writeText(phoneNumber).then(() => {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 0.5rem;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Copié !';
+                this.style.background = 'var(--primary)';
+                setTimeout(() => {
+                  this.innerHTML = originalText;
+                  this.style.background = '';
+                }, 2000);
+              }).catch(() => {
+                alert('Numéro: ' + phoneNumber);
+              });
+            }
+          });
+        }
+      });
     }
     
     function openModal(modal) {
