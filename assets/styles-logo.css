@@ -486,15 +486,11 @@ body::-webkit-scrollbar {
 .hero-visual {
   flex: 1;
   max-width: 1000px;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: relative;
   z-index: 1;
   pointer-events: none;
   margin-top: 2rem;
   margin-bottom: 2rem;
-  will-change: auto;
 }
 
 .hero-visual-container {
@@ -1827,13 +1823,10 @@ section {
 
   .hero-visual {
     max-width: 100%;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    margin-top: 0;
-    width: 90%;
-    max-width: 400px;
+    position: relative;
+    transform: none;
+    margin-top: 1rem;
+    width: 100%;
   }
 
   .hero-visual-container {
@@ -1972,13 +1965,10 @@ section {
   }
 
   .hero-visual {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    margin-top: 0;
-    width: 90%;
-    max-width: 400px;
+    position: relative;
+    transform: none;
+    margin-top: 1rem;
+    width: 100%;
   }
 
   .hero-visual-container {
