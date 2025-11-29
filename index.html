@@ -53,7 +53,7 @@
       
       // Initialize Firebase and load team members
       document.addEventListener('DOMContentLoaded', async () => {
-        // Charger DIRECTEMENT depuis les JSON statiques (INSTANTANÉ)
+        // Charger DIRECTEMENT depuis localStorage/Firebase (priorité à la DB)
         await loadTeamMembersFromJSON();
         await updateGalleryImagesFromJSON();
         
@@ -277,27 +277,29 @@
     
     loadSavedImages();
     
-    // Charger DIRECTEMENT depuis team-members.json
+    // Charger DIRECTEMENT depuis Firebase/localStorage (priorité à la DB)
     async function loadTeamMembersFromJSON() {
       const teamGrid = document.getElementById('teamGrid');
       if (!teamGrid) return;
       
-      let teamMembers = [];
-      try {
-        const teamResponse = await fetch('team-members.json');
-        if (teamResponse.ok) {
-          const teamData = await teamResponse.json();
-          if (teamData.team_members && Array.isArray(teamData.team_members)) {
-            teamMembers = teamData.team_members;
-          }
-        }
-      } catch (error) {
-        console.log('team-members.json non disponible');
-      }
+      // Charger D'ABORD depuis localStorage/Firebase (priorité à la base de données)
+      let teamMembers = JSON.parse(localStorage.getItem('team_members') || '[]');
       
-      // Si pas de données JSON, utiliser localStorage en fallback
+      // Si pas de données dans localStorage, essayer le JSON statique en fallback
       if (teamMembers.length === 0) {
-        teamMembers = JSON.parse(localStorage.getItem('team_members') || '[]');
+        try {
+          const teamResponse = await fetch('team-members.json');
+          if (teamResponse.ok) {
+            const teamData = await teamResponse.json();
+            if (teamData.team_members && Array.isArray(teamData.team_members)) {
+              teamMembers = teamData.team_members;
+              // Sauvegarder dans localStorage pour la prochaine fois
+              localStorage.setItem('team_members', JSON.stringify(teamMembers));
+            }
+          }
+        } catch (error) {
+          console.log('team-members.json non disponible');
+        }
       }
       // Get deleted members
       const deletedMembers = JSON.parse(localStorage.getItem('deleted_team_members') || '[]');
