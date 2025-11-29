@@ -168,6 +168,9 @@
                   const saved = localStorage.getItem('image_map');
                   if (saved) mapImg.src = saved;
                 }
+                
+                // Appliquer les positions de galerie après mise à jour
+                applyImagePositions();
               });
             }
             
