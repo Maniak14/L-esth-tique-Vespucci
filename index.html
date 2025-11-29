@@ -42,11 +42,32 @@
           }
         });
         
-        // Positions pour les images hero (si nécessaire)
+        // Positions pour les images hero
         document.querySelectorAll('.hero-image').forEach((img, index) => {
           const position = localStorage.getItem(`image_position_hero${index + 1}`);
           if (position) {
             img.style.objectPosition = position;
+          }
+        });
+        
+        // Positions pour les images de galerie
+        document.querySelectorAll('.gallery-item img').forEach(img => {
+          const imageId = img.getAttribute('data-image-id');
+          if (imageId) {
+            const position = localStorage.getItem(`image_position_${imageId}`);
+            if (position) {
+              img.style.objectPosition = position;
+            }
+          } else {
+            // Pour les images sans data-image-id, essayer avec l'index (gallery1-6)
+            const galleryItems = Array.from(document.querySelectorAll('.gallery-item img'));
+            const index = galleryItems.indexOf(img);
+            if (index < 6) {
+              const position = localStorage.getItem(`image_position_gallery${index + 1}`);
+              if (position) {
+                img.style.objectPosition = position;
+              }
+            }
           }
         });
       }
@@ -67,6 +88,12 @@
           } else {
             // Si pas d'image sauvegardée, ne pas modifier (garder l'image par défaut du HTML)
             console.log(`Image hero ${index + 1} non trouvée dans la base de données`);
+          }
+          
+          // Appliquer la position immédiatement après le chargement de l'image
+          const position = localStorage.getItem(`image_position_hero${index + 1}`);
+          if (position) {
+            img.style.objectPosition = position;
           }
         });
         
@@ -97,6 +124,12 @@
                   if (saved) {
                     img.src = saved;
                   }
+                  
+                  // Appliquer la position après mise à jour de l'image
+                  const position = localStorage.getItem(`image_position_hero${index + 1}`);
+                  if (position) {
+                    img.style.objectPosition = position;
+                  }
                 });
                 
                 // Mettre à jour map image
@@ -115,10 +148,18 @@
                 updateGalleryImagesFromJSON();
                 
                 // Mettre à jour hero images (uniquement depuis Firebase/localStorage)
+                const heroImgs = document.querySelectorAll('.hero-image');
                 heroImgs.forEach((img, index) => {
                   const saved = localStorage.getItem(`image_hero${index + 1}`);
                   if (saved) {
                     img.src = saved;
+                  }
+                  
+                  // Appliquer la position après mise à jour de l'image
+                  const position = localStorage.getItem(`image_position_hero${index + 1}`);
+                  if (position) {
+                    img.style.objectPosition = position;
+                    console.log(`Position hero ${index + 1} appliquée: ${position}`);
                   }
                 });
                 
@@ -135,6 +176,28 @@
               watchPositions(() => {
                 console.log('Positions mises à jour depuis Firebase');
                 applyImagePositions();
+                
+                // Forcer la mise à jour des positions hero explicitement
+                const heroImgs = document.querySelectorAll('.hero-image');
+                heroImgs.forEach((img, index) => {
+                  const position = localStorage.getItem(`image_position_hero${index + 1}`);
+                  if (position) {
+                    img.style.objectPosition = position;
+                    console.log(`Position hero ${index + 1} appliquée: ${position}`);
+                  }
+                });
+                
+                // Forcer la mise à jour des positions galerie explicitement
+                document.querySelectorAll('.gallery-item img').forEach((img) => {
+                  const imageId = img.getAttribute('data-image-id');
+                  if (imageId) {
+                    const position = localStorage.getItem(`image_position_${imageId}`);
+                    if (position) {
+                      img.style.objectPosition = position;
+                      console.log(`Position galerie ${imageId} appliquée: ${position}`);
+                    }
+                  }
+                });
               });
             }
             
@@ -212,8 +275,30 @@
         allGalleryImages.forEach((imageUrl, index) => {
           const item = document.createElement('div');
           item.className = 'gallery-item';
+          
+          // Déterminer l'ID de l'image pour la position
+          let imageId = null;
+          if (index < 6) {
+            // Images gallery1-6
+            imageId = `gallery${index + 1}`;
+          } else {
+            // Images personnalisées - essayer de trouver l'ID depuis customImages
+            const customIndex = index - 6;
+            if (customImages[customIndex]) {
+              if (typeof customImages[customIndex] === 'string') {
+                imageId = customImages[customIndex];
+              } else if (customImages[customIndex].id) {
+                imageId = customImages[customIndex].id;
+              }
+            }
+          }
+          
+          // Récupérer la position depuis localStorage
+          const position = imageId ? localStorage.getItem(`image_position_${imageId}`) : null;
+          const positionStyle = position ? `style="object-position: ${position};"` : '';
+          
           item.innerHTML = `
-            <img src="${imageUrl}" alt="Réalisation ${index + 1}" loading="lazy">
+            <img src="${imageUrl}" alt="Réalisation ${index + 1}" loading="lazy" ${imageId ? `data-image-id="${imageId}"` : ''} ${positionStyle}>
             <div class="gallery-overlay">
               <span>Voir plus</span>
             </div>
@@ -232,9 +317,11 @@
           galleryTrack.appendChild(clone);
         });
         
-        // Re-attach lightbox events
+        // Re-attach lightbox events et appliquer les positions
         requestAnimationFrame(() => {
           attachGalleryLightboxEvents();
+          // Appliquer les positions après le rendu
+          applyImagePositions();
         });
       });
     }
