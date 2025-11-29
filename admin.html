@@ -1186,7 +1186,7 @@
   <!-- Navigation -->
   <nav class="main-nav">
     <div class="nav-container">
-      <a href="accueil.html" class="logo">
+      <a href="index.html" class="logo">
         <img src="img/V.png" alt="Logo Vespucci" class="logo-image">
         <div class="logo-text-wrapper">
           <span class="logo-text">VESPUCCI</span>
@@ -1194,7 +1194,7 @@
         </div>
       </a>
       <div class="nav-links">
-        <a href="accueil.html" class="nav-item">Accueil</a>
+        <a href="index.html" class="nav-item">Accueil</a>
         <a href="tarifs.html" class="nav-item">Tarifs</a>
         <a href="femmes.html" class="nav-item">Femmes</a>
         <a href="hommes.html" class="nav-item">Hommes</a>
@@ -1213,7 +1213,7 @@
   <nav class="navbar">
     <div class="mobile-title"></div>
     <div class="nav-links-container">
-      <a href="accueil.html" class="nav-link">Accueil</a>
+      <a href="index.html" class="nav-link">Accueil</a>
       <a href="tarifs.html" class="nav-link">Tarifs</a>
       <a href="femmes.html" class="nav-link">Femmes</a>
       <a href="hommes.html" class="nav-link">Hommes</a>
@@ -1508,7 +1508,7 @@
   <footer class="main-footer">
     <div class="footer-content">
       <div class="footer-brand">
-        <a href="accueil.html" class="footer-logo">
+        <a href="index.html" class="footer-logo">
           <img src="img/V.png" alt="Logo Vespucci" class="footer-logo-image">
           <div class="footer-logo-text-wrapper">
             <span class="footer-logo-text">VESPUCCI</span>
@@ -1518,7 +1518,7 @@
         <p>L'Esthétique Vespucci © 2025</p>
       </div>
       <div class="footer-links">
-        <a href="accueil.html">Accueil</a>
+        <a href="index.html">Accueil</a>
         <a href="femmes.html">Femmes</a>
         <a href="tarifs.html">Tarifs</a>
         <a href="hommes.html">Hommes</a>
@@ -1732,7 +1732,7 @@
       if (imageId === 'hero1' || imageId === 'hero2') {
         const heroIndex = imageId === 'hero1' ? '1' : '2';
         // Save with both formats for compatibility
-        localStorage.setItem(`image_position_hero${heroIndex}`, position); // For accueil.html
+        localStorage.setItem(`image_position_hero${heroIndex}`, position); // For index.html
         localStorage.setItem(`image_position_${imageId}`, position); // For admin
         // Save to Firebase with the hero index format
         if (firebaseInitialized && typeof savePositionToFirebase === 'function') {
@@ -2007,7 +2007,7 @@
       if (imageId === 'hero1' || imageId === 'hero2') {
         const heroIndex = imageId === 'hero1' ? '1' : '2';
         // Save with both formats for compatibility
-        saveImage(`hero${heroIndex}`, url); // image_hero1 or image_hero2 (for accueil.html)
+        saveImage(`hero${heroIndex}`, url); // image_hero1 or image_hero2 (for index.html)
         saveImage(imageId, url); // image_hero1 or image_hero2 (for admin)
         updatePreviewImage(imageId, url);
         return;
