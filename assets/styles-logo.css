@@ -381,7 +381,7 @@ body::-webkit-scrollbar {
 .hero-cta {
   display: flex;
   gap: 1.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
   flex-wrap: wrap;
   animation: fadeInUp 0.8s ease 0.6s both;
 }
@@ -512,7 +512,7 @@ body::-webkit-scrollbar {
 }
 
 .hero-image-wrapper:hover {
-  transform: scale(1.02);
+  transform: none;
 }
 
 .image-glow {
@@ -558,7 +558,7 @@ body::-webkit-scrollbar {
 
 .hero-image-wrapper-right .hero-image {
   object-position: center 15%;
-  transform: scale(1.05);
+  transform: none;
 }
 
 .hero-image-wrapper:hover .hero-image {
@@ -566,11 +566,11 @@ body::-webkit-scrollbar {
 }
 
 .hero-image-wrapper-left:hover .hero-image {
-  transform: scale(1.05);
+  transform: none;
 }
 
 .hero-image-wrapper-right:hover .hero-image {
-  transform: scale(1.15);
+  transform: none;
 }
 
 .hero-status-overlay {
@@ -1819,7 +1819,7 @@ section {
   .hero-visual {
     max-width: 100%;
     transform: translateY(0);
-    margin-top: 1rem;
+    margin-top: 0;
   }
 
   .hero-visual-container {
@@ -1959,7 +1959,7 @@ section {
 
   .hero-visual {
     transform: translateY(0);
-    margin-top: 1rem;
+    margin-top: 0;
   }
 
   .hero-visual-container {
