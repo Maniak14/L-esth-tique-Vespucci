@@ -52,20 +52,122 @@
       margin-bottom: 1rem;
     }
     
-    .admin-section {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 2rem;
+    /* Accordion/Volet System */
+    .accordion-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
       margin-bottom: 2rem;
     }
     
-    .admin-section h2 {
+    .accordion-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .accordion-item:hover {
+      border-color: var(--primary);
+      box-shadow: 0 8px 30px rgba(32, 178, 170, 0.2);
+    }
+    
+    .accordion-header {
+      padding: 1.5rem 2rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, rgba(32, 178, 170, 0.05) 0%, transparent 100%);
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+    
+    .accordion-header:hover {
+      background: linear-gradient(135deg, rgba(32, 178, 170, 0.1) 0%, transparent 100%);
+    }
+    
+    .accordion-header.active {
+      background: linear-gradient(135deg, rgba(32, 178, 170, 0.15) 0%, transparent 100%);
+      border-bottom: 1px solid var(--primary);
+    }
+    
+    .accordion-title {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
       color: var(--text-primary);
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .accordion-icon {
       font-size: 1.8rem;
-      margin-bottom: 1.5rem;
-      border-bottom: 2px solid var(--primary);
-      padding-bottom: 0.5rem;
+      transition: transform 0.3s ease;
+    }
+    
+    .accordion-item.active .accordion-icon {
+      transform: rotate(180deg);
+    }
+    
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.3s ease;
+      padding: 0 2rem;
+    }
+    
+    .accordion-item.active .accordion-content {
+      max-height: 10000px;
+      padding: 2rem;
+    }
+    
+    .accordion-content-inner {
+      opacity: 0;
+      transition: opacity 0.3s ease 0.1s;
+    }
+    
+    .accordion-item.active .accordion-content-inner {
+      opacity: 1;
+    }
+    
+    .admin-section {
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      margin-bottom: 0;
+    }
+    
+    .admin-section h2 {
+      display: none;
+    }
+    
+    /* Loading indicator */
+    .loading-indicator {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+    
+    /* Smooth scroll for accordion opening */
+    .accordion-item.active {
+      animation: slideDown 0.4s ease;
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     
     .image-grid {
@@ -602,12 +704,23 @@
       <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 1rem; margin-bottom: 0;">💡 Le fichier a été téléchargé automatiquement. Vous pouvez aussi copier le JSON ci-dessus pour le coller dans catalog-images.json</p>
     </div>
 
-    <!-- Team Images Section -->
-    <div class="admin-section">
-      <h2>Photos de l'Équipe</h2>
-      <div class="image-grid" id="teamImages">
-        <!-- Team images will be loaded here -->
-      </div>
+    <!-- Accordion Container -->
+    <div class="accordion-container">
+      
+      <!-- Team Images Section -->
+      <div class="accordion-item" data-section="team">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <h3 class="accordion-title">
+            <span class="accordion-icon">👥</span>
+            Photos de l'Équipe
+          </h3>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+          <div class="accordion-content-inner">
+            <div class="image-grid" id="teamImages">
+              <!-- Team images will be loaded here -->
+            </div>
       <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
         <div class="add-image-btn" onclick="addNewTeamMember()" title="Ajouter un nouvel employé">
           <div>+</div>
@@ -615,21 +728,31 @@
         </div>
         <button class="btn-small" onclick="exportTeamData()" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e;">📥 Exporter les données</button>
       </div>
-      <div id="teamExportResult" style="display: none; margin-top: 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-          <h3 style="color: var(--text-primary); font-size: 1.1rem; margin: 0;">📋 Données exportées (copiez ceci) :</h3>
-          <button onclick="copyTeamExport()" class="btn-small" style="background: var(--primary); color: white;">📋 Copier</button>
+            <div id="teamExportResult" style="display: none; margin-top: 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="color: var(--text-primary); font-size: 1.1rem; margin: 0;">📋 Données exportées (copiez ceci) :</h3>
+                <button onclick="copyTeamExport()" class="btn-small" style="background: var(--primary); color: white;">📋 Copier</button>
+              </div>
+              <textarea id="teamExportData" readonly style="width: 100%; min-height: 200px; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-family: monospace; font-size: 0.85rem; resize: vertical;"></textarea>
+            </div>
+          </div>
         </div>
-        <textarea id="teamExportData" readonly style="width: 100%; min-height: 200px; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-family: monospace; font-size: 0.85rem; resize: vertical;"></textarea>
       </div>
-    </div>
 
-    <!-- Gallery Images Section -->
-    <div class="admin-section">
-      <h2>Galerie (Carousel)</h2>
-      <div class="image-grid" id="galleryImages">
-        <!-- Gallery images will be loaded here -->
-      </div>
+      <!-- Gallery Images Section -->
+      <div class="accordion-item" data-section="gallery">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <h3 class="accordion-title">
+            <span class="accordion-icon">🖼️</span>
+            Galerie (Carousel)
+          </h3>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+          <div class="accordion-content-inner">
+            <div class="image-grid" id="galleryImages">
+              <!-- Gallery images will be loaded here -->
+            </div>
       <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
         <div class="add-image-btn" onclick="addNewGalleryImage()" title="Ajouter une nouvelle image">
           <div>+</div>
@@ -637,18 +760,28 @@
         </div>
         <button class="btn-small" onclick="exportGalleryData()" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e;">📥 Exporter les données</button>
       </div>
-      <div id="galleryExportResult" style="display: none; margin-top: 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-          <h3 style="color: var(--text-primary); font-size: 1.1rem; margin: 0;">📋 Données exportées (copiez ceci) :</h3>
-          <button onclick="copyGalleryExport()" class="btn-small" style="background: var(--primary); color: white;">📋 Copier</button>
+            <div id="galleryExportResult" style="display: none; margin-top: 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="color: var(--text-primary); font-size: 1.1rem; margin: 0;">📋 Données exportées (copiez ceci) :</h3>
+                <button onclick="copyGalleryExport()" class="btn-small" style="background: var(--primary); color: white;">📋 Copier</button>
+              </div>
+              <textarea id="galleryExportData" readonly style="width: 100%; min-height: 200px; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-family: monospace; font-size: 0.85rem; resize: vertical;"></textarea>
+            </div>
+          </div>
         </div>
-        <textarea id="galleryExportData" readonly style="width: 100%; min-height: 200px; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-family: monospace; font-size: 0.85rem; resize: vertical;"></textarea>
       </div>
-    </div>
 
-    <!-- Femmes Catalog Section -->
-    <div class="admin-section">
-      <h2>Catalogue Femmes</h2>
+      <!-- Femmes Catalog Section -->
+      <div class="accordion-item" data-section="femmes">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <h3 class="accordion-title">
+            <span class="accordion-icon">👩</span>
+            Catalogue Femmes
+          </h3>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+          <div class="accordion-content-inner">
       
       <!-- Ajout en masse d'URLs -->
       <div style="background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem;">
@@ -680,18 +813,28 @@
         </div>
         <button class="btn-small" onclick="exportFemmesData()" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e;">📥 Exporter les données</button>
       </div>
-      <div id="femmesExportResult" style="display: none; margin-top: 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-          <h3 style="color: var(--text-primary); font-size: 1.1rem; margin: 0;">📋 Données exportées (copiez ceci) :</h3>
-          <button onclick="copyFemmesExport()" class="btn-small" style="background: var(--primary); color: white;">📋 Copier</button>
+            <div id="femmesExportResult" style="display: none; margin-top: 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="color: var(--text-primary); font-size: 1.1rem; margin: 0;">📋 Données exportées (copiez ceci) :</h3>
+                <button onclick="copyFemmesExport()" class="btn-small" style="background: var(--primary); color: white;">📋 Copier</button>
+              </div>
+              <textarea id="femmesExportData" readonly style="width: 100%; min-height: 200px; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-family: monospace; font-size: 0.85rem; resize: vertical;"></textarea>
+            </div>
+          </div>
         </div>
-        <textarea id="femmesExportData" readonly style="width: 100%; min-height: 200px; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-family: monospace; font-size: 0.85rem; resize: vertical;"></textarea>
       </div>
-    </div>
 
-    <!-- Partenaires Section -->
-    <div class="admin-section">
-      <h2>Partenaires</h2>
+      <!-- Partenaires Section -->
+      <div class="accordion-item" data-section="partenaires">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <h3 class="accordion-title">
+            <span class="accordion-icon">🤝</span>
+            Partenaires
+          </h3>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+          <div class="accordion-content-inner">
       <div class="image-grid" id="partenairesList">
         <!-- Partenaires will be loaded here -->
       </div>
@@ -702,18 +845,28 @@
         </div>
         <button class="btn-small" onclick="exportPartenairesData()" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e;">📥 Exporter les données</button>
       </div>
-      <div id="partenairesExportResult" style="display: none; margin-top: 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-          <h3 style="color: var(--text-primary); font-size: 1.1rem; margin: 0;">📋 Données exportées (copiez ceci) :</h3>
-          <button onclick="copyPartenairesExport()" class="btn-small" style="background: var(--primary); color: white;">📋 Copier</button>
+            <div id="partenairesExportResult" style="display: none; margin-top: 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="color: var(--text-primary); font-size: 1.1rem; margin: 0;">📋 Données exportées (copiez ceci) :</h3>
+                <button onclick="copyPartenairesExport()" class="btn-small" style="background: var(--primary); color: white;">📋 Copier</button>
+              </div>
+              <textarea id="partenairesExportData" readonly style="width: 100%; min-height: 200px; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-family: monospace; font-size: 0.85rem; resize: vertical;"></textarea>
+            </div>
+          </div>
         </div>
-        <textarea id="partenairesExportData" readonly style="width: 100%; min-height: 200px; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-family: monospace; font-size: 0.85rem; resize: vertical;"></textarea>
       </div>
-    </div>
 
-    <!-- Hommes Catalog Section -->
-    <div class="admin-section">
-      <h2>Catalogue Hommes</h2>
+      <!-- Hommes Catalog Section -->
+      <div class="accordion-item" data-section="hommes">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <h3 class="accordion-title">
+            <span class="accordion-icon">👨</span>
+            Catalogue Hommes
+          </h3>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+          <div class="accordion-content-inner">
       
       <!-- Ajout en masse d'URLs -->
       <div style="background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem;">
@@ -745,30 +898,55 @@
         </div>
         <button class="btn-small" onclick="exportHommesData()" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e;">📥 Exporter les données</button>
       </div>
-      <div id="hommesExportResult" style="display: none; margin-top: 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-          <h3 style="color: var(--text-primary); font-size: 1.1rem; margin: 0;">📋 Données exportées (copiez ceci) :</h3>
-          <button onclick="copyHommesExport()" class="btn-small" style="background: var(--primary); color: white;">📋 Copier</button>
+            <div id="hommesExportResult" style="display: none; margin-top: 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="color: var(--text-primary); font-size: 1.1rem; margin: 0;">📋 Données exportées (copiez ceci) :</h3>
+                <button onclick="copyHommesExport()" class="btn-small" style="background: var(--primary); color: white;">📋 Copier</button>
+              </div>
+              <textarea id="hommesExportData" readonly style="width: 100%; min-height: 200px; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-family: monospace; font-size: 0.85rem; resize: vertical;"></textarea>
+            </div>
+          </div>
         </div>
-        <textarea id="hommesExportData" readonly style="width: 100%; min-height: 200px; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-family: monospace; font-size: 0.85rem; resize: vertical;"></textarea>
       </div>
-    </div>
 
-    <!-- Hero Images Section -->
-    <div class="admin-section">
-      <h2>Images Hero</h2>
-      <div class="image-grid" id="heroImages">
-        <!-- Hero images will be loaded here -->
+      <!-- Hero Images Section -->
+      <div class="accordion-item" data-section="hero">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <h3 class="accordion-title">
+            <span class="accordion-icon">⭐</span>
+            Images Hero
+          </h3>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+          <div class="accordion-content-inner">
+            <div class="image-grid" id="heroImages">
+              <!-- Hero images will be loaded here -->
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- Map Image Section -->
-    <div class="admin-section">
-      <h2>Carte de Localisation</h2>
-      <div class="image-grid" id="mapImage">
-        <!-- Map image will be loaded here -->
+      <!-- Map Image Section -->
+      <div class="accordion-item" data-section="map">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <h3 class="accordion-title">
+            <span class="accordion-icon">🗺️</span>
+            Carte de Localisation
+          </h3>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+          <div class="accordion-content-inner">
+            <div class="image-grid" id="mapImage">
+              <!-- Map image will be loaded here -->
+            </div>
+          </div>
+        </div>
       </div>
+      
     </div>
+    <!-- End Accordion Container -->
 
     <button class="save-btn" onclick="saveAllImages()">💾 Sauvegarder toutes les modifications</button>
     <div class="success-message" id="successMessage">✅ Modifications sauvegardées avec succès !</div>
@@ -2240,54 +2418,94 @@
       });
     }
 
-    // Initialize admin page
-    function initAdmin() {
-      // Load team images
-      loadTeamMembers();
-
-      // Load gallery images
-      const galleryContainer = document.getElementById('galleryImages');
-      imageConfig.gallery.forEach(config => {
-        createImageItem(config, galleryContainer);
-      });
+    // Accordion toggle function
+    window.toggleAccordion = function(header) {
+      const item = header.closest('.accordion-item');
+      const isActive = item.classList.contains('active');
       
-      // Load custom gallery images
-      const customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
-      customImages.forEach(imageId => {
-        const saved = localStorage.getItem(`image_${imageId}`);
-        if (saved) {
-          const name = `Galerie ${galleryContainer.querySelectorAll('.image-item').length + 1}`;
-          const config = {
-            id: imageId,
-            name: name,
-            default: saved
-          };
-          createImageItem(config, galleryContainer, true);
+      // Close all other accordions
+      document.querySelectorAll('.accordion-item').forEach(acc => {
+        if (acc !== item) {
+          acc.classList.remove('active');
         }
       });
-
-      // Load hero images
-      const heroContainer = document.getElementById('heroImages');
-      if (Array.isArray(imageConfig.hero)) {
-        imageConfig.hero.forEach(config => {
-          createImageItem(config, heroContainer);
-        });
-      } else {
-        createImageItem(imageConfig.hero, heroContainer);
+      
+      // Toggle current accordion
+      item.classList.toggle('active', !isActive);
+      
+      // Load content if opening for the first time
+      if (!isActive) {
+        const section = item.dataset.section;
+        loadSectionContent(section);
       }
+    };
+    
+    // Track which sections have been loaded
+    const loadedSections = new Set();
+    
+    // Load section content only when opened
+    function loadSectionContent(section) {
+      if (loadedSections.has(section)) {
+        return; // Already loaded
+      }
+      
+      loadedSections.add(section);
+      
+      switch(section) {
+        case 'team':
+          loadTeamMembers();
+          break;
+        case 'gallery':
+          const galleryContainer = document.getElementById('galleryImages');
+          imageConfig.gallery.forEach(config => {
+            createImageItem(config, galleryContainer);
+          });
+          
+          // Load custom gallery images
+          const customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
+          customImages.forEach(imageId => {
+            const saved = localStorage.getItem(`image_${imageId}`);
+            if (saved) {
+              const name = `Galerie ${galleryContainer.querySelectorAll('.image-item').length + 1}`;
+              const config = {
+                id: imageId,
+                name: name,
+                default: saved
+              };
+              createImageItem(config, galleryContainer, true);
+            }
+          });
+          break;
+        case 'femmes':
+          loadFemmesCatalog();
+          break;
+        case 'partenaires':
+          loadPartenaires();
+          break;
+        case 'hommes':
+          loadHommesCatalog();
+          break;
+        case 'hero':
+          const heroContainer = document.getElementById('heroImages');
+          if (Array.isArray(imageConfig.hero)) {
+            imageConfig.hero.forEach(config => {
+              createImageItem(config, heroContainer);
+            });
+          } else {
+            createImageItem(imageConfig.hero, heroContainer);
+          }
+          break;
+        case 'map':
+          const mapContainer = document.getElementById('mapImage');
+          createImageItem(imageConfig.map, mapContainer);
+          break;
+      }
+    }
 
-      // Load map image
-      const mapContainer = document.getElementById('mapImage');
-      createImageItem(imageConfig.map, mapContainer);
-      
-      // Load femmes catalog
-      loadFemmesCatalog();
-      
-      // Load hommes catalog
-      loadHommesCatalog();
-      
-      // Load partenaires
-      loadPartenaires();
+    // Initialize admin page
+    function initAdmin() {
+      // Don't load anything by default - wait for user to open accordions
+      // This improves initial page load performance
     }
 
     // Initialize on load
