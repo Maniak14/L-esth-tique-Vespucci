@@ -754,11 +754,11 @@
       </div>
     </div>
 
-    <!-- Hero Image Section -->
+    <!-- Hero Images Section -->
     <div class="admin-section">
-      <h2>Image Hero</h2>
-      <div class="image-grid" id="heroImage">
-        <!-- Hero image will be loaded here -->
+      <h2>Images Hero</h2>
+      <div class="image-grid" id="heroImages">
+        <!-- Hero images will be loaded here -->
       </div>
     </div>
 
@@ -815,7 +815,10 @@
         { id: 'gallery5', name: 'Galerie 5', default: 'img/carousel/5.png' },
         { id: 'gallery6', name: 'Galerie 6', default: 'img/carousel/6.png' }
       ],
-      hero: { id: 'hero', name: 'Image Hero', default: 'img/hero.png' },
+      hero: [
+        { id: 'hero1', name: 'Image Hero 1 (Patron)', default: 'img/2.png' },
+        { id: 'hero2', name: 'Image Hero 2 (Co-Patron)', default: 'img/1.png' }
+      ],
       map: { id: 'map', name: 'Carte', default: 'img/map.png' }
     };
 
@@ -907,6 +910,14 @@
         const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
         const image = hommesImages.find(img => img.id === config.id);
         return image ? image.url : config.default;
+      }
+      
+      // Check if it's a hero image (hero1 or hero2)
+      if (config.id === 'hero1' || config.id === 'hero2') {
+        const heroIndex = config.id === 'hero1' ? '1' : '2';
+        // Try both formats for compatibility
+        const saved = localStorage.getItem(`image_hero${heroIndex}`) || localStorage.getItem(`image_${config.id}`);
+        return saved || config.default;
       }
       
       const saved = getSavedImage(config.id);
@@ -1191,6 +1202,16 @@
       // Check if it's a catalog image (femmes/hommes)
       if (imageId.startsWith('femme_') || imageId.startsWith('homme_')) {
         updateCatalogImageUrl(imageId, url);
+        updatePreviewImage(imageId, url);
+        return;
+      }
+      
+      // Check if it's a hero image (hero1 or hero2)
+      if (imageId === 'hero1' || imageId === 'hero2') {
+        const heroIndex = imageId === 'hero1' ? '1' : '2';
+        // Save with both formats for compatibility
+        saveImage(`hero${heroIndex}`, url); // image_hero1 or image_hero2 (for index.html)
+        saveImage(imageId, url); // image_hero1 or image_hero2 (for admin)
         updatePreviewImage(imageId, url);
         return;
       }
@@ -2221,9 +2242,15 @@
         }
       });
 
-      // Load hero image
-      const heroContainer = document.getElementById('heroImage');
-      createImageItem(imageConfig.hero, heroContainer);
+      // Load hero images
+      const heroContainer = document.getElementById('heroImages');
+      if (Array.isArray(imageConfig.hero)) {
+        imageConfig.hero.forEach(config => {
+          createImageItem(config, heroContainer);
+        });
+      } else {
+        createImageItem(imageConfig.hero, heroContainer);
+      }
 
       // Load map image
       const mapContainer = document.getElementById('mapImage');
