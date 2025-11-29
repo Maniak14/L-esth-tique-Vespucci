@@ -10,9 +10,9 @@
     
     // Liste des pages disponibles
     const pages = {
-      '/': 'index.html',
-      '/index': 'index.html',
-      '/accueil': 'index.html',
+      '/': 'accueil.html',
+      '/index': 'accueil.html',
+      '/accueil': 'accueil.html',
       '/tarifs': 'tarifs.html',
       '/femmes': 'femmes.html',
       '/hommes': 'hommes.html',
@@ -31,8 +31,8 @@
       // Rediriger vers la page correspondante
       window.location.replace(targetPage);
     } else {
-      // Si aucune page trouvée, rediriger vers l'index
-      window.location.replace('index.html');
+      // Si aucune page trouvée, rediriger vers l'accueil
+      window.location.replace('accueil.html');
     }
   </script>
 </head>

@@ -11,8 +11,8 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}.html -f
 RewriteRule ^(.*)$ $1.html [NC,L]
 
-# Rediriger la racine vers index.html
-DirectoryIndex index.html
+# Rediriger la racine vers accueil.html
+DirectoryIndex accueil.html
 
 # Empêcher l'accès direct aux fichiers .html (optionnel)
 # RewriteCond %{THE_REQUEST} \s/+(.+)\.html[\s?] [NC]
