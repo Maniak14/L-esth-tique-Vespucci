@@ -686,24 +686,46 @@
     
     // Charger IMMÉDIATEMENT au chargement de la page
     document.addEventListener('DOMContentLoaded', () => {
+      // Charger instantanément depuis le cache
       loadFemmesCatalog();
       
-      // Firebase en arrière-plan uniquement pour mise à jour (optionnel)
+      // Initialiser Firebase en arrière-plan pour synchronisation
       if (initFirebaseDB && typeof initFirebaseDB === 'function') {
         const initialized = initFirebaseDB();
         if (initialized && typeof firebaseFirestore !== 'undefined') {
-            firebaseFirestore.collection('data').doc('femmes_images').onSnapshot((doc) => {
-              if (doc.exists) {
-                const data = doc.data();
+          // Charger les positions d'images depuis Firebase en premier
+          if (typeof loadAllDataFromFirebase === 'function') {
+            loadAllDataFromFirebase().then(() => {
+              // Réafficher avec les positions chargées
+              filterByCategory(currentCategory);
+            });
+          }
+          
+          // Écouter les changements du catalogue femmes en temps réel
+          firebaseFirestore.collection('data').doc('femmes_images').onSnapshot((doc) => {
+            if (doc.exists) {
+              const data = doc.data();
               if (data.images && Array.isArray(data.images) && data.images.length > 0) {
-                  localStorage.setItem('femmes_images', JSON.stringify(data.images));
+                // Mettre à jour le cache
+                localStorage.setItem('femmes_images', JSON.stringify(data.images));
+                // Mettre à jour et réafficher
                 allFemmesImages = data.images;
                 filterByCategory(currentCategory);
-                }
               }
+            }
+          }, (error) => {
+            console.log('Firebase non disponible, utilisation du cache local');
+          });
+          
+          // Écouter les changements de positions en temps réel
+          if (typeof watchPositions === 'function') {
+            watchPositions((positions) => {
+              // Appliquer les positions aux images du catalogue
+              applyImagePositions();
             });
           }
         }
+      }
     });
 
     // Afficher immédiatement depuis le cache si disponible
@@ -723,6 +745,28 @@
           femmesImages.push({ id: `femme_${i}`, url: `img/femmes/${i}.png` });
         }
       return femmesImages;
+    }
+    
+    // Appliquer les positions d'images depuis Firebase
+    function applyImagePositions() {
+      const catalogItems = document.querySelectorAll('#femmesCatalog .catalog-item img');
+      catalogItems.forEach(img => {
+        const card = img.closest('.catalog-item');
+        if (card) {
+          const label = card.querySelector('.catalog-label');
+          if (label) {
+            const match = label.textContent.match(/Coupe (\d+)/);
+            if (match) {
+              const fileNumber = parseInt(match[1]);
+              const imageId = `femme_${fileNumber + 1}`;
+              const position = localStorage.getItem(`image_position_${imageId}`);
+              if (position) {
+                img.style.objectPosition = position;
+              }
+            }
+          }
+        }
+      });
     }
     
     // Afficher le catalogue (optimisé pour performance)
@@ -750,10 +794,13 @@
         const match = item.id.match(/femme_(\d+)/);
           const displayNumber = match ? parseInt(match[1]) - 1 : index; // femme_44 → 43 (numéro du fichier)
         
+        // Récupérer la position depuis Firebase/localStorage
+        const position = localStorage.getItem(`image_position_${item.id}`) || 'center center';
+        
         const card = document.createElement('div');
           card.className = 'catalog-item';
         card.innerHTML = `
-            <img src="${item.url}" alt="Coupe Femme ${displayNumber}" loading="lazy">
+            <img src="${item.url}" alt="Coupe Femme ${displayNumber}" loading="lazy" style="object-position: ${position};">
             <div class="catalog-label">Coupe ${displayNumber}</div>
           `;
           fragment.appendChild(card);
@@ -762,8 +809,11 @@
         container.innerHTML = '';
         container.appendChild(fragment);
         
-        // Re-attach lightbox events après un court délai pour éviter le blocage
-        setTimeout(() => attachCatalogEvents(), 0);
+        // Appliquer les positions et re-attach events
+        requestAnimationFrame(() => {
+          applyImagePositions();
+          attachCatalogEvents();
+        });
       });
     }
     
