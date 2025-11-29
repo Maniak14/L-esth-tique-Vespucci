@@ -46,82 +46,126 @@
         'gallery6': 'https://i.goopics.net/gu631x.png'
       };
       
+      // Fonction pour appliquer les positions d'images
+      function applyImagePositions() {
+        // Positions pour les images de l'équipe
+        document.querySelectorAll('.team-image-wrapper img').forEach(img => {
+          const imageId = img.getAttribute('data-image-id');
+          if (imageId) {
+            const position = localStorage.getItem(`image_position_${imageId}`);
+            if (position) {
+              img.style.objectPosition = position;
+            }
+          }
+        });
+        
+        // Positions pour les images hero (si nécessaire)
+        document.querySelectorAll('.hero-image').forEach((img, index) => {
+          const position = localStorage.getItem(`image_position_hero${index + 1}`);
+          if (position) {
+            img.style.objectPosition = position;
+          }
+        });
+      }
+      
       // Initialize Firebase and load team members
       document.addEventListener('DOMContentLoaded', async () => {
         // Charger DIRECTEMENT depuis les JSON statiques (INSTANTANÉ)
         await loadTeamMembersFromJSON();
         await updateGalleryImagesFromJSON();
         
-        // Firebase en arrière-plan uniquement pour mise à jour (optionnel)
-        if (initFirebaseDB && typeof initFirebaseDB === 'function') {
-          firebaseInitialized = initFirebaseDB();
-          if (firebaseInitialized) {
-            // Load all data from Firebase en arrière-plan
-            loadAllDataFromFirebase().then(() => {
-              // Mettre à jour si Firebase a des données plus récentes
-              loadTeamMembersFromJSON();
-              updateGalleryImagesFromJSON();
-            });
-            
-            // Watch for real-time updates
-            watchImages(() => {
-              console.log('Images mises à jour depuis Firebase');
-              loadTeamMembersFromJSON();
-              updateGalleryImagesFromJSON();
-              const heroImgs = document.querySelectorAll('.hero-image');
-              heroImgs.forEach((img, index) => {
-                const saved = localStorage.getItem(`image_hero${index + 1}`);
-                if (saved) img.src = saved;
-              });
-              const mapImg = document.querySelector('.location-map img');
-              if (mapImg) {
-                const saved = localStorage.getItem('image_map');
-                if (saved) mapImg.src = saved;
-              }
-            });
-            watchPositions(() => {
-              console.log('Positions mises à jour depuis Firebase');
-              document.querySelectorAll('.team-image-wrapper img').forEach(img => {
-                const imageId = img.getAttribute('data-image-id');
-                if (imageId) {
-                  const position = localStorage.getItem(`image_position_${imageId}`);
-                  if (position) {
-                    img.style.objectPosition = position;
-                  }
-                }
-              });
-            });
-            watchTeamMembers(() => {
-              console.log('Membres de l\'équipe mis à jour depuis Firebase');
-              loadTeamMembersFromJSON();
-            });
-          }
-        }
-        
-        // Update hero images
+        // Mettre à jour les images hero et map depuis le cache
         const heroImgs = document.querySelectorAll('.hero-image');
         heroImgs.forEach((img, index) => {
           const saved = localStorage.getItem(`image_hero${index + 1}`);
           if (saved) img.src = saved;
         });
         
-        // Update map image
         const mapImg = document.querySelector('.location-map img');
         if (mapImg) {
           const saved = localStorage.getItem('image_map');
           if (saved) mapImg.src = saved;
         }
+        
+        // Appliquer les positions depuis le cache
+        applyImagePositions();
+        
+        // Initialiser Firebase en arrière-plan pour synchronisation
+        if (initFirebaseDB && typeof initFirebaseDB === 'function') {
+          firebaseInitialized = initFirebaseDB();
+          if (firebaseInitialized) {
+            // Charger toutes les données depuis Firebase en arrière-plan
+            if (typeof loadAllDataFromFirebase === 'function') {
+              loadAllDataFromFirebase().then(() => {
+                // Mettre à jour si Firebase a des données plus récentes
+                loadTeamMembersFromJSON();
+                updateGalleryImagesFromJSON();
+                applyImagePositions();
+                
+                // Mettre à jour hero images
+                heroImgs.forEach((img, index) => {
+                  const saved = localStorage.getItem(`image_hero${index + 1}`);
+                  if (saved) img.src = saved;
+                });
+                
+                // Mettre à jour map image
+                if (mapImg) {
+                  const saved = localStorage.getItem('image_map');
+                  if (saved) mapImg.src = saved;
+                }
+              });
+            }
+            
+            // Écouter les changements d'images en temps réel
+            if (typeof watchImages === 'function') {
+              watchImages(() => {
+                console.log('Images mises à jour depuis Firebase');
+                loadTeamMembersFromJSON();
+                updateGalleryImagesFromJSON();
+                
+                // Mettre à jour hero images
+                heroImgs.forEach((img, index) => {
+                  const saved = localStorage.getItem(`image_hero${index + 1}`);
+                  if (saved) img.src = saved;
+                });
+                
+                // Mettre à jour map image
+                if (mapImg) {
+                  const saved = localStorage.getItem('image_map');
+                  if (saved) mapImg.src = saved;
+                }
+              });
+            }
+            
+            // Écouter les changements de positions en temps réel
+            if (typeof watchPositions === 'function') {
+              watchPositions(() => {
+                console.log('Positions mises à jour depuis Firebase');
+                applyImagePositions();
+              });
+            }
+            
+            // Écouter les changements de membres de l'équipe en temps réel
+            if (typeof watchTeamMembers === 'function') {
+              watchTeamMembers(() => {
+                console.log('Membres de l\'équipe mis à jour depuis Firebase');
+                loadTeamMembersFromJSON();
+                applyImagePositions();
+              });
+            }
+          }
+        }
       });
     }
     
-    // Charger DIRECTEMENT depuis gallery-images.json
+    // Charger DIRECTEMENT depuis gallery-images.json (optimisé pour performance)
     async function updateGalleryImagesFromJSON() {
       const galleryTrack = document.querySelector('.gallery-track');
       if (!galleryTrack) return;
       
       const allGalleryImages = [];
       
-      // Load default gallery images
+      // Load default gallery images depuis le cache
       for (let i = 1; i <= 6; i++) {
         const saved = localStorage.getItem(`image_gallery${i}`);
         allGalleryImages.push(saved || `img/carousel/${i}.png`);
@@ -161,31 +205,40 @@
         }
       });
       
-      // Clear and rebuild gallery track
-      galleryTrack.innerHTML = '';
-      
-      // Create all gallery items
-      allGalleryImages.forEach((imageUrl, index) => {
-        const item = document.createElement('div');
-        item.className = 'gallery-item';
-        item.innerHTML = `
-          <img src="${imageUrl}" alt="Réalisation ${index + 1}">
-          <div class="gallery-overlay">
-            <span>Voir plus</span>
-          </div>
-        `;
-        galleryTrack.appendChild(item);
+      // Utiliser requestAnimationFrame pour un rendu fluide
+      requestAnimationFrame(() => {
+        // Utiliser DocumentFragment pour optimiser le DOM
+        const fragment = document.createDocumentFragment();
+        
+        // Create all gallery items
+        allGalleryImages.forEach((imageUrl, index) => {
+          const item = document.createElement('div');
+          item.className = 'gallery-item';
+          item.innerHTML = `
+            <img src="${imageUrl}" alt="Réalisation ${index + 1}" loading="lazy">
+            <div class="gallery-overlay">
+              <span>Voir plus</span>
+            </div>
+          `;
+          fragment.appendChild(item);
+        });
+        
+        // Clear and rebuild gallery track
+        galleryTrack.innerHTML = '';
+        galleryTrack.appendChild(fragment);
+        
+        // Duplicate all items for seamless infinite scroll
+        const itemsToDuplicate = galleryTrack.querySelectorAll('.gallery-item');
+        itemsToDuplicate.forEach(item => {
+          const clone = item.cloneNode(true);
+          galleryTrack.appendChild(clone);
+        });
+        
+        // Re-attach lightbox events
+        requestAnimationFrame(() => {
+          attachGalleryLightboxEvents();
+        });
       });
-      
-      // Duplicate all items for seamless infinite scroll
-      const itemsToDuplicate = galleryTrack.querySelectorAll('.gallery-item');
-      itemsToDuplicate.forEach(item => {
-        const clone = item.cloneNode(true);
-        galleryTrack.appendChild(clone);
-      });
-      
-      // Re-attach lightbox events
-      attachGalleryLightboxEvents();
     }
     
     // Attach lightbox events to gallery items
