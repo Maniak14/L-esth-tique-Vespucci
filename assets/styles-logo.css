@@ -1814,8 +1814,7 @@ section {
   .hero {
     flex-direction: column;
     text-align: center;
-    gap: 1rem;
-    padding: 3rem 1.5rem 1rem;
+    gap: 3rem;
   }
 
   .hero-content {
@@ -1826,15 +1825,14 @@ section {
     max-width: 100%;
     position: relative;
     transform: none;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
+    margin-top: 1rem;
     width: 100%;
   }
 
   .hero-visual-container {
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    gap: 2rem;
   }
 
   .hero-image-wrapper {
@@ -1955,12 +1953,7 @@ section {
 
 @media (max-width: 480px) {
   section {
-    padding: 2rem 1.5rem;
-  }
-
-  .hero {
-    padding: 3rem 1.5rem 1rem;
-    gap: 1rem;
+    padding: 4rem 1.5rem;
   }
 
   .hero-title {
@@ -1974,17 +1967,12 @@ section {
   .hero-visual {
     position: relative;
     transform: none;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
+    margin-top: 1rem;
     width: 100%;
   }
 
   .hero-visual-container {
-    gap: 0.5rem;
-  }
-
-  .gallery-section {
-    padding: 1rem 0 4rem 0;
+    gap: 0.8rem;
   }
 
   .hero-image-wrapper {
