@@ -57,11 +57,17 @@
         await loadTeamMembersFromJSON();
         await updateGalleryImagesFromJSON();
         
-        // Mettre à jour les images hero et map depuis le cache
+        // Mettre à jour les images hero et map depuis le cache (uniquement depuis Firebase/localStorage)
         const heroImgs = document.querySelectorAll('.hero-image');
         heroImgs.forEach((img, index) => {
           const saved = localStorage.getItem(`image_hero${index + 1}`);
-          if (saved) img.src = saved;
+          // Charger UNIQUEMENT depuis localStorage/Firebase (pas de valeurs par défaut)
+          if (saved) {
+            img.src = saved;
+          } else {
+            // Si pas d'image sauvegardée, ne pas modifier (garder l'image par défaut du HTML)
+            console.log(`Image hero ${index + 1} non trouvée dans la base de données`);
+          }
         });
         
         const mapImg = document.querySelector('.location-map img');
@@ -85,10 +91,12 @@
                 updateGalleryImagesFromJSON();
                 applyImagePositions();
                 
-                // Mettre à jour hero images
+                // Mettre à jour hero images (uniquement depuis Firebase/localStorage)
                 heroImgs.forEach((img, index) => {
                   const saved = localStorage.getItem(`image_hero${index + 1}`);
-                  if (saved) img.src = saved;
+                  if (saved) {
+                    img.src = saved;
+                  }
                 });
                 
                 // Mettre à jour map image
@@ -106,10 +114,12 @@
                 loadTeamMembersFromJSON();
                 updateGalleryImagesFromJSON();
                 
-                // Mettre à jour hero images
+                // Mettre à jour hero images (uniquement depuis Firebase/localStorage)
                 heroImgs.forEach((img, index) => {
                   const saved = localStorage.getItem(`image_hero${index + 1}`);
-                  if (saved) img.src = saved;
+                  if (saved) {
+                    img.src = saved;
+                  }
                 });
                 
                 // Mettre à jour map image
@@ -141,36 +151,40 @@
       });
     }
     
-    // Charger DIRECTEMENT depuis gallery-images.json (optimisé pour performance)
+    // Charger DIRECTEMENT depuis Firebase/localStorage (priorité à la DB)
     async function updateGalleryImagesFromJSON() {
       const galleryTrack = document.querySelector('.gallery-track');
       if (!galleryTrack) return;
       
       const allGalleryImages = [];
       
-      // Load default gallery images depuis le cache
+      // Charger D'ABORD depuis localStorage/Firebase (priorité à la base de données)
+      // Charger les images personnalisées depuis localStorage
+      let customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
+      
+      // Si pas de données dans localStorage, essayer le JSON statique en fallback
+      if (customImages.length === 0) {
+        try {
+          const galleryResponse = await fetch('gallery-images.json');
+          if (galleryResponse.ok) {
+            const galleryData = await galleryResponse.json();
+            if (galleryData.gallery && Array.isArray(galleryData.gallery)) {
+              customImages = galleryData.gallery;
+              // Sauvegarder dans localStorage pour la prochaine fois
+              localStorage.setItem('custom_gallery_images', JSON.stringify(customImages));
+            }
+          }
+        } catch (error) {
+          console.log('gallery-images.json non disponible');
+        }
+      }
+      
+      // Charger les images gallery1-6 depuis localStorage (priorité à la DB)
       for (let i = 1; i <= 6; i++) {
         const saved = localStorage.getItem(`image_gallery${i}`);
-        allGalleryImages.push(saved || `img/carousel/${i}.png`);
-      }
-      
-      // Charger DIRECTEMENT depuis gallery-images.json
-      let customImages = [];
-      try {
-        const galleryResponse = await fetch('gallery-images.json');
-        if (galleryResponse.ok) {
-          const galleryData = await galleryResponse.json();
-          if (galleryData.gallery && Array.isArray(galleryData.gallery)) {
-            customImages = galleryData.gallery;
-          }
+        if (saved) {
+          allGalleryImages.push(saved);
         }
-      } catch (error) {
-        console.log('gallery-images.json non disponible');
-      }
-      
-      // Si pas de données JSON, utiliser localStorage en fallback
-      if (customImages.length === 0) {
-        customImages = JSON.parse(localStorage.getItem('custom_gallery_images') || '[]');
       }
       
       // Ajouter les images personnalisées
