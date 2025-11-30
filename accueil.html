@@ -1168,33 +1168,8 @@
       const reviewsHTML = shuffledReviews.map(createReviewCard).join('');
       reviewsTrack.innerHTML = reviewsHTML + reviewsHTML;
       
-      // Optimize animation speed for mobile
-      function updateAnimationSpeed() {
-        const width = window.innerWidth;
-        let animationDuration = '180s';
-        
-        if (width <= 400) {
-          animationDuration = '90s';
-        } else if (width <= 480) {
-          animationDuration = '100s';
-        }
-        
-        reviewsTrack.style.animation = `scrollReviews ${animationDuration} linear infinite`;
-      }
-      
-      updateAnimationSpeed();
-      
-      // Update on resize
-      let resizeTimeout;
-      window.addEventListener('resize', () => {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(updateAnimationSpeed, 250);
-      });
-      
-      // Force hardware acceleration for better performance
-      reviewsTrack.style.willChange = 'transform';
-      reviewsTrack.style.backfaceVisibility = 'hidden';
-      reviewsTrack.style.webkitBackfaceVisibility = 'hidden';
+      // Ensure animation speed remains constant
+      reviewsTrack.style.animation = 'scrollReviews 180s linear infinite';
     }
 
     // Modal Handling
