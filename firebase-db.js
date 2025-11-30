@@ -459,8 +459,6 @@ async function loadAllDataFromFirebase() {
         localStorage.setItem('partenaires', JSON.stringify(data.partenaires));
       }
     }
-    
-    console.log('Toutes les données ont été chargées depuis Firestore');
   } catch (error) {
     console.error('Erreur chargement données Firestore:', error);
   }

@@ -88,7 +88,6 @@
             img.src = saved;
           } else {
             // Si pas d'image sauvegardée, ne pas modifier (garder l'image par défaut du HTML)
-            console.log(`Image hero ${index + 1} non trouvée dans la base de données`);
           }
           
           // Appliquer la position immédiatement après le chargement de l'image
@@ -144,7 +143,6 @@
             // Écouter les changements d'images en temps réel
             if (typeof watchImages === 'function') {
               watchImages(() => {
-                console.log('Images mises à jour depuis Firebase');
                 loadTeamMembersFromJSON();
                 updateGalleryImagesFromJSON();
                 
@@ -160,7 +158,6 @@
                   const position = localStorage.getItem(`image_position_hero${index + 1}`);
                   if (position) {
                     img.style.objectPosition = position;
-                    console.log(`Position hero ${index + 1} appliquée: ${position}`);
                   }
                 });
                 
@@ -178,7 +175,6 @@
             // Écouter les changements de positions en temps réel
             if (typeof watchPositions === 'function') {
               watchPositions(() => {
-                console.log('Positions mises à jour depuis Firebase');
                 applyImagePositions();
                 
                 // Forcer la mise à jour des positions hero explicitement
@@ -187,7 +183,6 @@
                   const position = localStorage.getItem(`image_position_hero${index + 1}`);
                   if (position) {
                     img.style.objectPosition = position;
-                    console.log(`Position hero ${index + 1} appliquée: ${position}`);
                   }
                 });
                 
@@ -198,7 +193,6 @@
                     const position = localStorage.getItem(`image_position_${imageId}`);
                     if (position) {
                       img.style.objectPosition = position;
-                      console.log(`Position galerie ${imageId} appliquée: ${position}`);
                     }
                   }
                 });
@@ -208,7 +202,6 @@
             // Écouter les changements de membres de l'équipe en temps réel
             if (typeof watchTeamMembers === 'function') {
               watchTeamMembers(() => {
-                console.log('Membres de l\'équipe mis à jour depuis Firebase');
                 loadTeamMembersFromJSON();
                 loadTeamContacts(); // Mettre à jour aussi les contacts dans le modal
                 applyImagePositions();
@@ -243,7 +236,6 @@
             }
           }
         } catch (error) {
-          console.log('gallery-images.json non disponible');
         }
       }
       
@@ -404,7 +396,6 @@
             }
           }
         } catch (error) {
-          console.log('team-members.json non disponible');
         }
       }
       // Get deleted members
@@ -422,7 +413,6 @@
         // Charger UNIQUEMENT depuis localStorage/Firebase (pas de valeurs par défaut hardcodées)
         if (!savedImage) {
           // Si pas d'image sauvegardée, ne pas afficher ce membre
-          console.log(`Image manquante pour ${imageId}, membre ignoré`);
           return;
         }
         
@@ -1212,7 +1202,6 @@
             }
           }
         } catch (error) {
-          console.log('team-members.json non disponible');
         }
       }
       

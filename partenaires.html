@@ -421,7 +421,6 @@
           }
         }
       } catch (error) {
-        console.log('Erreur chargement contacts');
       }
     }
 
@@ -1081,7 +1080,6 @@
           // Écouter les changements de partenaires en temps réel
           if (typeof watchPartenaires === 'function') {
             watchPartenaires((partenaires) => {
-              console.log('Partenaires mis à jour depuis Firebase');
               loadPartenaires();
             });
           }

@@ -596,7 +596,6 @@
             localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
           }
         } catch (error) {
-          console.log('JSON non disponible, utilisation des images par défaut');
         }
       }
       
@@ -709,7 +708,6 @@
               }
             }
           }, (error) => {
-            console.log('Firebase non disponible, utilisation du cache local');
           });
           
           // Écouter les changements de positions en temps réel
@@ -917,7 +915,6 @@
           }
         }
       } catch (error) {
-        console.log('Erreur chargement contacts');
       }
     }
 

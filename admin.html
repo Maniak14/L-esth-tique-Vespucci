@@ -1595,7 +1595,6 @@
           // Écouter les changements en temps réel avec debounce
           if (typeof watchImages === 'function') {
             watchImages(() => {
-              console.log('Images mises à jour depuis Firebase');
               // Recharger seulement si l'accordéon correspondant est ouvert
               debounceReload(() => {
                 const activeSection = document.querySelector('.accordion-item.active')?.dataset.section;
@@ -1614,7 +1613,6 @@
           
           if (typeof watchPositions === 'function') {
             watchPositions(() => {
-              console.log('Positions mises à jour depuis Firebase');
               // Mettre à jour les positions dans l'interface sans recharger
               debounceReload(() => {
                 document.querySelectorAll('[id^="preview_"]').forEach(img => {
@@ -1634,7 +1632,6 @@
           
           if (typeof watchTeamMembers === 'function') {
             watchTeamMembers(() => {
-              console.log('Membres de l\'équipe mis à jour depuis Firebase');
               debounceReload(() => {
                 const activeSection = document.querySelector('.accordion-item.active')?.dataset.section;
                 if (activeSection === 'team' && typeof loadTeamMembers === 'function') {
@@ -1646,7 +1643,6 @@
           
           if (typeof watchPartenaires === 'function') {
             watchPartenaires(() => {
-              console.log('Partenaires mis à jour depuis Firebase');
               debounceReload(() => {
                 const activeSection = document.querySelector('.accordion-item.active')?.dataset.section;
                 if (activeSection === 'partenaires' && typeof loadPartenaires === 'function') {
