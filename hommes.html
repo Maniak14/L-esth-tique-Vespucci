@@ -964,6 +964,8 @@
     }
     
     // Initialize mobile navigation
+    let mobileNavInitialized = false;
+    let currentIndex = 0;
     function initMobileNavigation() {
       const catalogGrid = document.getElementById('hommesCatalog');
       const prevBtn = document.getElementById('hommesPrevBtn');
@@ -974,8 +976,17 @@
       
       if (!catalogGrid || !prevBtn || !nextBtn) return;
       
+      // Skip if already initialized
+      if (mobileNavInitialized) {
+        // Just update the indicator with current items
+        const items = catalogGrid.querySelectorAll('.catalog-item');
+        if (indicatorCurrent) indicatorCurrent.textContent = Math.min(currentIndex + 1, items.length);
+        if (indicatorTotal) indicatorTotal.textContent = items.length;
+        return;
+      }
+      
       const items = catalogGrid.querySelectorAll('.catalog-item');
-      let currentIndex = 0;
+      currentIndex = 0;
       
       // Update indicator
       function updateIndicator() {
@@ -1069,6 +1080,22 @@
       
       // Initial update
       updateIndicator();
+      
+      mobileNavInitialized = true;
+      
+      // Reset on window resize to handle orientation changes
+      let resizeTimeout;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+          const newItems = catalogGrid.querySelectorAll('.catalog-item');
+          if (newItems.length > 0 && currentIndex >= newItems.length) {
+            currentIndex = newItems.length - 1;
+            scrollToItem(currentIndex);
+          }
+          updateIndicator();
+        }, 250);
+      });
     }
     
     // Load catalog on page load
