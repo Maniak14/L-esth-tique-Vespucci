@@ -742,24 +742,25 @@
         // Utiliser DocumentFragment pour optimiser le DOM
         const fragment = document.createDocumentFragment();
         
-        // Trier les images par numéro d'ID pour garantir l'ordre
+        // Trier par ordre personnalisé (ou ID en secours)
         femmesImages.sort((a, b) => {
-          const matchA = a.id.match(/femme_(\d+)/);
-          const matchB = b.id.match(/femme_(\d+)/);
-          const numA = matchA ? parseInt(matchA[1]) : 0;
-          const numB = matchB ? parseInt(matchB[1]) : 0;
-          return numA - numB;
+          const orderA = Number(a.order) || 0;
+          const orderB = Number(b.order) || 0;
+          if (orderA === orderB) {
+            const matchA = a.id.match(/femme_(\d+)/);
+            const matchB = b.id.match(/femme_(\d+)/);
+            const numA = matchA ? parseInt(matchA[1]) : 0;
+            const numB = matchB ? parseInt(matchB[1]) : 0;
+            return numA - numB;
+          }
+          return orderA - orderB;
         });
         
-      femmesImages.forEach((item, index) => {
-          // Extraire le numéro de l'ID (femme_44 → 44) puis soustraire 1 pour obtenir le numéro du fichier (43.png → 43)
-          // Fichier 43.png correspond à femme_44 dans le JSON, donc on affiche "Coupe 43"
-        const match = item.id.match(/femme_(\d+)/);
-          const displayNumber = match ? parseInt(match[1]) - 1 : index; // femme_44 → 43 (numéro du fichier)
-        
-        const card = document.createElement('div');
+        femmesImages.forEach((item, index) => {
+          const displayNumber = Number(item.order) || index + 1;
+          const card = document.createElement('div');
           card.className = 'catalog-item';
-        card.innerHTML = `
+          card.innerHTML = `
             <img src="${item.url}" alt="Coupe Femme ${displayNumber}" loading="lazy">
             <div class="catalog-label">Coupe ${displayNumber}</div>
           `;
