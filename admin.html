@@ -678,6 +678,7 @@
           <div>+</div>
           <span>Ajouter une image</span>
         </div>
+        <button class="btn-small" onclick="insertFemmesImageAtPosition()" style="background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.4); color: #3b82f6;">↕️ Insérer à une position</button>
         <button class="btn-small" onclick="exportFemmesData()" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e;">📥 Exporter les données</button>
       </div>
       <div id="femmesExportResult" style="display: none; margin-top: 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem;">
@@ -721,6 +722,7 @@
           <div>+</div>
           <span>Ajouter une image</span>
         </div>
+        <button class="btn-small" onclick="insertHommesImageAtPosition()" style="background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.4); color: #3b82f6;">↕️ Insérer à une position</button>
         <button class="btn-small" onclick="exportHommesData()" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e;">📥 Exporter les données</button>
       </div>
       <div id="hommesExportResult" style="display: none; margin-top: 1rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem;">
@@ -897,6 +899,53 @@
       };
       return defaultPositions[imageId] || 'center center';
     }
+
+    // Helpers for catalog (femmes/hommes)
+    function getCatalogKeyFromId(imageId) {
+      if (imageId.startsWith('femme_')) return 'femmes';
+      if (imageId.startsWith('homme_')) return 'hommes';
+      return null;
+    }
+
+    function extractIdNumber(imageId) {
+      const match = imageId.match(/_(\d+)/);
+      return match ? parseInt(match[1], 10) : Number.MAX_SAFE_INTEGER;
+    }
+
+    function normalizeCatalogImages(images, prefix) {
+      const normalized = (images || []).map((img, index) => ({
+        ...img,
+        order: Number(img.order) || index + 1,
+        categories: Array.isArray(img.categories)
+          ? img.categories.filter(Boolean)
+          : []
+      }));
+
+      normalized.sort((a, b) => {
+        const orderA = Number(a.order) || extractIdNumber(a.id);
+        const orderB = Number(b.order) || extractIdNumber(b.id);
+        if (orderA === orderB) {
+          return extractIdNumber(a.id) - extractIdNumber(b.id);
+        }
+        return orderA - orderB;
+      });
+
+      return normalized.map((img, idx) => ({ ...img, order: idx + 1 }));
+    }
+
+    function persistCatalogImages(catalogKey, images) {
+      const storageKey = `${catalogKey}_images`;
+      localStorage.setItem(storageKey, JSON.stringify(images));
+
+      if (firebaseInitialized) {
+        if (catalogKey === 'femmes' && typeof saveFemmesImagesToFirebase === 'function') {
+          saveFemmesImagesToFirebase(images);
+        }
+        if (catalogKey === 'hommes' && typeof saveHommesImagesToFirebase === 'function') {
+          saveHommesImagesToFirebase(images);
+        }
+      }
+    }
     
     // Save image position
     function saveImagePosition(imageId, position) {
@@ -1048,6 +1097,9 @@
       
       const isCatalogImage = config.id.startsWith('femme_') || config.id.startsWith('homme_');
       const isTeamMember = imageConfig.team.some(t => t.id === config.id) || (isCustom && config.id.startsWith('team_'));
+      const catalogKey = getCatalogKeyFromId(config.id);
+      const orderValue = Number(config.order) || 0;
+      const categoriesValue = Array.isArray(config.categories) ? config.categories.join(', ') : '';
       const deleteBtn = (isCustom || isCatalogImage || isTeamMember) ? `<button class="delete-image-btn" onclick="${isCatalogImage ? 'deleteCatalogImage' : (isTeamMember ? 'deleteTeamMember' : 'deleteCustomImage')}('${config.id}')" title="Supprimer">×</button>` : '';
       const resetBtn = (!isCustom && !isCatalogImage && !isTeamMember) ? `<button class="remove-btn" onclick="resetImage('${config.id}')" title="Réinitialiser">×</button>` : '';
       
@@ -1093,6 +1145,18 @@
         ${imagePreview}
         <input type="text" class="input-url" placeholder="URL de l'image" value="${currentImage}" onchange="updateImageUrl('${config.id}', this.value); updatePreviewImage('${config.id}', this.value)">
         <button class="btn-small" onclick="updateImageUrl('${config.id}', this.previousElementSibling.value); ${(config.id.startsWith('femme_') || config.id.startsWith('homme_')) ? 'loadFemmesCatalog(); loadHommesCatalog();' : ''}">Mettre à jour</button>
+        ${isCatalogImage ? `
+          <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.5rem;">
+            <label style="color: var(--text-secondary); font-size: 0.9rem;">Position</label>
+            <input type="number" class="input-url" value="${orderValue}" min="1" style="max-width: 120px;" onchange="updateCatalogOrder('${config.id}', this.value)">
+            <button class="btn-small" style="padding: 0.45rem 0.9rem;" onclick="updateCatalogOrder('${config.id}', ${orderValue} - 1)">↑</button>
+            <button class="btn-small" style="padding: 0.45rem 0.9rem;" onclick="updateCatalogOrder('${config.id}', ${orderValue} + 1)">↓</button>
+          </div>
+          <div class="url-input-group">
+            <label style="color: var(--text-secondary); font-size: 0.9rem;">Catégories (séparées par des virgules)</label>
+            <input type="text" class="input-url" value="${categoriesValue}" placeholder="ex: afro, tresse" onblur="updateCatalogCategories('${config.id}', this.value)">
+          </div>
+        ` : ''}
         ${teamFields}
       `;
       
@@ -1422,16 +1486,16 @@
         const newId = `femme_${currentNumber}`;
         const newImage = {
           id: newId,
-          url: url
+          url: url,
+          order: femmesImages.length + 1,
+          categories: []
         };
         femmesImages.push(newImage);
       });
       
       // Sauvegarder
-      localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
-      if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
-        saveFemmesImagesToFirebase(femmesImages);
-      }
+      femmesImages = normalizeCatalogImages(femmesImages, 'femme');
+      persistCatalogImages('femmes', femmesImages);
       
       // Afficher le résultat
       resultDiv.style.display = 'block';
@@ -1455,34 +1519,23 @@
     };
     
     // Add new femmes image (global function)
-    window.addNewFemmesImage = function() {
-      const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
-      
-      // Trouver le prochain numéro disponible
-      let nextNumber = 1;
-      if (femmesImages.length > 0) {
-        const numbers = femmesImages
-          .map(img => {
-            const match = img.id.match(/femme_(\d+)/);
-            return match ? parseInt(match[1]) : 0;
-          })
-          .filter(n => n > 0)
-          .sort((a, b) => b - a);
-        nextNumber = numbers.length > 0 ? numbers[0] + 1 : femmesImages.length + 1;
-      }
-      
-      const newId = `femme_${nextNumber}`;
+    window.addNewFemmesImage = function(position = null) {
+      let femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
+      femmesImages = normalizeCatalogImages(femmesImages, 'femme');
+
+      const maxId = femmesImages.reduce((max, img) => Math.max(max, extractIdNumber(img.id)), 0);
+      const insertPosition = Math.max(1, Math.min(position ? parseInt(position, 10) : femmesImages.length + 1, femmesImages.length + 1));
+      const newId = `femme_${maxId + 1}`;
       const newImage = {
         id: newId,
-        url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E'
+        url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E',
+        order: insertPosition,
+        categories: []
       };
-      
-      femmesImages.push(newImage);
-      localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
-      if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
-        saveFemmesImagesToFirebase(femmesImages);
-      }
-      
+
+      femmesImages.splice(insertPosition - 1, 0, newImage);
+      femmesImages = normalizeCatalogImages(femmesImages, 'femme');
+      persistCatalogImages('femmes', femmesImages);
       loadFemmesCatalog();
     };
     
@@ -1530,16 +1583,16 @@
         const newId = `homme_${currentNumber}`;
         const newImage = {
           id: newId,
-          url: url
+          url: url,
+          order: hommesImages.length + 1,
+          categories: []
         };
         hommesImages.push(newImage);
       });
       
       // Sauvegarder
-      localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
-      if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
-        saveHommesImagesToFirebase(hommesImages);
-      }
+      hommesImages = normalizeCatalogImages(hommesImages, 'homme');
+      persistCatalogImages('hommes', hommesImages);
       
       // Afficher le résultat
       resultDiv.style.display = 'block';
@@ -1736,35 +1789,40 @@
     };
     
     // Add new hommes image (global function)
-    window.addNewHommesImage = function() {
-      const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
-      
-      // Trouver le prochain numéro disponible
-      let nextNumber = 1;
-      if (hommesImages.length > 0) {
-        const numbers = hommesImages
-          .map(img => {
-            const match = img.id.match(/homme_(\d+)/);
-            return match ? parseInt(match[1]) : 0;
-          })
-          .filter(n => n > 0)
-          .sort((a, b) => b - a);
-        nextNumber = numbers.length > 0 ? numbers[0] + 1 : hommesImages.length + 1;
-      }
-      
-      const newId = `homme_${nextNumber}`;
+    window.addNewHommesImage = function(position = null) {
+      let hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
+      hommesImages = normalizeCatalogImages(hommesImages, 'homme');
+
+      const maxId = hommesImages.reduce((max, img) => Math.max(max, extractIdNumber(img.id)), 0);
+      const insertPosition = Math.max(1, Math.min(position ? parseInt(position, 10) : hommesImages.length + 1, hommesImages.length + 1));
+      const newId = `homme_${maxId + 1}`;
       const newImage = {
         id: newId,
-        url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E'
+        url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E',
+        order: insertPosition,
+        categories: []
       };
-      
-      hommesImages.push(newImage);
-      localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
-      if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
-        saveHommesImagesToFirebase(hommesImages);
-      }
-      
+
+      hommesImages.splice(insertPosition - 1, 0, newImage);
+      hommesImages = normalizeCatalogImages(hommesImages, 'homme');
+      persistCatalogImages('hommes', hommesImages);
       loadHommesCatalog();
+    };
+
+    window.insertFemmesImageAtPosition = function() {
+      const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
+      const maxPosition = femmesImages.length + 1;
+      const position = parseInt(prompt(`Position d'insertion (1-${maxPosition})`, `${maxPosition}`), 10);
+      if (!position || Number.isNaN(position)) return;
+      addNewFemmesImage(position);
+    };
+
+    window.insertHommesImageAtPosition = function() {
+      const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
+      const maxPosition = hommesImages.length + 1;
+      const position = parseInt(prompt(`Position d'insertion (1-${maxPosition})`, `${maxPosition}`), 10);
+      if (!position || Number.isNaN(position)) return;
+      addNewHommesImage(position);
     };
     
     // Load femmes catalog in admin
@@ -1778,25 +1836,17 @@
         }
         localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
       }
+      femmesImages = normalizeCatalogImages(femmesImages, 'femme');
+      persistCatalogImages('femmes', femmesImages);
       
       container.innerHTML = '';
-      // Trier les images par numéro d'ID pour garantir l'ordre
-      femmesImages.sort((a, b) => {
-        const matchA = a.id.match(/femme_(\d+)/);
-        const matchB = b.id.match(/femme_(\d+)/);
-        const numA = matchA ? parseInt(matchA[1]) : 0;
-        const numB = matchB ? parseInt(matchB[1]) : 0;
-        return numA - numB;
-      });
-      femmesImages.forEach((item, index) => {
-        // Extraire le numéro de l'ID et soustraire 1 (femme_1 → Coupe 0, femme_2 → Coupe 1, etc.)
-        const match = item.id.match(/femme_(\d+)/);
-        const number = match ? parseInt(match[1]) - 1 : index;
-        
+      femmesImages.forEach((item) => {
         const config = {
           id: item.id,
-          name: `Coupe ${number}`,
-          default: item.url
+          name: `Coupe ${item.order}`,
+          default: item.url,
+          order: item.order,
+          categories: item.categories || []
         };
         createImageItem(config, container, true);
       });
@@ -1813,25 +1863,17 @@
         }
         localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
       }
+      hommesImages = normalizeCatalogImages(hommesImages, 'homme');
+      persistCatalogImages('hommes', hommesImages);
       
       container.innerHTML = '';
-      // Trier les images par numéro d'ID pour garantir l'ordre
-      hommesImages.sort((a, b) => {
-        const matchA = a.id.match(/homme_(\d+)/);
-        const matchB = b.id.match(/homme_(\d+)/);
-        const numA = matchA ? parseInt(matchA[1]) : 0;
-        const numB = matchB ? parseInt(matchB[1]) : 0;
-        return numA - numB;
-      });
-      hommesImages.forEach((item, index) => {
-        // Extraire le numéro de l'ID et soustraire 1 (homme_1 → Coupe 0, homme_2 → Coupe 1, etc.)
-        const match = item.id.match(/homme_(\d+)/);
-        const number = match ? parseInt(match[1]) - 1 : index;
-        
+      hommesImages.forEach((item) => {
         const config = {
           id: item.id,
-          name: `Coupe ${number}`,
-          default: item.url
+          name: `Coupe ${item.order}`,
+          default: item.url,
+          order: item.order,
+          categories: item.categories || []
         };
         createImageItem(config, container, true);
       });
@@ -1847,10 +1889,8 @@
         const image = femmesImages.find(img => img.id === imageId);
         if (image) {
           image.url = url;
-          localStorage.setItem('femmes_images', JSON.stringify(femmesImages));
-          if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
-            saveFemmesImagesToFirebase(femmesImages);
-          }
+          const normalized = normalizeCatalogImages(femmesImages, 'femme');
+          persistCatalogImages('femmes', normalized);
         }
       }
       // Check if it's a hommes image
@@ -1859,10 +1899,8 @@
         const image = hommesImages.find(img => img.id === imageId);
         if (image) {
           image.url = url;
-          localStorage.setItem('hommes_images', JSON.stringify(hommesImages));
-          if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
-            saveHommesImagesToFirebase(hommesImages);
-          }
+          const normalized = normalizeCatalogImages(hommesImages, 'homme');
+          persistCatalogImages('hommes', normalized);
         }
       }
       
@@ -1874,6 +1912,50 @@
           img.src = url;
         }
       }
+    }
+
+    function updateCatalogOrder(imageId, newPosition) {
+      const catalogKey = getCatalogKeyFromId(imageId);
+      if (!catalogKey) return;
+      let images = JSON.parse(localStorage.getItem(`${catalogKey}_images`) || '[]');
+      images = normalizeCatalogImages(images, catalogKey === 'femmes' ? 'femme' : 'homme');
+
+      const currentIndex = images.findIndex(img => img.id === imageId);
+      if (currentIndex === -1) return;
+
+      const targetPosition = Math.max(1, Math.min(parseInt(newPosition, 10) || 1, images.length));
+      const [moving] = images.splice(currentIndex, 1);
+      images.splice(targetPosition - 1, 0, moving);
+
+      images = images.map((img, idx) => ({ ...img, order: idx + 1 }));
+      persistCatalogImages(catalogKey, images);
+
+      if (catalogKey === 'femmes') {
+        loadFemmesCatalog();
+      } else {
+        loadHommesCatalog();
+      }
+    }
+
+    function updateCatalogCategories(imageId, rawCategories) {
+      const catalogKey = getCatalogKeyFromId(imageId);
+      if (!catalogKey) return;
+      let images = JSON.parse(localStorage.getItem(`${catalogKey}_images`) || '[]');
+      const idx = images.findIndex(img => img.id === imageId);
+      if (idx === -1) return;
+
+      const categories = (rawCategories || '')
+        .split(',')
+        .map(c => c.trim())
+        .filter(Boolean);
+
+      images[idx] = {
+        ...images[idx],
+        categories
+      };
+
+      images = normalizeCatalogImages(images, catalogKey === 'femmes' ? 'femme' : 'homme');
+      persistCatalogImages(catalogKey, images);
     }
     
     // Delete femmes/hommes image
@@ -1888,19 +1970,15 @@
         // Remove from localStorage
         if (imageId.startsWith('femme_')) {
           const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
-          const updated = femmesImages.filter(img => img.id !== imageId);
-          localStorage.setItem('femmes_images', JSON.stringify(updated));
-          if (firebaseInitialized && typeof saveFemmesImagesToFirebase === 'function') {
-            saveFemmesImagesToFirebase(updated);
-          }
+          let updated = femmesImages.filter(img => img.id !== imageId);
+          updated = normalizeCatalogImages(updated, 'femme');
+          persistCatalogImages('femmes', updated);
           loadFemmesCatalog();
         } else if (imageId.startsWith('homme_')) {
           const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
-          const updated = hommesImages.filter(img => img.id !== imageId);
-          localStorage.setItem('hommes_images', JSON.stringify(updated));
-          if (firebaseInitialized && typeof saveHommesImagesToFirebase === 'function') {
-            saveHommesImagesToFirebase(updated);
-          }
+          let updated = hommesImages.filter(img => img.id !== imageId);
+          updated = normalizeCatalogImages(updated, 'homme');
+          persistCatalogImages('hommes', updated);
           loadHommesCatalog();
         }
       }
