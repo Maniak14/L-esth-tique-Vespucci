@@ -638,12 +638,8 @@
       }
       
       // Stocker toutes les images
-      allFemmesImages = femmesImages;
-      
-      // Initialiser les filtres de catégorie
-      initCategoryFilters();
-      
-      // Afficher le catalogue avec le filtre actif
+      allFemmesImages = normalizeFemmesImages(femmesImages);
+      renderCategoryFilters();
       filterByCategory(currentCategory);
     }
     
@@ -685,29 +681,11 @@
     // Filtrer les images par catégorie
     function filterByCategory(category) {
       let filteredImages = [];
-      
       if (category === 'all') {
-        // Afficher toutes les images
         filteredImages = allFemmesImages;
       } else {
-        // Filtrer par catégorie
-        const categoryNumbers = CATEGORIES[category] || [];
-        filteredImages = allFemmesImages.filter(item => {
-          // Extraire le numéro de l'ID (femme_44 → 44)
-          // Les numéros de catégorie sont les numéros des fichiers (43.png)
-          // Mais dans la base, c'est femme_44 (fichier 43.png = femme_44)
-          // Donc on doit comparer : numéro du fichier + 1 = ID dans la base
-          const match = item.id.match(/femme_(\d+)/);
-          if (match) {
-            const dbId = parseInt(match[1]); // femme_44 → 44
-            // Vérifier si le numéro du fichier (dbId - 1) est dans la catégorie
-            const fileNumber = dbId - 1; // 44 - 1 = 43 (numéro du fichier)
-            return categoryNumbers.includes(fileNumber);
-          }
-          return false;
-        });
+        filteredImages = allFemmesImages.filter(item => (item.categories || []).includes(category));
       }
-      
       displayFemmesCatalog(filteredImages);
     }
     
@@ -719,17 +697,19 @@
       if (initFirebaseDB && typeof initFirebaseDB === 'function') {
         const initialized = initFirebaseDB();
         if (initialized && typeof firebaseFirestore !== 'undefined') {
-            firebaseFirestore.collection('data').doc('femmes_images').onSnapshot((doc) => {
-              if (doc.exists) {
-                const data = doc.data();
+          firebaseFirestore.collection('data').doc('femmes_images').onSnapshot((doc) => {
+            if (doc.exists) {
+              const data = doc.data();
               if (data.images && Array.isArray(data.images) && data.images.length > 0) {
-                  localStorage.setItem('femmes_images', JSON.stringify(data.images));
-                allFemmesImages = data.images;
+                const normalized = normalizeFemmesImages(data.images);
+                localStorage.setItem('femmes_images', JSON.stringify(normalized));
+                allFemmesImages = normalized;
+                renderCategoryFilters();
                 filterByCategory(currentCategory);
-                }
               }
-            });
-          }
+            }
+          });
+        }
         }
     });
 
@@ -737,8 +717,8 @@
     (function() {
       const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
       if (femmesImages.length > 0 && document.readyState !== 'loading') {
-        allFemmesImages = femmesImages;
-        initCategoryFilters();
+        allFemmesImages = normalizeFemmesImages(femmesImages);
+        renderCategoryFilters();
         filterByCategory(currentCategory);
       }
     })();
