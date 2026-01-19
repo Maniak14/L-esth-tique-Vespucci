@@ -1151,6 +1151,7 @@
             <input type="number" class="input-url" value="${orderValue}" min="1" style="max-width: 120px;" onchange="updateCatalogOrder('${config.id}', this.value)">
             <button class="btn-small" style="padding: 0.45rem 0.9rem;" onclick="updateCatalogOrder('${config.id}', ${orderValue} - 1)">↑</button>
             <button class="btn-small" style="padding: 0.45rem 0.9rem;" onclick="updateCatalogOrder('${config.id}', ${orderValue} + 1)">↓</button>
+            <button class="btn-small" style="padding: 0.45rem 0.9rem;" onclick="insertAfterCatalog('${config.id}')">+ après</button>
           </div>
           <div class="url-input-group">
             <label style="color: var(--text-secondary); font-size: 0.9rem;">Catégories (séparées par des virgules)</label>
@@ -1808,6 +1809,22 @@
       persistCatalogImages('hommes', hommesImages);
       loadHommesCatalog();
     };
+
+    function insertAfterCatalog(imageId) {
+      const catalogKey = getCatalogKeyFromId(imageId);
+      if (!catalogKey) return;
+      const storageKey = `${catalogKey}_images`;
+      let images = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      images = normalizeCatalogImages(images, catalogKey === 'femmes' ? 'femme' : 'homme');
+      const target = images.find(img => img.id === imageId);
+      if (!target) return;
+      const insertPos = (Number(target.order) || 0) + 1;
+      if (catalogKey === 'femmes') {
+        addNewFemmesImage(insertPos);
+      } else {
+        addNewHommesImage(insertPos);
+      }
+    }
 
     window.insertFemmesImageAtPosition = function() {
       const femmesImages = JSON.parse(localStorage.getItem('femmes_images') || '[]');
