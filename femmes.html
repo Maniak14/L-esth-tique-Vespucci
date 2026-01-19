@@ -639,6 +639,7 @@
       
       // Stocker toutes les images
       allFemmesImages = normalizeFemmesImages(femmesImages);
+      localStorage.setItem('femmes_images', JSON.stringify(allFemmesImages));
       renderCategoryFilters();
       filterByCategory(currentCategory);
     }

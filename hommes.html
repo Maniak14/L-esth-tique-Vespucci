@@ -635,12 +635,9 @@
       }
       
       // Stocker toutes les images
-      allHommesImages = hommesImages;
-      
-      // Initialiser les filtres de catégorie
-      initCategoryFilters();
-      
-      // Afficher le catalogue avec le filtre actif
+      allHommesImages = normalizeHommesImages(hommesImages);
+      localStorage.setItem('hommes_images', JSON.stringify(allHommesImages));
+      renderCategoryFilters();
       filterByCategory(currentCategory);
     }
     
@@ -684,25 +681,9 @@
       let filteredImages = [];
       
       if (category === 'all') {
-        // Afficher toutes les images
         filteredImages = allHommesImages;
       } else {
-        // Filtrer par catégorie
-        const categoryNumbers = CATEGORIES[category] || [];
-        filteredImages = allHommesImages.filter(item => {
-          // Extraire le numéro de l'ID (homme_44 → 44)
-          // Les numéros de catégorie sont les numéros des fichiers (43.png)
-          // Mais dans la base, c'est homme_44 (fichier 43.png = homme_44)
-          // Donc on doit comparer : numéro du fichier + 1 = ID dans la base
-          const match = item.id.match(/homme_(\d+)/);
-          if (match) {
-            const dbId = parseInt(match[1]); // homme_44 → 44
-            // Vérifier si le numéro du fichier (dbId - 1) est dans la catégorie
-            const fileNumber = dbId - 1; // 44 - 1 = 43 (numéro du fichier)
-            return categoryNumbers.includes(fileNumber);
-          }
-          return false;
-        });
+        filteredImages = allHommesImages.filter(item => (item.categories || []).includes(category));
       }
       
       displayHommesCatalog(filteredImages);
@@ -716,13 +697,14 @@
       if (initFirebaseDB && typeof initFirebaseDB === 'function') {
         const initialized = initFirebaseDB();
         if (initialized && typeof firebaseFirestore !== 'undefined') {
-            firebaseFirestore.collection('data').doc('hommes_images').onSnapshot((doc) => {
-              if (doc.exists) {
-                const data = doc.data();
+          firebaseFirestore.collection('data').doc('hommes_images').onSnapshot((doc) => {
+            if (doc.exists) {
+              const data = doc.data();
               if (data.images && Array.isArray(data.images) && data.images.length > 0) {
-                  localStorage.setItem('hommes_images', JSON.stringify(data.images));
-                // Mettre à jour allHommesImages et réappliquer le filtre actif
-                allHommesImages = data.images;
+                const normalized = normalizeHommesImages(data.images);
+                localStorage.setItem('hommes_images', JSON.stringify(normalized));
+                allHommesImages = normalized;
+                renderCategoryFilters();
                 filterByCategory(currentCategory);
               }
             }
@@ -735,8 +717,8 @@
     (function() {
       const hommesImages = JSON.parse(localStorage.getItem('hommes_images') || '[]');
       if (hommesImages.length > 0 && document.readyState !== 'loading') {
-        allHommesImages = hommesImages;
-        initCategoryFilters();
+        allHommesImages = normalizeHommesImages(hommesImages);
+        renderCategoryFilters();
         filterByCategory(currentCategory);
       }
     })();
@@ -760,24 +742,25 @@
         // Utiliser DocumentFragment pour optimiser le DOM
         const fragment = document.createDocumentFragment();
         
-        // Trier les images par numéro d'ID pour garantir l'ordre (numérique)
+        // Trier par ordre personnalisé (ou ID en secours)
         hommesImages.sort((a, b) => {
-          const matchA = a.id.match(/homme_(\d+)/);
-          const matchB = b.id.match(/homme_(\d+)/);
-          const numA = matchA ? parseInt(matchA[1]) : 0;
-          const numB = matchB ? parseInt(matchB[1]) : 0;
-          return numA - numB;
+          const orderA = Number(a.order) || 0;
+          const orderB = Number(b.order) || 0;
+          if (orderA === orderB) {
+            const matchA = a.id.match(/homme_(\d+)/);
+            const matchB = b.id.match(/homme_(\d+)/);
+            const numA = matchA ? parseInt(matchA[1]) : 0;
+            const numB = matchB ? parseInt(matchB[1]) : 0;
+            return numA - numB;
+          }
+          return orderA - orderB;
         });
         
-      hommesImages.forEach((item, index) => {
-          // Extraire le numéro de l'ID (homme_44 → 44) puis soustraire 1 pour obtenir le numéro du fichier (43.png → 43)
-          // Fichier 43.png correspond à homme_44 dans le JSON, donc on affiche "Coupe 43"
-        const match = item.id.match(/homme_(\d+)/);
-          const displayNumber = match ? parseInt(match[1]) - 1 : index; // homme_44 → 43 (numéro du fichier)
-        
-        const card = document.createElement('div');
+        hommesImages.forEach((item, index) => {
+          const displayNumber = Number(item.order) || index + 1;
+          const card = document.createElement('div');
           card.className = 'catalog-item';
-        card.innerHTML = `
+          card.innerHTML = `
             <img src="${item.url}" alt="Coupe Homme ${displayNumber}" loading="lazy">
             <div class="catalog-label">Coupe ${displayNumber}</div>
           `;
