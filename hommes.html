@@ -565,17 +565,47 @@
     // Images directement dans le code pour chargement instantané
     const HOMMES_IMAGES_DATA = [];
     
-    // Définir les catégories avec leurs numéros de coupe
-    const CATEGORIES = {
-      'attache': [43, 76, 101, 111, 149, 150, 151, 152, 154, 170, 193, 196, 197, 201, 208, 209, 243, 256, 257, 268, 294, 353, 361, 405, 434, 435, 439, 474],
-      'court': [33, 34, 38, 40, 41, 46, 48, 67, 68, 69, 72, 102, 103, 124, 125, 126, 128, 144, 162, 227, 231, 232, 244, 245, 246, 252, 263, 272, 273, 297, 298, 311, 322, 335, 336, 383, 394, 425, 428, 430, 432, 437, 440, 445, 449, 451, 452, 453, 457, 466, 468, 470, 471, 473, 475],
-      'degrade': [37, 39, 73, 86, 91, 104, 187, 213, 226, 228, 303, 323, 354, 427, 455, 458, 459, 460, 461, 467],
-      'long': [123, 184, 207, 223, 260, 401, 418, 441, 443, 462]
-    };
-    
-    // Variable pour stocker toutes les images
+    // Variables catalogue
     let allHommesImages = [];
     let currentCategory = 'all';
+    let availableCategories = ['all'];
+
+    function normalizeHommesImages(images) {
+      const normalized = (images || []).map((img, idx) => ({
+        ...img,
+        order: Number(img.order) || idx + 1,
+        categories: Array.isArray(img.categories) ? img.categories.filter(Boolean) : []
+      }));
+      normalized.sort((a, b) => (a.order || 0) - (b.order || 0));
+      return normalized;
+    }
+
+    function buildCategoryList(images) {
+      const set = new Set(['all']);
+      images.forEach(img => {
+        (img.categories || []).forEach(cat => set.add(cat));
+      });
+      return Array.from(set);
+    }
+
+    function renderCategoryFilters() {
+      const container = document.querySelector('.category-filters');
+      if (!container) return;
+
+      const categories = buildCategoryList(allHommesImages);
+      availableCategories = categories;
+      container.innerHTML = '';
+
+      categories.forEach(category => {
+        const btn = document.createElement('button');
+        btn.className = `category-filter-btn${category === currentCategory ? ' active' : ''}`;
+        btn.setAttribute('data-category', category);
+        btn.textContent = category === 'all' ? 'Tout' : category;
+        container.appendChild(btn);
+      });
+
+      initCategoryFilters();
+    }
     
     // Charger depuis JSON statique (INSTANTANÉ)
     async function loadHommesCatalog() {
