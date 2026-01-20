@@ -1610,7 +1610,7 @@
       const newImage = {
         id: newId,
         url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E',
-        order: insertPosition,
+        order: insertPosition - 0.5,  // Order temporaire entre position-1 et position pour garantir le tri correct
         categories: []
       };
 
@@ -1880,7 +1880,7 @@
       const newImage = {
         id: newId,
         url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E',
-        order: insertPosition,
+        order: insertPosition - 0.5,  // Order temporaire entre position-1 et position pour garantir le tri correct
         categories: []
       };
 
