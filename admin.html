@@ -1240,12 +1240,12 @@
         <input type="text" class="input-url" placeholder="URL de l'image" value="${currentImage}" onchange="updateImageUrl('${config.id}', this.value); updatePreviewImage('${config.id}', this.value)">
         <button class="btn-small" onclick="updateImageUrl('${config.id}', this.previousElementSibling.value); ${(config.id.startsWith('femme_') || config.id.startsWith('homme_')) ? 'loadFemmesCatalog(); loadHommesCatalog();' : ''}">Mettre à jour</button>
         ${isCatalogImage ? `
-          <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.5rem;">
-            <label style="color: var(--text-secondary); font-size: 0.9rem;">Position</label>
-            <input type="number" class="input-url" value="${orderValue}" min="1" style="max-width: 120px;" onchange="updateCatalogOrder('${config.id}', this.value)">
-            <button class="btn-small" style="padding: 0.45rem 0.9rem;" onclick="updateCatalogOrder('${config.id}', ${orderValue} - 1)">↑</button>
-            <button class="btn-small" style="padding: 0.45rem 0.9rem;" onclick="updateCatalogOrder('${config.id}', ${orderValue} + 1)">↓</button>
-            <button class="btn-small" style="padding: 0.45rem 0.9rem;" onclick="insertAfterCatalog('${config.id}')">+ après</button>
+          <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.75rem; flex-wrap: wrap;">
+            <label style="color: var(--text-secondary); font-size: 0.9rem; flex-basis: 100%; margin-bottom: 0.25rem;">📍 Ordre (Position)</label>
+            <input type="number" class="input-url" value="${orderValue}" min="1" style="max-width: 80px; flex: 1; min-width: 80px;" onchange="updateCatalogOrder('${config.id}', this.value)">
+            <button class="btn-small" style="padding: 0.45rem 0.9rem;" onclick="updateCatalogOrder('${config.id}', ${orderValue} - 1)">↑ Haut</button>
+            <button class="btn-small" style="padding: 0.45rem 0.9rem;" onclick="updateCatalogOrder('${config.id}', ${orderValue} + 1)">↓ Bas</button>
+            <button class="btn-small" style="padding: 0.45rem 0.9rem;" onclick="insertAfterCatalog('${config.id}')">+ Après</button>
           </div>
           <div class="url-input-group">
             <label style="color: var(--text-secondary); font-size: 0.9rem;">Catégories (séparées par des virgules)</label>
