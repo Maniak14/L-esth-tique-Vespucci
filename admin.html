@@ -2021,12 +2021,21 @@
       if (currentIndex === -1) return;
 
       const targetPosition = Math.max(1, Math.min(parseInt(newPosition, 10) || 1, images.length));
+      
+      // Si la position n'a pas changé, ne rien faire
+      if (currentIndex === targetPosition - 1) return;
+      
+      // Retirer l'élément de sa position actuelle
       const [moving] = images.splice(currentIndex, 1);
+      
+      // L'insérer à la nouvelle position
       images.splice(targetPosition - 1, 0, moving);
 
+      // Réassigner tous les orders dans l'ordre du tableau
       images = images.map((img, idx) => ({ ...img, order: idx + 1 }));
       persistCatalogImages(catalogKey, images);
 
+      // Recharger l'affichage
       if (catalogKey === 'femmes') {
         loadFemmesCatalog();
       } else {
