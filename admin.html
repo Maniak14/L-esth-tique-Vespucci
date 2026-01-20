@@ -585,7 +585,8 @@
           <h1>🔧 Administration - L'Esthétique Vespucci</h1>
           <p style="color: var(--text-secondary);">Gérez les images de votre site</p>
         </div>
-        <div style="display: flex; gap: 1rem; align-items: center;">
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <button onclick="testFirebaseConnection()" id="firebaseTestBtn" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #3b82f6; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: all 0.3s ease; white-space: nowrap;" onmouseover="this.style.background='rgba(59, 130, 246, 0.2)'" onmouseout="this.style.background='rgba(59, 130, 246, 0.1)'" title="Tester la connexion à Firebase">🔌 Test Firebase</button>
           <button onclick="exportAllCatalogData()" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #22c55e; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: all 0.3s ease; white-space: nowrap;" onmouseover="this.style.background='rgba(34, 197, 94, 0.2)'" onmouseout="this.style.background='rgba(34, 197, 94, 0.1)'" title="Télécharger catalog-images.json avec toutes les données">📥 Exporter tout (JSON)</button>
           <button onclick="logout()" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: all 0.3s ease; white-space: nowrap;" onmouseover="this.style.background='rgba(239, 68, 68, 0.2)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'">Déconnexion</button>
         </div>
@@ -860,8 +861,16 @@
     // Save image to localStorage and Firebase
     function saveImage(imageId, imageUrl) {
       localStorage.setItem(`image_${imageId}`, imageUrl);
-      if (window.firebaseInitialized && typeof saveImageToFirebase === 'function') {
+      
+      // OBLIGATOIRE: Sauvegarder dans Firebase
+      if (typeof saveImageToFirebase === 'function') {
+        // Initialiser Firebase si nécessaire
+        if (!window.firebaseInitialized) {
+          initFirebaseDB();
+        }
+        // Sauvegarder dans Firebase
         saveImageToFirebase(imageId, imageUrl);
+        console.log('✅ Image sauvegardée dans Firebase:', imageId);
       }
     }
 
@@ -937,21 +946,32 @@
       const storageKey = `${catalogKey}_images`;
       localStorage.setItem(storageKey, JSON.stringify(images));
 
-      if (firebaseInitialized) {
-        if (catalogKey === 'femmes' && typeof saveFemmesImagesToFirebase === 'function') {
-          saveFemmesImagesToFirebase(images);
-        }
-        if (catalogKey === 'hommes' && typeof saveHommesImagesToFirebase === 'function') {
-          saveHommesImagesToFirebase(images);
-        }
+      // OBLIGATOIRE: Sauvegarder dans Firebase
+      if (!window.firebaseInitialized) {
+        initFirebaseDB();
+      }
+      
+      if (catalogKey === 'femmes' && typeof saveFemmesImagesToFirebase === 'function') {
+        saveFemmesImagesToFirebase(images);
+        console.log('✅ Images femmes sauvegardées dans Firebase');
+      }
+      if (catalogKey === 'hommes' && typeof saveHommesImagesToFirebase === 'function') {
+        saveHommesImagesToFirebase(images);
+        console.log('✅ Images hommes sauvegardées dans Firebase');
       }
     }
     
     // Save image position
     function saveImagePosition(imageId, position) {
       localStorage.setItem(`image_position_${imageId}`, position);
-      if (firebaseInitialized && typeof savePositionToFirebase === 'function') {
+      
+      // OBLIGATOIRE: Sauvegarder dans Firebase
+      if (typeof savePositionToFirebase === 'function') {
+        if (!window.firebaseInitialized) {
+          initFirebaseDB();
+        }
         savePositionToFirebase(imageId, position);
+        console.log('✅ Position sauvegardée dans Firebase:', imageId);
       }
       // Update preview
       const previewImg = document.querySelector(`#preview_${imageId}`);
@@ -1062,8 +1082,16 @@
       }
       
       localStorage.setItem('team_members', JSON.stringify(teamMembers));
-      if (firebaseInitialized && typeof saveTeamMembersToFirebase === 'function') {
+      
+      // OBLIGATOIRE: Sauvegarder dans Firebase
+      if (typeof saveTeamMembersToFirebase === 'function') {
+        // Initialiser Firebase si nécessaire
+        if (!window.firebaseInitialized) {
+          initFirebaseDB();
+        }
+        // Sauvegarder dans Firebase
         saveTeamMembersToFirebase(teamMembers);
+        console.log('✅ Données envoyées à Firebase');
       }
     }
     
@@ -1084,6 +1112,58 @@
           const fullName = `${firstName} ${lastName}`.trim() || 'Nouvel employé';
           label.textContent = fullName;
         }
+      }
+    }
+    
+    // Test Firebase Connection
+    async function testFirebaseConnection() {
+      const btn = document.getElementById('firebaseTestBtn');
+      const originalText = btn.textContent;
+      btn.textContent = '⏳ Test en cours...';
+      btn.disabled = true;
+      
+      try {
+        // Initialiser Firebase
+        if (!window.firebaseInitialized) {
+          initFirebaseDB();
+        }
+        
+        if (!window.firebaseInitialized) {
+          throw new Error('Firebase non initialisé');
+        }
+        
+        // Tenter une écriture de test
+        const testData = {
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          message: 'Test de connexion réussi'
+        };
+        
+        await db.collection('test').doc('connection_test').set(testData);
+        
+        // Lire les données pour vérifier
+        const doc = await db.collection('test').doc('connection_test').get();
+        
+        if (doc.exists) {
+          btn.textContent = '✅ Firebase OK!';
+          btn.style.color = '#22c55e';
+          btn.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+          alert('✅ Connexion Firebase réussie!\n\nProjet: vespucci-6b1be\nBase de données: Firestore\n\nLes données sont bien sauvegardées sur Firebase.');
+        } else {
+          throw new Error('Impossible de lire le document de test');
+        }
+      } catch (error) {
+        console.error('Erreur Firebase:', error);
+        btn.textContent = '❌ Erreur Firebase';
+        btn.style.color = '#ef4444';
+        btn.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+        alert('❌ Erreur de connexion Firebase:\n' + error.message);
+      } finally {
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.style.color = '#3b82f6';
+          btn.style.borderColor = 'rgba(59, 130, 246, 0.3)';
+          btn.disabled = false;
+        }, 3000);
       }
     }
 

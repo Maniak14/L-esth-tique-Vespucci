@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Test Firebase - L'Esthétique Vespucci</title>
+  <link rel="icon" type="image/png" href="img/V.png">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #fff;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: rgba(30, 30, 50, 0.8);
+      border: 1px solid rgba(32, 178, 170, 0.3);
+      border-radius: 20px;
+      padding: 2rem;
+      backdrop-filter: blur(20px);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 0.5rem;
+      font-size: 2rem;
+      background: linear-gradient(135deg, #20b2aa, #48d1cc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #999;
+      margin-bottom: 2rem;
+    }
+
+    .test-section {
+      margin-bottom: 2rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(32, 178, 170, 0.2);
+      border-radius: 15px;
+      padding: 1.5rem;
+    }
+
+    .test-section h2 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: #20b2aa;
+    }
+
+    .button {
+      background: linear-gradient(135deg, #20b2aa, #48d1cc);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(32, 178, 170, 0.3);
+    }
+
+    .button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .status.success {
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid rgba(34, 197, 94, 0.5);
+      color: #4ade80;
+    }
+
+    .status.error {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      color: #f87171;
+    }
+
+    .status.info {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.5);
+      color: #93c5fd;
+    }
+
+    .status.warning {
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      color: #fbbf24;
+    }
+
+    .console-output {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(32, 178, 170, 0.3);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 1rem;
+    }
+
+    .console-line {
+      margin: 0.25rem 0;
+      padding: 0.25rem 0;
+      border-bottom: 1px solid rgba(32, 178, 170, 0.1);
+    }
+
+    .console-line.success {
+      color: #4ade80;
+    }
+
+    .console-line.error {
+      color: #f87171;
+    }
+
+    .console-line.info {
+      color: #93c5fd;
+    }
+
+    .data-table {
+      width: 100%;
+      margin-top: 1rem;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .data-table th {
+      background: rgba(32, 178, 170, 0.2);
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 2px solid rgba(32, 178, 170, 0.3);
+    }
+
+    .data-table td {
+      padding: 0.75rem;
+      border-bottom: 1px solid rgba(32, 178, 170, 0.1);
+    }
+
+    .data-table tr:hover {
+      background: rgba(32, 178, 170, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔧 Test Firebase - Vespucci</h1>
+    <p class="subtitle">Vérifiez la connexion et la synchronisation avec Firebase</p>
+
+    <!-- Test Connection Section -->
+    <div class="test-section">
+      <h2>1️⃣ Test de Connexion</h2>
+      <button class="button" onclick="testConnection()">🔌 Tester la Connexion</button>
+      <div id="connectionStatus"></div>
+    </div>
+
+    <!-- Read Data Section -->
+    <div class="test-section">
+      <h2>2️⃣ Charger les Données</h2>
+      <button class="button" onclick="loadTeamData()">👥 Charger Équipe</button>
+      <button class="button" onclick="loadAllData()">📦 Charger Tout</button>
+      <div id="dataStatus"></div>
+      <div id="teamDataTable"></div>
+    </div>
+
+    <!-- Write Data Section -->
+    <div class="test-section">
+      <h2>3️⃣ Écrire des Données de Test</h2>
+      <button class="button" onclick="writeTestData()">✍️ Écrire Test</button>
+      <button class="button" onclick="clearTestData()">🗑️ Supprimer Test</button>
+      <div id="writeStatus"></div>
+    </div>
+
+    <!-- Console Output -->
+    <div class="test-section">
+      <h2>📋 Sortie Console</h2>
+      <div class="console-output" id="consoleOutput"></div>
+    </div>
+
+    <!-- Status Overview -->
+    <div class="test-section">
+      <h2>📊 État Global</h2>
+      <table class="data-table">
+        <tbody>
+          <tr>
+            <td><strong>Firebase SDK</strong></td>
+            <td id="fbSDKStatus">❓ Vérification...</td>
+          </tr>
+          <tr>
+            <td><strong>Firebase Initialisé</strong></td>
+            <td id="fbInitStatus">❓ Vérification...</td>
+          </tr>
+          <tr>
+            <td><strong>Firestore DB</strong></td>
+            <td id="fbDBStatus">❓ Vérification...</td>
+          </tr>
+          <tr>
+            <td><strong>Données LocalStorage</strong></td>
+            <td id="lsStatus">❓ Vérification...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="firebase-db.js"></script>
+
+  <script>
+    let consoleLines = [];
+    const MAX_CONSOLE_LINES = 50;
+
+    function addConsoleLog(message, type = 'info') {
+      consoleLines.push({ message, type });
+      if (consoleLines.length > MAX_CONSOLE_LINES) {
+        consoleLines.shift();
+      }
+      updateConsoleOutput();
+    }
+
+    function updateConsoleOutput() {
+      const output = document.getElementById('consoleOutput');
+      output.innerHTML = consoleLines.map(line => 
+        `<div class="console-line ${line.type}">${new Date().toLocaleTimeString()} - ${line.message}</div>`
+      ).join('');
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function setStatus(elementId, content, type = 'info') {
+      const el = document.getElementById(elementId);
+      el.className = `status ${type}`;
+      el.innerHTML = content;
+    }
+
+    async function checkGlobalStatus() {
+      // Firebase SDK
+      document.getElementById('fbSDKStatus').textContent = 
+        typeof firebase !== 'undefined' ? '✅ Chargé' : '❌ Non chargé';
+
+      // Firebase Initialized
+      if (!window.firebaseInitialized) {
+        initFirebaseDB();
+      }
+      document.getElementById('fbInitStatus').textContent = 
+        window.firebaseInitialized ? '✅ Oui' : '❌ Non';
+
+      // Firestore DB
+      document.getElementById('fbDBStatus').textContent = 
+        (typeof db !== 'undefined' && db) ? '✅ Disponible' : '❌ Non disponible';
+
+      // LocalStorage
+      const teamData = localStorage.getItem('team_members');
+      const hasData = teamData ? `✅ ${JSON.parse(teamData).length} membres` : '❌ Vide';
+      document.getElementById('lsStatus').textContent = hasData;
+    }
+
+    async function testConnection() {
+      const btn = event.target;
+      btn.disabled = true;
+      addConsoleLog('Test de connexion lancé...', 'info');
+
+      try {
+        if (!window.firebaseInitialized) {
+          initFirebaseDB();
+        }
+
+        if (!window.firebaseInitialized) {
+          throw new Error('Firebase non initialisé');
+        }
+
+        addConsoleLog('✅ Firebase initialisé', 'success');
+
+        const testData = {
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          message: 'Test de connexion',
+          checked: new Date().toISOString()
+        };
+
+        await db.collection('test').doc('connection_test').set(testData);
+        addConsoleLog('✅ Données écrites dans Firestore', 'success');
+
+        const doc = await db.collection('test').doc('connection_test').get();
+        if (doc.exists) {
+          addConsoleLog('✅ Document lu avec succès', 'success');
+          setStatus('connectionStatus', 
+            '<strong>✅ Connexion réussie!</strong><br>Projet: vespucci-6b1be<br>Base: Firestore<br>Status: Online ✓', 
+            'success');
+        } else {
+          throw new Error('Document non trouvé');
+        }
+      } catch (error) {
+        addConsoleLog('❌ Erreur: ' + error.message, 'error');
+        setStatus('connectionStatus', 
+          '<strong>❌ Erreur de connexion</strong><br>' + error.message, 
+          'error');
+      } finally {
+        btn.disabled = false;
+        checkGlobalStatus();
+      }
+    }
+
+    async function loadTeamData() {
+      const btn = event.target;
+      btn.disabled = true;
+      addConsoleLog('Chargement des données équipe...', 'info');
+
+      try {
+        if (!window.firebaseInitialized) {
+          initFirebaseDB();
+        }
+
+        const doc = await db.collection('data').doc('team_members').get();
+        if (doc.exists) {
+          const data = doc.data();
+          const members = data.members || [];
+          addConsoleLog(`✅ ${members.length} membres chargés de Firebase`, 'success');
+          
+          // Display in table
+          const tableHtml = `
+            <table class="data-table">
+              <tr>
+                <th>ID</th>
+                <th>Prénom</th>
+                <th>Nom</th>
+                <th>Grade</th>
+                <th>Téléphone</th>
+              </tr>
+              ${members.map(m => `
+                <tr>
+                  <td>${m.id}</td>
+                  <td>${m.firstName || '-'}</td>
+                  <td>${m.lastName || '-'}</td>
+                  <td>${m.grade || '-'}</td>
+                  <td>${m.phone || '-'}</td>
+                </tr>
+              `).join('')}
+            </table>
+          `;
+          document.getElementById('teamDataTable').innerHTML = tableHtml;
+          setStatus('dataStatus', `<strong>✅ ${members.length} membres trouvés</strong>`, 'success');
+        } else {
+          addConsoleLog('⚠️ Aucune donnée équipe trouvée', 'warning');
+          setStatus('dataStatus', '<strong>⚠️ Aucune donnée</strong>', 'warning');
+        }
+      } catch (error) {
+        addConsoleLog('❌ Erreur: ' + error.message, 'error');
+        setStatus('dataStatus', '<strong>❌ Erreur</strong><br>' + error.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function loadAllData() {
+      addConsoleLog('Chargement de toutes les données...', 'info');
+      try {
+        await loadAllDataFromFirebase();
+        addConsoleLog('✅ Toutes les données chargées', 'success');
+        checkGlobalStatus();
+      } catch (error) {
+        addConsoleLog('❌ Erreur: ' + error.message, 'error');
+      }
+    }
+
+    async function writeTestData() {
+      const btn = event.target;
+      btn.disabled = true;
+      addConsoleLog('Écriture de données test...', 'info');
+
+      try {
+        const testData = {
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          firstName: 'Test',
+          lastName: 'Firebase',
+          grade: 'Testeur',
+          phone: '000-0000'
+        };
+
+        await db.collection('test').doc('test_member').set(testData);
+        addConsoleLog('✅ Données test écrites', 'success');
+        setStatus('writeStatus', '<strong>✅ Données test écrites</strong>', 'success');
+      } catch (error) {
+        addConsoleLog('❌ Erreur: ' + error.message, 'error');
+        setStatus('writeStatus', '<strong>❌ Erreur</strong><br>' + error.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function clearTestData() {
+      const btn = event.target;
+      btn.disabled = true;
+      addConsoleLog('Suppression des données test...', 'info');
+
+      try {
+        await db.collection('test').doc('connection_test').delete();
+        await db.collection('test').doc('test_member').delete();
+        addConsoleLog('✅ Données test supprimées', 'success');
+        setStatus('writeStatus', '<strong>✅ Données supprimées</strong>', 'success');
+      } catch (error) {
+        addConsoleLog('❌ Erreur: ' + error.message, 'error');
+        setStatus('writeStatus', '<strong>❌ Erreur</strong><br>' + error.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // Initialize on load
+    window.addEventListener('load', () => {
+      addConsoleLog('Page de test Firebase chargée', 'info');
+      checkGlobalStatus();
+    });
+  </script>
+</body>
+</html>
