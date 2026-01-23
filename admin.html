@@ -2299,18 +2299,24 @@
           </div>
         `;
         
-        // Add event listeners
-        const editBtn = item.querySelector('.btn-edit-partner');
-        const deleteBtn = item.querySelector('.btn-delete-partner');
-        
-        if (editBtn) {
-          editBtn.addEventListener('click', () => window.editPartner(partner.id));
-        }
-        if (deleteBtn) {
-          deleteBtn.addEventListener('click', () => window.deletePartner(partner.id));
-        }
-        
         partnersContainer.appendChild(item);
+        
+        // Add event listeners after appending to DOM
+        setTimeout(() => {
+          const editBtn = document.querySelector(`[data-partner-id="${partner.id}"] .btn-edit-partner`);
+          const deleteBtn = document.querySelector(`[data-partner-id="${partner.id}"] .btn-delete-partner`);
+          
+          if (editBtn) {
+            editBtn.onclick = function() {
+              window.editPartner(partner.id);
+            };
+          }
+          if (deleteBtn) {
+            deleteBtn.onclick = function() {
+              window.deletePartner(partner.id);
+            };
+          }
+        }, 0);
       });
     }
     
@@ -2328,7 +2334,7 @@
       partners.push(newPartner);
       savePartners(partners);
       loadPartners();
-      editPartner(newId);
+      window.editPartner(newId);
     };
     
     // Edit partner
@@ -2620,6 +2626,26 @@
       
       // Load partners
       loadPartners();
+      
+      // Initialize default partners if none exist
+      initializeDefaultPartners();
+    }
+    
+    // Initialize default partners if none exist
+    function initializeDefaultPartners() {
+      const partners = JSON.parse(localStorage.getItem('partners') || '[]');
+      if (partners.length === 0) {
+        console.log('No partners found, creating defaults...');
+        const defaultPartners = [
+          { id: 'partner_auto_exo', name: 'Auto Exotic', image: 'img/auto_exo.webp', badge: 'Partenaire Officiel' },
+          { id: 'partner_ltd', name: 'LTD SandyShore', image: 'img/ltd.webp', badge: 'Partenaire Officiel' },
+          { id: 'partner_hen', name: 'Hen House', image: 'img/hen.png', badge: 'Partenaire Officiel' },
+          { id: 'partner_delight', name: 'Delight', image: 'img/delight.png', badge: 'Partenaire Officiel' },
+          { id: 'partner_life', name: 'Life Invader', image: 'img/life.png', badge: 'Partenaire Officiel' }
+        ];
+        savePartners(defaultPartners);
+        console.log('Default partners created:', defaultPartners);
+      }
     }
 
     // Initialize on load
