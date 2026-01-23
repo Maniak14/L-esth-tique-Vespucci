@@ -1242,7 +1242,7 @@
         ${isCatalogImage ? `
           <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.75rem; flex-wrap: wrap;">
             <label style="color: var(--text-secondary); font-size: 0.9rem; flex-basis: 100%; margin-bottom: 0.25rem;">📍 Ordre (Position)</label>
-            <input type="number" class="input-url" value="${orderValue}" min="1" style="max-width: 80px; flex: 1; min-width: 80px;" onchange="updateCatalogOrder('${config.id}', this.value)">
+            <input type="number" class="input-url" value="${orderValue}" min="0" style="max-width: 80px; flex: 1; min-width: 80px;" onchange="updateCatalogOrder('${config.id}', this.value)">
             <button class="btn-small" style="padding: 0.45rem 0.9rem;" onclick="updateCatalogOrder('${config.id}', ${orderValue} - 1)">↑ Haut</button>
             <button class="btn-small" style="padding: 0.45rem 0.9rem;" onclick="updateCatalogOrder('${config.id}', ${orderValue} + 1)">↓ Bas</button>
             <button class="btn-small" style="padding: 0.45rem 0.9rem;" onclick="insertAfterCatalog('${config.id}')">+ Après</button>
@@ -2023,6 +2023,30 @@
           img.src = url;
         }
       }
+    }
+
+    // Diminue tous les ordres de 1 (utile si on commence à 0)
+    function decrementAllOrders(catalogKey = null) {
+      const catalogs = catalogKey ? [catalogKey] : ['femmes', 'hommes'];
+      
+      catalogs.forEach(key => {
+        let images = JSON.parse(localStorage.getItem(`${key}_images`) || '[]');
+        if (images.length === 0) return;
+        
+        // Diminuer tous les ordres de 1 (minimum 0)
+        images = images.map(img => ({
+          ...img,
+          order: Math.max(0, (img.order || 1) - 1)
+        }));
+        
+        persistCatalogImages(key, images);
+      });
+      
+      // Recharger l'affichage
+      loadFemmesCatalog();
+      loadHommesCatalog();
+      
+      alert('Tous les ordres ont été diminués de 1 !');
     }
 
     function updateCatalogOrder(imageId, newPosition) {
