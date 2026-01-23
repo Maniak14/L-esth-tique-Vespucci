@@ -9,6 +9,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="firebase-db.js"></script>
   <script>
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual';
@@ -216,51 +221,8 @@
       </p>
     </div>
 
-    <div class="partners-grid-premium">
-      <div class="partner-card premium-partner">
-        <div class="partner-badge">Partenaire Officiel</div>
-        <div class="partner-glow"></div>
-        <div class="partner-image-wrapper">
-          <img src="img/auto_exo.webp" alt="Auto Exótic" class="partner-image">
-        </div>
-        <h3 class="partner-name">Auto Exótic</h3>
-      </div>
-
-      <div class="partner-card premium-partner">
-        <div class="partner-badge">Partenaire Officiel</div>
-        <div class="partner-glow"></div>
-        <div class="partner-image-wrapper">
-          <img src="img/ltd.webp" alt="LTD SandyShore" class="partner-image">
-        </div>
-        <h3 class="partner-name">LTD SandyShore</h3>
-      </div>
-
-      <div class="partner-card premium-partner">
-        <div class="partner-badge">Partenaire Officiel</div>
-        <div class="partner-glow"></div>
-        <div class="partner-image-wrapper">
-          <img src="img/hen.png" alt="Hen House" class="partner-image">
-        </div>
-        <h3 class="partner-name">Hen House</h3>
-      </div>
-
-      <div class="partner-card premium-partner">
-        <div class="partner-badge">Partenaire Officiel</div>
-        <div class="partner-glow"></div>
-        <div class="partner-image-wrapper">
-          <img src="img/delight.png" alt="Delight" class="partner-image">
-        </div>
-        <h3 class="partner-name">Delight</h3>
-      </div>
-
-      <div class="partner-card premium-partner">
-        <div class="partner-badge">Partenaire Officiel</div>
-        <div class="partner-glow"></div>
-        <div class="partner-image-wrapper">
-          <img src="img/life.png" alt="Life Invader" class="partner-image">
-        </div>
-        <h3 class="partner-name">Life Invader</h3>
-      </div>
+    <div class="partners-grid-premium" id="partnersGrid">
+      <!-- Partners will be loaded dynamically here -->
     </div>
   </section>
 
@@ -557,6 +519,74 @@
       // Vérifier l'état initial au chargement
       handleScrollToTop();
     }
+
+    // ========== LOAD PARTNERS DYNAMICALLY ==========
+    
+    function loadPartnersDisplay() {
+      const partnersGrid = document.getElementById('partnersGrid');
+      if (!partnersGrid) return;
+      
+      // Try to load from localStorage first (Firebase cached data)
+      let partners = JSON.parse(localStorage.getItem('partners') || '[]');
+      
+      // If no partners in localStorage, load from Firebase
+      if (partners.length === 0 && typeof loadPartnersFromFirebase === 'function') {
+        loadPartnersFromFirebase((loadedPartners) => {
+          partners = loadedPartners;
+          renderPartners(partnersGrid, partners);
+        });
+        return;
+      }
+      
+      renderPartners(partnersGrid, partners);
+      
+      // Watch for changes from other tabs/Firebase
+      if (typeof watchPartners === 'function') {
+        watchPartners((updatedPartners) => {
+          renderPartners(partnersGrid, updatedPartners);
+        });
+      }
+    }
+    
+    function renderPartners(container, partners) {
+      container.innerHTML = '';
+      
+      // If no partners, show default ones for backward compatibility
+      if (!partners || partners.length === 0) {
+        const defaultPartners = [
+          { id: 'auto_exo', name: 'Auto Exótic', image: 'img/auto_exo.webp', badge: 'Partenaire Officiel' },
+          { id: 'ltd', name: 'LTD SandyShore', image: 'img/ltd.webp', badge: 'Partenaire Officiel' },
+          { id: 'hen', name: 'Hen House', image: 'img/hen.png', badge: 'Partenaire Officiel' },
+          { id: 'delight', name: 'Delight', image: 'img/delight.png', badge: 'Partenaire Officiel' },
+          { id: 'life', name: 'Life Invader', image: 'img/life.png', badge: 'Partenaire Officiel' }
+        ];
+        partners = defaultPartners;
+      }
+      
+      partners.forEach(partner => {
+        const card = document.createElement('div');
+        card.className = 'partner-card premium-partner';
+        card.innerHTML = `
+          <div class="partner-badge">${partner.badge || 'Partenaire Officiel'}</div>
+          <div class="partner-glow"></div>
+          <div class="partner-image-wrapper">
+            <img src="${partner.image}" alt="${partner.name}" class="partner-image">
+          </div>
+          <h3 class="partner-name">${partner.name}</h3>
+        `;
+        container.appendChild(card);
+      });
+    }
+    
+    // Load partners when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize Firebase if available
+      if (typeof initFirebaseDB === 'function') {
+        initFirebaseDB();
+      }
+      loadPartnersDisplay();
+    });
+    
   </script>
 
   <style>

@@ -456,3 +456,63 @@ async function loadAllDataFromFirebase() {
     console.error('Erreur chargement données Firestore:', error);
   }
 }
+
+// ========== PARTNERS ==========
+
+// Sauvegarder les partenaires dans Firestore
+function savePartnersToFirebase(partners) {
+  if (!window.firebaseInitialized || !db) return;
+  
+  try {
+    db.collection('data').doc('partners').set({
+      partners: partners,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (error) {
+    console.error('Erreur sauvegarde partenaires:', error);
+  }
+}
+
+// Charger les partenaires depuis Firestore
+function loadPartnersFromFirebase(callback) {
+  if (!window.firebaseInitialized || !db) {
+    if (callback) callback([]);
+    return;
+  }
+  
+  try {
+    db.collection('data').doc('partners').get().then((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        const partners = data.partners || [];
+        localStorage.setItem('partners', JSON.stringify(partners));
+        if (callback) callback(partners);
+      } else {
+        if (callback) callback([]);
+      }
+    });
+  } catch (error) {
+    console.error('Erreur chargement partenaires:', error);
+    if (callback) callback([]);
+  }
+}
+
+// Écouter les changements de partenaires en temps réel
+function watchPartners(callback) {
+  if (!window.firebaseInitialized || !db) return;
+  
+  try {
+    db.collection('data').doc('partners').onSnapshot((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        const partners = data.partners || [];
+        localStorage.setItem('partners', JSON.stringify(partners));
+        if (callback) callback(partners);
+      } else {
+        if (callback) callback([]);
+      }
+    });
+  } catch (error) {
+    console.error('Erreur watch partenaires:', error);
+  }
+}
