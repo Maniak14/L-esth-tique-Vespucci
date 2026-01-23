@@ -2026,7 +2026,7 @@
     }
 
     // Diminue tous les ordres de 1 (utile si on commence à 0)
-    function decrementAllOrders(catalogKey = null) {
+    window.decrementAllOrders = function(catalogKey = null) {
       const catalogs = catalogKey ? [catalogKey] : ['femmes', 'hommes'];
       
       catalogs.forEach(key => {
@@ -2042,11 +2042,8 @@
         persistCatalogImages(key, images);
       });
       
-      // Recharger l'affichage
-      loadFemmesCatalog();
-      loadHommesCatalog();
-      
-      alert('Tous les ordres ont été diminués de 1 !');
+      alert('Tous les ordres ont été diminués de 1 !\nRafraîchissez la page pour voir les modifications.');
+      location.reload();
     }
 
     function updateCatalogOrder(imageId, newPosition) {
