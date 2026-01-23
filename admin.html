@@ -2294,7 +2294,159 @@
       
       // Load hommes catalog
       loadHommesCatalog();
+      
+      // Load partners
+      loadPartners();
     }
+
+    // ========== PARTNERS MANAGEMENT ==========
+    
+    // Load partners
+    function loadPartners() {
+      const partnersGrid = document.getElementById('partnersGrid');
+      if (!partnersGrid) return;
+      
+      let partners = JSON.parse(localStorage.getItem('partners') || '[]');
+      
+      // Load from Firebase if available
+      if (typeof loadPartnersFromFirebase === 'function') {
+        loadPartnersFromFirebase((loadedPartners) => {
+          if (loadedPartners && loadedPartners.length > 0) {
+            partners = loadedPartners;
+          }
+          renderPartnersAdmin(partnersGrid, partners);
+        });
+      } else {
+        renderPartnersAdmin(partnersGrid, partners);
+      }
+      
+      // Watch for changes
+      if (typeof watchPartners === 'function') {
+        watchPartners((updatedPartners) => {
+          renderPartnersAdmin(partnersGrid, updatedPartners);
+        });
+      }
+    }
+    
+    // Render partners in admin
+    function renderPartnersAdmin(container, partners) {
+      container.innerHTML = '';
+      
+      if (!partners || partners.length === 0) {
+        container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 2rem;">Aucun partenaire pour le moment. Ajoutez-en un ci-dessus !</div>';
+        return;
+      }
+      
+      partners.forEach((partner, index) => {
+        const card = document.createElement('div');
+        card.className = 'partner-card-admin';
+        card.style.cssText = `
+          position: relative;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 15px;
+          padding: 1.5rem;
+          text-align: center;
+          transition: all 0.3s ease;
+        `;
+        
+        card.innerHTML = `
+          <div style="position: relative; width: 100%; height: 150px; margin-bottom: 1rem; border-radius: 10px; overflow: hidden; background: var(--bg-dark);">
+            <img src="${partner.image}" alt="${partner.name}" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage%20Manquante%3C/text%3E%3C/svg%3E'">
+          </div>
+          <h3 style="color: var(--text-primary); font-size: 1.1rem; margin-bottom: 0.5rem;">${partner.name}</h3>
+          <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">${partner.badge || 'Partenaire Officiel'}</div>
+          <button onclick="deletePartner('${partner.id}')" class="btn-small" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; width: 100%;">🗑️ Supprimer</button>
+        `;
+        
+        container.appendChild(card);
+      });
+    }
+    
+    // Add partner (global function)
+    window.addPartner = function() {
+      const nameInput = document.getElementById('partnerName');
+      const imageInput = document.getElementById('partnerImage');
+      const badgeInput = document.getElementById('partnerBadge');
+      
+      const name = nameInput.value.trim();
+      const image = imageInput.value.trim();
+      const badge = badgeInput.value.trim() || 'Partenaire Officiel';
+      
+      if (!name) {
+        alert('⚠️ Veuillez entrer un nom de partenaire');
+        return;
+      }
+      
+      if (!image) {
+        alert('⚠️ Veuillez entrer une URL d\'image');
+        return;
+      }
+      
+      if (!image.startsWith('http://') && !image.startsWith('https://')) {
+        alert('⚠️ L\'URL de l\'image doit commencer par http:// ou https://');
+        return;
+      }
+      
+      let partners = JSON.parse(localStorage.getItem('partners') || '[]');
+      
+      // Generate ID from name
+      const id = name.toLowerCase()
+        .replace(/[éèêë]/g, 'e')
+        .replace(/[àâä]/g, 'a')
+        .replace(/[ùûü]/g, 'u')
+        .replace(/[îï]/g, 'i')
+        .replace(/[ôö]/g, 'o')
+        .replace(/[^a-z0-9]/g, '_')
+        .replace(/_+/g, '_')
+        .replace(/^_|_$/g, '');
+      
+      const newPartner = {
+        id: id,
+        name: name,
+        image: image,
+        badge: badge
+      };
+      
+      partners.push(newPartner);
+      
+      // Save to localStorage and Firebase
+      localStorage.setItem('partners', JSON.stringify(partners));
+      if (typeof savePartnersToFirebase === 'function') {
+        savePartnersToFirebase(partners);
+      }
+      
+      // Clear inputs
+      nameInput.value = '';
+      imageInput.value = '';
+      badgeInput.value = 'Partenaire Officiel';
+      
+      // Reload display
+      loadPartners();
+      
+      alert('✅ Partenaire ajouté avec succès !');
+    };
+    
+    // Delete partner (global function)
+    window.deletePartner = function(partnerId) {
+      if (!confirm('Êtes-vous sûr de vouloir supprimer ce partenaire ?')) {
+        return;
+      }
+      
+      let partners = JSON.parse(localStorage.getItem('partners') || '[]');
+      partners = partners.filter(p => p.id !== partnerId);
+      
+      // Save to localStorage and Firebase
+      localStorage.setItem('partners', JSON.stringify(partners));
+      if (typeof savePartnersToFirebase === 'function') {
+        savePartnersToFirebase(partners);
+      }
+      
+      // Reload display
+      loadPartners();
+      
+      alert('✅ Partenaire supprimé avec succès !');
+    };
 
     // Initialize on load
     document.addEventListener('DOMContentLoaded', initAdmin);
