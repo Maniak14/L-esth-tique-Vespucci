@@ -574,12 +574,15 @@
     let availableCategories = ['all'];
 
     function normalizeFemmesImages(images) {
-      const normalized = (images || []).map((img, idx) => ({
-        ...img,
-        order: Number(img.order) || idx + 1,
-        categories: Array.isArray(img.categories) ? img.categories.filter(Boolean) : []
-      }));
-      normalized.sort((a, b) => (a.order || 0) - (b.order || 0));
+      const normalized = (images || []).map((img, idx) => {
+        const rawOrder = Number(img.order);
+        return {
+          ...img,
+          order: Number.isFinite(rawOrder) ? rawOrder : idx,
+          categories: Array.isArray(img.categories) ? img.categories.filter(Boolean) : []
+        };
+      });
+      normalized.sort((a, b) => (Number.isFinite(a.order) ? a.order : 0) - (Number.isFinite(b.order) ? b.order : 0));
       return normalized;
     }
 
@@ -758,7 +761,7 @@
         });
         
         femmesImages.forEach((item, index) => {
-          const displayNumber = Number(item.order) || index + 1;
+          const displayNumber = Number.isFinite(Number(item.order)) ? Number(item.order) : index;
           const card = document.createElement('div');
           card.className = 'catalog-item';
           card.innerHTML = `
