@@ -936,24 +936,29 @@
     }
 
     function normalizeCatalogImages(images, prefix) {
-      const normalized = (images || []).map((img, index) => ({
-        ...img,
-        order: Number(img.order) || index + 1,
-        categories: Array.isArray(img.categories)
-          ? img.categories.filter(Boolean)
-          : []
-      }));
+      const normalized = (images || []).map((img, index) => {
+        const rawOrder = Number(img.order);
+        return {
+          ...img,
+          // Conserver 0 si déjà présent, sinon fallback à l'index (0-based)
+          order: Number.isFinite(rawOrder) ? rawOrder : index,
+          categories: Array.isArray(img.categories)
+            ? img.categories.filter(Boolean)
+            : []
+        };
+      });
 
       normalized.sort((a, b) => {
-        const orderA = Number(a.order) || extractIdNumber(a.id);
-        const orderB = Number(b.order) || extractIdNumber(b.id);
+        const orderA = Number.isFinite(a.order) ? a.order : extractIdNumber(a.id);
+        const orderB = Number.isFinite(b.order) ? b.order : extractIdNumber(b.id);
         if (orderA === orderB) {
           return extractIdNumber(a.id) - extractIdNumber(b.id);
         }
         return orderA - orderB;
       });
 
-      return normalized.map((img, idx) => ({ ...img, order: idx + 1 }));
+      // Réindexer en 0-based pour l'affichage et le stockage
+      return normalized.map((img, idx) => ({ ...img, order: idx }));
     }
 
     function persistCatalogImages(catalogKey, images) {
@@ -1619,16 +1624,16 @@
       femmesImages = normalizeCatalogImages(femmesImages, 'femme');
 
       const maxId = femmesImages.reduce((max, img) => Math.max(max, extractIdNumber(img.id)), 0);
-      const insertPosition = Math.max(1, Math.min(position ? parseInt(position, 10) : femmesImages.length + 1, femmesImages.length + 1));
+      const insertPosition = Math.max(0, Math.min(position !== null ? parseInt(position, 10) : femmesImages.length, femmesImages.length));
       const newId = `femme_${maxId + 1}`;
       const newImage = {
         id: newId,
         url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E',
-        order: insertPosition - 0.5,  // Order temporaire entre position-1 et position pour garantir le tri correct
+        order: insertPosition,
         categories: []
       };
 
-      femmesImages.splice(insertPosition - 1, 0, newImage);
+      femmesImages.splice(insertPosition, 0, newImage);
       femmesImages = normalizeCatalogImages(femmesImages, 'femme');
       persistCatalogImages('femmes', femmesImages);
       loadFemmesCatalog();
@@ -1889,16 +1894,16 @@
       hommesImages = normalizeCatalogImages(hommesImages, 'homme');
 
       const maxId = hommesImages.reduce((max, img) => Math.max(max, extractIdNumber(img.id)), 0);
-      const insertPosition = Math.max(1, Math.min(position ? parseInt(position, 10) : hommesImages.length + 1, hommesImages.length + 1));
+      const insertPosition = Math.max(0, Math.min(position !== null ? parseInt(position, 10) : hommesImages.length, hommesImages.length));
       const newId = `homme_${maxId + 1}`;
       const newImage = {
         id: newId,
         url: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3ENouvelle%20Image%3C/text%3E%3C/svg%3E',
-        order: insertPosition - 0.5,  // Order temporaire entre position-1 et position pour garantir le tri correct
+        order: insertPosition,
         categories: []
       };
 
-      hommesImages.splice(insertPosition - 1, 0, newImage);
+      hommesImages.splice(insertPosition, 0, newImage);
       hommesImages = normalizeCatalogImages(hommesImages, 'homme');
       persistCatalogImages('hommes', hommesImages);
       loadHommesCatalog();
@@ -2055,19 +2060,20 @@
       const currentIndex = images.findIndex(img => img.id === imageId);
       if (currentIndex === -1) return;
 
-      const targetPosition = Math.max(1, Math.min(parseInt(newPosition, 10) || 1, images.length));
+      const maxPos = Math.max(0, images.length - 1);
+      const targetPosition = Math.min(Math.max(0, parseInt(newPosition, 10) || 0), maxPos);
       
       // Si la position n'a pas changé, ne rien faire
-      if (currentIndex === targetPosition - 1) return;
+      if (currentIndex === targetPosition) return;
       
       // Retirer l'élément de sa position actuelle
       const [moving] = images.splice(currentIndex, 1);
       
       // L'insérer à la nouvelle position
-      images.splice(targetPosition - 1, 0, moving);
+      images.splice(targetPosition, 0, moving);
 
-      // Réassigner tous les orders dans l'ordre du tableau
-      images = images.map((img, idx) => ({ ...img, order: idx + 1 }));
+      // Réassigner tous les orders dans l'ordre du tableau (0-based)
+      images = images.map((img, idx) => ({ ...img, order: idx }));
       persistCatalogImages(catalogKey, images);
 
       // Recharger l'affichage
