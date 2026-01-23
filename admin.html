@@ -791,6 +791,40 @@
     <div class="success-message" id="successMessage">✅ Modifications sauvegardées avec succès !</div>
   </div>
 
+  <!-- Partner Edit Modal -->
+  <div id="partnerEditModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 10000; justify-content: center; align-items: center; padding: 1rem;">
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 2rem; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;">
+      <h2 style="color: var(--text-primary); margin-top: 0; margin-bottom: 1.5rem;">Éditer le Partenaire</h2>
+      
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; color: var(--text-primary); font-weight: 600; margin-bottom: 0.5rem;">Nom du partenaire</label>
+        <input type="text" id="partnerEditName" placeholder="Nom du partenaire" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-dark); color: var(--text-primary); box-sizing: border-box; font-size: 1rem;">
+      </div>
+      
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; color: var(--text-primary); font-weight: 600; margin-bottom: 0.5rem;">Badge</label>
+        <input type="text" id="partnerEditBadge" placeholder="Ex: Partenaire Officiel" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-dark); color: var(--text-primary); box-sizing: border-box; font-size: 1rem;">
+      </div>
+      
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; color: var(--text-primary); font-weight: 600; margin-bottom: 0.5rem;">URL de l'image</label>
+        <textarea id="partnerEditImage" placeholder="https://..." style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-dark); color: var(--text-primary); box-sizing: border-box; font-size: 1rem; min-height: 80px; resize: vertical;"></textarea>
+      </div>
+      
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; color: var(--text-primary); font-weight: 600; margin-bottom: 0.5rem;">Aperçu de l'image</label>
+        <div style="width: 100%; height: 150px; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+          <img id="partnerEditPreview" src="" alt="Aperçu" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+        </div>
+      </div>
+      
+      <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+        <button onclick="closePartnerModal()" style="flex: 1; padding: 0.75rem; background: var(--border); color: var(--text-primary); border: none; border-radius: 10px; cursor: pointer; font-weight: 600;">Annuler</button>
+        <button onclick="savePartnerEdit()" style="flex: 1; padding: 0.75rem; background: var(--primary); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600;">Sauvegarder</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer class="main-footer">
     <div class="footer-content">
@@ -2270,23 +2304,74 @@
         return;
       }
       
-      const newName = prompt('Nom du partenaire:', partner.name);
-      if (newName === null) return;
+      // Store the ID for saving later
+      window.currentEditingPartnerId = partnerId;
       
-      const newImage = prompt('URL de l\'image du partenaire:', partner.image);
-      if (newImage === null) return;
+      // Populate the form
+      document.getElementById('partnerEditName').value = partner.name;
+      document.getElementById('partnerEditBadge').value = partner.badge || 'Partenaire Officiel';
+      document.getElementById('partnerEditImage').value = partner.image;
+      document.getElementById('partnerEditPreview').src = partner.image;
       
-      const newBadge = prompt('Badge du partenaire:', partner.badge || 'Partenaire Officiel');
-      if (newBadge === null) return;
+      // Open the modal
+      document.getElementById('partnerEditModal').style.display = 'flex';
+    };
+    
+    // Close partner modal
+    window.closePartnerModal = function() {
+      document.getElementById('partnerEditModal').style.display = 'none';
+      window.currentEditingPartnerId = null;
+    };
+    
+    // Save partner edit
+    window.savePartnerEdit = function() {
+      const partnerId = window.currentEditingPartnerId;
+      if (!partnerId) return;
       
-      partner.name = newName.trim();
-      partner.image = newImage.trim();
-      partner.badge = newBadge.trim();
+      const partners = JSON.parse(localStorage.getItem('partners') || '[]');
+      const partner = partners.find(p => p.id === partnerId);
+      
+      if (!partner) return;
+      
+      const newName = document.getElementById('partnerEditName').value.trim();
+      const newBadge = document.getElementById('partnerEditBadge').value.trim();
+      const newImage = document.getElementById('partnerEditImage').value.trim();
+      
+      if (!newName) {
+        alert('Le nom du partenaire ne peut pas être vide');
+        return;
+      }
+      
+      if (!newImage) {
+        alert('L\'URL de l\'image ne peut pas être vide');
+        return;
+      }
+      
+      partner.name = newName;
+      partner.badge = newBadge;
+      partner.image = newImage;
       
       savePartners(partners);
       loadPartners();
-      alert('Partenaire modifié avec succès!');
+      closePartnerModal();
+      alert('✅ Partenaire modifié avec succès!');
     };
+    
+    // Update image preview
+    document.addEventListener('DOMContentLoaded', function() {
+      const imageInput = document.getElementById('partnerEditImage');
+      const preview = document.getElementById('partnerEditPreview');
+      if (imageInput) {
+        imageInput.addEventListener('input', function() {
+          if (this.value.trim()) {
+            preview.src = this.value.trim();
+            preview.onerror = function() {
+              preview.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EERREUR%3C/text%3E%3C/svg%3E';
+            };
+          }
+        });
+      }
+    });
     
     // Delete partner
     window.deletePartner = function(partnerId) {
