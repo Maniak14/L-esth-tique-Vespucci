@@ -381,6 +381,64 @@ function loadHommesImagesFromFirebase(callback) {
   }
 }
 
+// ========== PARTNERS ==========
+
+// Sauvegarder les partenaires
+function savePartnersToFirebase(partners) {
+  if (!window.firebaseInitialized || !db) return;
+  
+  try {
+    db.collection('data').doc('partners').set({
+      partners: partners,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (error) {
+    console.error('Erreur sauvegarde partners:', error);
+  }
+}
+
+// Charger les partenaires
+function loadPartnersFromFirebase(callback) {
+  if (!window.firebaseInitialized || !db) {
+    if (callback) callback([]);
+    return;
+  }
+  
+  try {
+    db.collection('data').doc('partners').get().then((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        const partners = data.partners || [];
+        localStorage.setItem('partners', JSON.stringify(partners));
+        if (callback) callback(partners);
+      } else {
+        if (callback) callback([]);
+      }
+    });
+  } catch (error) {
+    console.error('Erreur chargement partners:', error);
+    if (callback) callback([]);
+  }
+}
+
+// Écouter les changements de partenaires en temps réel
+function watchPartners(callback) {
+  if (!window.firebaseInitialized || !db) return;
+  
+  try {
+    db.collection('data').doc('partners').onSnapshot((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        const partners = data.partners || [];
+        localStorage.setItem('partners', JSON.stringify(partners));
+        if (callback) callback(partners);
+      }
+    });
+  } catch (error) {
+    console.error('Erreur watch partners:', error);
+  }
+}
+
 // ========== LOAD ALL DATA ==========
 
 // Charger toutes les données depuis Firestore
@@ -448,6 +506,15 @@ async function loadAllDataFromFirebase() {
       const data = hommesDoc.data();
       if (data.images) {
         localStorage.setItem('hommes_images', JSON.stringify(data.images));
+      }
+    }
+    
+    // Charger partners
+    const partnersDoc = await db.collection('data').doc('partners').get();
+    if (partnersDoc.exists) {
+      const data = partnersDoc.data();
+      if (data.partners) {
+        localStorage.setItem('partners', JSON.stringify(data.partners));
       }
     }
     
