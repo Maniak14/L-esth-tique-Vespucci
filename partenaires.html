@@ -521,24 +521,36 @@
       const partnersGrid = document.getElementById('partnersGrid');
       if (!partnersGrid) return;
       
-      let partners = JSON.parse(localStorage.getItem('partners') || '[]');
-      
-      // Load from Firebase if available
-      if (partners.length === 0 && typeof loadPartnersFromFirebase === 'function') {
+      // Always try to load from Firebase first
+      if (typeof loadPartnersFromFirebase === 'function') {
         console.log('Loading partners from Firebase...');
         loadPartnersFromFirebase((loadedPartners) => {
           console.log('Partners loaded from Firebase:', loadedPartners);
-          renderPartners(partnersGrid, loadedPartners);
+          if (loadedPartners && loadedPartners.length > 0) {
+            // Save to localStorage for offline access
+            localStorage.setItem('partners', JSON.stringify(loadedPartners));
+            renderPartners(partnersGrid, loadedPartners);
+          } else {
+            // If Firebase is empty, try localStorage
+            const localPartners = JSON.parse(localStorage.getItem('partners') || '[]');
+            console.log('No partners in Firebase, checking localStorage:', localPartners);
+            renderPartners(partnersGrid, localPartners);
+          }
         });
       } else {
-        console.log('Loading partners from localStorage:', partners);
+        // Fallback to localStorage if Firebase is not available
+        const partners = JSON.parse(localStorage.getItem('partners') || '[]');
+        console.log('Firebase not available, loading from localStorage:', partners);
         renderPartners(partnersGrid, partners);
       }
       
       // Watch for changes from other tabs/Firebase
       if (typeof watchPartners === 'function') {
         watchPartners((updatedPartners) => {
-          console.log('Partners updated:', updatedPartners);
+          console.log('Partners updated in real-time:', updatedPartners);
+          if (updatedPartners && updatedPartners.length > 0) {
+            localStorage.setItem('partners', JSON.stringify(updatedPartners));
+          }
           renderPartners(partnersGrid, updatedPartners);
         });
       }
@@ -548,17 +560,17 @@
       console.log('Rendering partners:', partners);
       container.innerHTML = '';
       
-      // If no partners in database, show default ones
+      // If no partners in database, show message instead of defaults
       if (!partners || partners.length === 0) {
-        console.log('No partners in database, loading defaults');
-        const defaultPartners = [
-          { id: 'auto_exo', name: 'Auto Exotic', image: 'img/auto_exo.webp', badge: 'Partenaire Officiel' },
-          { id: 'ltd', name: 'LTD SandyShore', image: 'img/ltd.webp', badge: 'Partenaire Officiel' },
-          { id: 'hen', name: 'Hen House', image: 'img/hen.png', badge: 'Partenaire Officiel' },
-          { id: 'delight', name: 'Delight', image: 'img/delight.png', badge: 'Partenaire Officiel' },
-          { id: 'life', name: 'Life Invader', image: 'img/life.png', badge: 'Partenaire Officiel' }
-        ];
-        partners = defaultPartners;
+        console.log('No partners in database');
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem;">
+            <div style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.3;">🤝</div>
+            <h3 style="color: var(--text-primary); font-size: 1.5rem; margin-bottom: 0.5rem;">Aucun partenaire pour le moment</h3>
+            <p style="color: var(--text-secondary);">Les partenaires seront affichés ici prochainement.</p>
+          </div>
+        `;
+        return;
       }
       
       console.log('Final partners to render:', partners);
