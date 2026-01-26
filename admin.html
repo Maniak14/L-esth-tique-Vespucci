@@ -549,9 +549,321 @@
       backdrop-filter: blur(20px);
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     }
+
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      min-width: 300px;
+      max-width: 400px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      animation: slideIn 0.3s ease;
+      pointer-events: auto;
+      backdrop-filter: blur(20px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .toast::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--toast-color, var(--primary));
+    }
+
+    .toast.success {
+      --toast-color: #10b981;
+    }
+
+    .toast.error {
+      --toast-color: #ef4444;
+    }
+
+    .toast.warning {
+      --toast-color: #f59e0b;
+    }
+
+    .toast.info {
+      --toast-color: var(--primary);
+    }
+
+    .toast-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .toast-content {
+      flex: 1;
+    }
+
+    .toast-title {
+      color: var(--text-primary);
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .toast-message {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .toast-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 0.25rem;
+      font-size: 1.25rem;
+      line-height: 1;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+
+    .toast-close:hover {
+      opacity: 1;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOut {
+      to {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+    }
+
+    .toast.removing {
+      animation: slideOut 0.3s ease forwards;
+    }
+
+    /* Modal de confirmation */
+    .confirm-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999998;
+      padding: 1rem;
+    }
+
+    .confirm-modal.active {
+      display: flex;
+    }
+
+    .confirm-modal-content {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .confirm-modal-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .confirm-modal-icon {
+      font-size: 2.5rem;
+    }
+
+    .confirm-modal-title {
+      color: var(--text-primary);
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .confirm-modal-message {
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .confirm-modal-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+    }
+
+    .confirm-btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .confirm-btn-cancel {
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .confirm-btn-cancel:hover {
+      background: var(--surface);
+    }
+
+    .confirm-btn-confirm {
+      background: #ef4444;
+      color: white;
+    }
+
+    .confirm-btn-confirm:hover {
+      background: #dc2626;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    }
+
+    /* Improved Partner Cards */
+    .partner-card {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .partner-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(32, 178, 170, 0.05), rgba(200, 160, 255, 0.05));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .partner-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      border-color: var(--primary);
+    }
+
+    .partner-card:hover::before {
+      opacity: 1;
+    }
+
+    .partner-card-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .partner-card-actions button {
+      flex: 1;
+      padding: 0.75rem;
+      border-radius: 10px;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-edit {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #3b82f6;
+    }
+
+    .btn-edit:hover {
+      background: rgba(59, 130, 246, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-delete {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+    }
+
+    .btn-delete:hover {
+      background: rgba(239, 68, 68, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .toast-container {
+        right: 1rem;
+        left: 1rem;
+      }
+
+      .toast {
+        min-width: auto;
+        max-width: none;
+      }
+    }
   </style>
 </head>
 <body>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Confirm Modal -->
+  <div class="confirm-modal" id="confirmModal">
+    <div class="confirm-modal-content">
+      <div class="confirm-modal-header">
+        <span class="confirm-modal-icon">⚠️</span>
+        <h3 class="confirm-modal-title" id="confirmModalTitle">Confirmation</h3>
+      </div>
+      <p class="confirm-modal-message" id="confirmModalMessage"></p>
+      <div class="confirm-modal-actions">
+        <button class="confirm-btn confirm-btn-cancel" id="confirmModalCancel">Annuler</button>
+        <button class="confirm-btn confirm-btn-confirm" id="confirmModalConfirm">Confirmer</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Animated Background -->
   <div class="animated-bg">
     <div class="gradient-orb orb-1"></div>
@@ -754,16 +1066,31 @@
       <h2>🤝 Gestion des Partenaires</h2>
       
       <div style="background: var(--bg-dark); border: 1px solid var(--border); border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem;">
-        <h3 style="color: var(--text-primary); font-size: 1.2rem; margin-bottom: 1rem;">➕ Ajouter un nouveau partenaire</h3>
+        <h3 style="color: var(--text-primary); font-size: 1.2rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 1.5rem;">➕</span>
+          Ajouter un nouveau partenaire
+        </h3>
         <div style="display: flex; flex-direction: column; gap: 1rem;">
-          <input type="text" id="partnerName" placeholder="Nom du partenaire" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-size: 0.9rem;">
-          <input type="text" id="partnerImage" placeholder="URL de l'image (https://...)" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-size: 0.9rem;">
-          <input type="text" id="partnerBadge" placeholder="Badge (ex: Partenaire Officiel)" value="Partenaire Officiel" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-size: 0.9rem;">
-          <button class="btn-small" onclick="addPartner()" style="background: var(--primary); color: white; width: 100%;">➕ Ajouter le partenaire</button>
+          <div>
+            <label style="display: block; color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.5rem;">Nom du partenaire *</label>
+            <input type="text" id="partnerName" placeholder="Ex: Auto Exotic" style="width: 100%; padding: 0.875rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-size: 0.9rem; transition: all 0.3s ease;">
+          </div>
+          <div>
+            <label style="display: block; color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.5rem;">URL de l'image *</label>
+            <input type="text" id="partnerImage" placeholder="https://exemple.com/image.png" style="width: 100%; padding: 0.875rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-size: 0.9rem; transition: all 0.3s ease;">
+          </div>
+          <div>
+            <label style="display: block; color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.5rem;">Badge</label>
+            <input type="text" id="partnerBadge" placeholder="Partenaire Officiel" value="Partenaire Officiel" style="width: 100%; padding: 0.875rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-primary); font-size: 0.9rem; transition: all 0.3s ease;">
+          </div>
+          <button class="btn-small" onclick="addPartner()" style="background: var(--primary); color: white; width: 100%; padding: 1rem; font-size: 1rem; font-weight: 600; border-radius: 12px; border: none; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            <span style="font-size: 1.25rem;">➕</span>
+            Ajouter le partenaire
+          </button>
         </div>
       </div>
       
-      <div id="partnersGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem;">
+      <div id="partnersGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
         <!-- Partners will be loaded here -->
       </div>
     </div>
@@ -2339,29 +2666,102 @@
       
       partners.forEach((partner, index) => {
         const card = document.createElement('div');
-        card.className = 'partner-card-admin';
-        card.style.cssText = `
-          position: relative;
-          background: var(--surface);
-          border: 1px solid var(--border);
-          border-radius: 15px;
-          padding: 1.5rem;
-          text-align: center;
-          transition: all 0.3s ease;
-        `;
+        card.className = 'partner-card';
         
         card.innerHTML = `
-          <div style="position: relative; width: 100%; height: 150px; margin-bottom: 1rem; border-radius: 10px; overflow: hidden; background: var(--bg-dark);">
+          <div style="position: relative; width: 100%; height: 150px; margin-bottom: 1rem; border-radius: 10px; overflow: hidden; background: var(--bg-dark); z-index: 1;">
             <img src="${partner.image}" alt="${partner.name}" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2214%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage%20Manquante%3C/text%3E%3C/svg%3E'">
           </div>
-          <h3 style="color: var(--text-primary); font-size: 1.1rem; margin-bottom: 0.5rem;">${partner.name}</h3>
-          <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">${partner.badge || 'Partenaire Officiel'}</div>
-          <button onclick="deletePartner('${partner.id}')" class="btn-small" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; width: 100%;">🗑️ Supprimer</button>
+          <h3 style="color: var(--text-primary); font-size: 1.1rem; margin-bottom: 0.5rem; position: relative; z-index: 1;">${partner.name}</h3>
+          <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem; position: relative; z-index: 1;">${partner.badge || 'Partenaire Officiel'}</div>
+          <div class="partner-card-actions">
+            <button onclick="editPartner('${partner.id}')" class="btn-edit">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+              Éditer
+            </button>
+            <button onclick="deletePartner('${partner.id}')" class="btn-delete">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+              Supprimer
+            </button>
+          </div>
         `;
         
         container.appendChild(card);
       });
     }
+    
+    // Toast notification system
+    function showToast(type, title, message) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      
+      const icons = {
+        success: '✅',
+        error: '❌',
+        warning: '⚠️',
+        info: 'ℹ️'
+      };
+      
+      toast.innerHTML = `
+        <span class="toast-icon">${icons[type] || icons.info}</span>
+        <div class="toast-content">
+          <div class="toast-title">${title}</div>
+          ${message ? `<div class="toast-message">${message}</div>` : ''}
+        </div>
+        <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+      `;
+      
+      container.appendChild(toast);
+      
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        toast.classList.add('removing');
+        setTimeout(() => toast.remove(), 300);
+      }, 5000);
+    }
+
+    // Confirm modal
+    let confirmCallback = null;
+    
+    function showConfirm(title, message, onConfirm) {
+      const modal = document.getElementById('confirmModal');
+      const modalTitle = document.getElementById('confirmModalTitle');
+      const modalMessage = document.getElementById('confirmModalMessage');
+      
+      modalTitle.textContent = title;
+      modalMessage.textContent = message;
+      confirmCallback = onConfirm;
+      
+      modal.classList.add('active');
+    }
+    
+    document.getElementById('confirmModalCancel')?.addEventListener('click', () => {
+      document.getElementById('confirmModal').classList.remove('active');
+      confirmCallback = null;
+    });
+    
+    document.getElementById('confirmModalConfirm')?.addEventListener('click', () => {
+      if (confirmCallback) {
+        confirmCallback();
+        confirmCallback = null;
+      }
+      document.getElementById('confirmModal').classList.remove('active');
+    });
+    
+    // Close modal on backdrop click
+    document.getElementById('confirmModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'confirmModal') {
+        document.getElementById('confirmModal').classList.remove('active');
+        confirmCallback = null;
+      }
+    });
     
     // Add partner (global function)
     window.addPartner = function() {
@@ -2374,17 +2774,20 @@
       const badge = badgeInput.value.trim() || 'Partenaire Officiel';
       
       if (!name) {
-        alert('⚠️ Veuillez entrer un nom de partenaire');
+        showToast('warning', 'Attention', 'Veuillez entrer un nom de partenaire');
+        nameInput.focus();
         return;
       }
       
       if (!image) {
-        alert('⚠️ Veuillez entrer une URL d\'image');
+        showToast('warning', 'Attention', 'Veuillez entrer une URL d\'image');
+        imageInput.focus();
         return;
       }
       
       if (!image.startsWith('http://') && !image.startsWith('https://')) {
-        alert('⚠️ L\'URL de l\'image doit commencer par http:// ou https://');
+        showToast('error', 'Erreur', 'L\'URL de l\'image doit commencer par http:// ou https://');
+        imageInput.focus();
         return;
       }
       
@@ -2424,28 +2827,72 @@
       // Reload display
       loadPartners();
       
-      alert('✅ Partenaire ajouté avec succès !');
+      showToast('success', 'Succès', `Le partenaire "${name}" a été ajouté avec succès !`);
     };
-    
-    // Delete partner (global function)
-    window.deletePartner = function(partnerId) {
-      if (!confirm('Êtes-vous sûr de vouloir supprimer ce partenaire ?')) {
+
+    // Edit partner (global function)
+    window.editPartner = function(partnerId) {
+      let partners = JSON.parse(localStorage.getItem('partners') || '[]');
+      const partner = partners.find(p => p.id === partnerId);
+      
+      if (!partner) {
+        showToast('error', 'Erreur', 'Partenaire introuvable');
         return;
       }
       
-      let partners = JSON.parse(localStorage.getItem('partners') || '[]');
-      partners = partners.filter(p => p.id !== partnerId);
+      // Fill form with partner data
+      const nameInput = document.getElementById('partnerName');
+      const imageInput = document.getElementById('partnerImage');
+      const badgeInput = document.getElementById('partnerBadge');
       
-      // Save to localStorage and Firebase
+      nameInput.value = partner.name;
+      imageInput.value = partner.image;
+      badgeInput.value = partner.badge || 'Partenaire Officiel';
+      
+      // Scroll to form
+      nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      nameInput.focus();
+      
+      // Delete old partner (we'll add the updated one)
+      partners = partners.filter(p => p.id !== partnerId);
       localStorage.setItem('partners', JSON.stringify(partners));
       if (typeof savePartnersToFirebase === 'function') {
         savePartnersToFirebase(partners);
       }
       
-      // Reload display
       loadPartners();
       
-      alert('✅ Partenaire supprimé avec succès !');
+      showToast('info', 'Mode édition', 'Modifiez les informations et cliquez sur "Ajouter" pour sauvegarder');
+    };
+    
+    // Delete partner (global function)
+    window.deletePartner = function(partnerId) {
+      let partners = JSON.parse(localStorage.getItem('partners') || '[]');
+      const partner = partners.find(p => p.id === partnerId);
+      
+      if (!partner) {
+        showToast('error', 'Erreur', 'Partenaire introuvable');
+        return;
+      }
+      
+      showConfirm(
+        'Supprimer le partenaire',
+        `Êtes-vous sûr de vouloir supprimer "${partner.name}" ?`,
+        () => {
+          partners = partners.filter(p => p.id !== partnerId);
+          
+          // Save to localStorage and Firebase
+          localStorage.setItem('partners', JSON.stringify(partners));
+          if (typeof savePartnersToFirebase === 'function') {
+            savePartnersToFirebase(partners);
+          }
+          
+          // Reload display
+          loadPartners();
+          
+          showToast('success', 'Supprimé', `Le partenaire "${partner.name}" a été supprimé avec succès`);
+        }
+      );
     };
 
     // Initialize on load
